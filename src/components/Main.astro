@@ -6,9 +6,19 @@ type Props = {
   pageTitle: string | [string, string];
   pageDesc?: string;
   class?: string;
+  /** Translation key of the page title, enables live language switching. */
+  titleKey?: string;
+  /** Translation key of the page description. */
+  descKey?: string;
 };
 
-const { pageTitle, pageDesc, class: className } = Astro.props;
+const {
+  pageTitle,
+  pageDesc,
+  class: className,
+  titleKey,
+  descKey,
+} = Astro.props;
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const backUrl = config.features.showBackButton
@@ -21,8 +31,16 @@ const backUrl = config.features.showBackButton
   id="main-content"
   class:list={["app-layout pb-4", className]}
 >
-  <h1 class="text-2xl font-semibold sm:text-3xl">{pageTitle}</h1>
-  <p class="mt-2 mb-6 italic">{pageDesc}</p>
+  <h1 class="text-2xl font-semibold sm:text-3xl" data-i18n={titleKey}>
+    {pageTitle}
+  </h1>
+  {
+    pageDesc && (
+      <p class="mt-2 mb-6 italic" data-i18n={descKey}>
+        {pageDesc}
+      </p>
+    )
+  }
   <slot />
 </main>
 

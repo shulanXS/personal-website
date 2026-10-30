@@ -21,13 +21,15 @@ import config from "./astro-paper.config";
 
 export default defineConfig({
   site: config.site.url,
-  integrations: [
-    mdx(),
-    sitemap({
-      filter: page =>
-        config.features?.showArchives !== false || !page.endsWith("/archives/"),
-    }),
-  ],
+  /**
+   * The Astro Dev Toolbar renders a floating bubble in the bottom corner
+   * during `astro dev`. It is a pure development aid and gets in the way of
+   * checking the real layout, so it stays off.
+   */
+  devToolbar: {
+    enabled: false,
+  },
+  integrations: [mdx(), sitemap()],
   i18n: {
     locales: ["en"],
     defaultLocale: "en",

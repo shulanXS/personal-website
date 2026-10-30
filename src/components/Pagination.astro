@@ -5,6 +5,7 @@ import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import LinkButton from "./LinkButton.astro";
 import { useTranslations } from "@/i18n";
+import config from "@/config";
 
 type Props = {
   page: Page<CollectionEntry<"posts">>;
@@ -12,7 +13,7 @@ type Props = {
 
 const { page } = Astro.props;
 
-const t = useTranslations(Astro.currentLocale);
+const t = useTranslations(config.site.uiLang);
 ---
 
 {
@@ -20,16 +21,20 @@ const t = useTranslations(Astro.currentLocale);
     <nav
       class="mt-auto mb-8 flex justify-center gap-4"
       role="navigation"
-      aria-label="Pagination Navigation"
+      aria-label={t.a11y.paginationNavigation}
+      data-i18n="a11y.paginationNavigation"
+      data-i18n-attr="aria-label"
     >
       <LinkButton
         disabled={!page.url.prev}
         href={page.url.prev as string}
         class:list={["select-none", { "opacity-50": !page.url.prev }]}
         aria-label={t.a11y.goToPreviousPage}
+        data-i18n="a11y.goToPreviousPage"
+        data-i18n-attr="aria-label"
       >
         <IconArrowLeft class="inline-block rtl:rotate-180" />
-        {t.pagination.prev}
+        <span data-i18n="pagination.prev">{t.pagination.prev}</span>
       </LinkButton>
       {page.currentPage} / {page.lastPage}
       <LinkButton
@@ -37,8 +42,10 @@ const t = useTranslations(Astro.currentLocale);
         href={page.url.next as string}
         class:list={["select-none", { "opacity-50": !page.url.next }]}
         aria-label={t.a11y.goToNextPage}
+        data-i18n="a11y.goToNextPage"
+        data-i18n-attr="aria-label"
       >
-        {t.pagination.next}
+        <span data-i18n="pagination.next">{t.pagination.next}</span>
         <IconArrowRight class="inline-block rtl:rotate-180" />
       </LinkButton>
     </nav>

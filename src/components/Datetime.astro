@@ -5,7 +5,7 @@ import timezone from "dayjs/plugin/timezone";
 import IconCalendar from "@/assets/icons/IconCalendar.svg";
 import config from "@/config";
 import { useTranslations } from "@/i18n";
-
+import { formatDate, formatCompactDate } from "@/utils/formatDate";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -15,6 +15,21 @@ type Props = {
   pubDatetime: string | Date;
   timezone?: string;
   modDatetime?: string | Date | null;
+  /**
+   * Render the date on its own, without the calendar icon.
+   *
+   * On the notes timeline the date sits in a narrow column next to the
+   * vertical rule, where an icon would take up more room than the text
+   * itself.
+   */
+  bare?: boolean;
+  /**
+   * Use the short numeric layout instead of the full one.
+   *
+   * The timeline column is only a few characters wide, so the long
+   * "2026年6月3日 14:05" would wrap.
+   */
+  compact?: boolean;
 };
 
 const {
@@ -23,9 +38,11 @@ const {
   size = "sm",
   class: className = "",
   timezone: postTimezone,
+  bare = false,
+  compact = false,
 } = Astro.props;
 
-const t = useTranslations(Astro.currentLocale);
+const t = useTranslations(config.site.uiLang);
 
 const isModified = modDatetime && modDatetime > pubDatetime;
 
@@ -33,28 +50,61 @@ const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
   postTimezone ?? config.site.timezone
 );
 
-const date = datetime.format("D MMM, YYYY");
+// The month name follows the interface language, so the Chinese UI shows
+// "9 10月 2025" instead of the English "9 Oct, 2025".
+const date = compact
+  ? formatCompactDate(
+      isModified ? modDatetime : pubDatetime,
+      config.site.uiLang,
+      postTimezone ?? config.site.timezone
+    )
+  : formatDate(
+      isModified ? modDatetime : pubDatetime,
+      config.site.uiLang,
+      postTimezone ?? config.site.timezone
+    );
 ---
 
 <div
   class:list={["text-muted-foreground flex items-center gap-x-2", className]}
 >
-  <IconCalendar
-    class:list={[
-      "inline-block size-6 min-w-5.5",
-      { "scale-90": size === "sm" },
-    ]}
-  />
+  {
+    !bare && (
+      <IconCalendar
+        class:list={[
+          "inline-block size-6 min-w-5.5",
+          { "scale-90": size === "sm" },
+        ]}
+      />
+    )
+  }
   {
     isModified && (
-      <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
-        {t.post.updatedAt}:
-      </span>
+      <>
+        {/*
+          The colon lives outside the translated span, otherwise replacing the
+          label would also remove the punctuation.
+        */}
+        <span
+          class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+          data-i18n="post.updatedAt"
+        >
+          {t.post.updatedAt}
+        </span>
+        <span
+          class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+          aria-hidden="true"
+        >
+          :
+        </span>
+      </>
     )
   }
   <time
     class:list={["text-sm", { "sm:text-base": size === "lg" }]}
     datetime={datetime.toISOString()}
+    data-date={compact ? undefined : datetime.toISOString()}
+    data-date-compact={compact ? datetime.toISOString() : undefined}
   >
     {date}
   </time>

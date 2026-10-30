@@ -1,0 +1,230 @@
+# Pages CMS configuration
+# Docs: https://pagescms.org/docs/configuration/
+#
+# NOTE: In this project the file name of a content file determines its URL
+# (the `slug` frontmatter field is not part of the Content Collections schema
+# and is therefore dropped). Every `filename` template below is deliberately
+# free of date prefixes so that editing a publish date never changes a link.
+
+media:
+  - name: images
+    label: Images
+    input: public/uploads
+    output: /uploads
+    rename: random
+    extensions: [png, jpg, jpeg, webp, gif, avif]
+    categories: [image]
+
+content:
+  # ---------------------------------------------------------------------
+  # Blog — reuses the existing posts collection.
+  # MDX files are intentionally NOT part of this collection: their body
+  # contains JSX components which the rich-text editor would destroy.
+  # ---------------------------------------------------------------------
+  - name: posts
+    label: Blog
+    type: collection
+    path: src/content/posts
+    filename:
+      template: "{fields.slug}.md"
+      field: create
+    fields:
+      - name: title
+        type: string
+        required: true
+      - name: description
+        type: text
+        required: true
+      - name: slug
+        type: string
+        required: true
+        label: Slug
+        description: File name and URL segment. Keep it stable once published.
+        pattern: "^[a-z0-9-]+$"
+      - name: author
+        type: string
+        required: false
+      - name: pubDatetime
+        type: date
+        required: true
+      - name: modDatetime
+        type: date
+        required: false
+      - name: tags
+        type: list
+        required: false
+        of:
+          type: string
+      - name: featured
+        type: boolean
+        required: false
+        default: false
+      - name: draft
+        type: boolean
+        required: false
+        default: false
+      - name: ogImage
+        type: image
+        required: false
+      - name: body
+        type: rich-text
+
+  # ---------------------------------------------------------------------
+  # Notes — short-form posts. The `id` field is a UUID v4 and doubles as
+  # the file name and the URL segment, so the link stays stable when the
+  # publish date changes.
+  # ---------------------------------------------------------------------
+  - name: notes
+    label: Notes
+    type: collection
+    path: src/content/notes
+    filename: "{fields.id}.md"
+    fields:
+      - name: id
+        type: uuid
+        required: true
+        label: ID
+      - name: title
+        type: string
+        required: false
+      - name: content
+        type: text
+        required: false
+        label: Content
+      - name: images
+        type: list
+        required: false
+        label: Images
+        of:
+          type: image
+      - name: pubDatetime
+        type: date
+        required: true
+      - name: modDatetime
+        type: date
+        required: false
+      - name: tags
+        type: list
+        required: false
+        of:
+          type: string
+      - name: draft
+        type: boolean
+        required: false
+        default: false
+
+  # ---------------------------------------------------------------------
+  # Writing — novels, essays, short stories.
+  # `series`, `chapterNumber` and `status` are reserved for chapters.
+  # ---------------------------------------------------------------------
+  - name: writing
+    label: Writing
+    type: collection
+    path: src/content/writing
+    filename:
+      template: "{fields.slug}.md"
+      field: create
+    fields:
+      - name: title
+        type: string
+        required: true
+      - name: slug
+        type: string
+        required: true
+        label: Slug
+        pattern: "^[a-z0-9-]+$"
+      - name: type
+        type: select
+        required: false
+        default: essay
+        options:
+          - value: novel
+            label: Novel
+          - value: essay
+            label: Essay
+          - value: short
+            label: Short Story
+      - name: description
+        type: text
+        required: false
+      - name: series
+        type: string
+        required: false
+      - name: chapterNumber
+        type: number
+        required: false
+      - name: status
+        type: select
+        required: false
+        options:
+          - value: ongoing
+            label: Ongoing
+          - value: completed
+            label: Completed
+      - name: cover
+        type: image
+        required: false
+      - name: pubDatetime
+        type: date
+        required: true
+      - name: modDatetime
+        type: date
+        required: false
+      - name: tags
+        type: list
+        required: false
+        of:
+          type: string
+      - name: draft
+        type: boolean
+        required: false
+        default: false
+      - name: body
+        type: rich-text
+
+  # ---------------------------------------------------------------------
+  # Projects — a plain data file, editable with a simple form.
+  # ---------------------------------------------------------------------
+  - name: projects
+    label: Projects
+    type: file
+    path: src/data/projects.json
+    fields:
+      - name: projects
+        type: list
+        required: false
+        of:
+          type: object
+          fields:
+            - name: name
+              type: string
+              required: true
+            - name: description
+              type: text
+              required: false
+            - name: techStack
+              type: list
+              required: false
+              of:
+                type: string
+            - name: tags
+              type: list
+              required: false
+              label: Tags
+              of:
+                type: string
+            - name: github
+              type: string
+              required: false
+            - name: demo
+              type: string
+              required: false
+            - name: screenshot
+              type: image
+              required: false
+            - name: featured
+              type: boolean
+              required: false
+            - name: order
+              type: number
+              required: false

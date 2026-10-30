@@ -140,6 +140,35 @@ export default defineAstroPaperConfig({
 
 > See [this discussion](https://github.com/satnaing/astro-paper/discussions/334#discussioncomment-10139247) for adding AstroPaper to the Google Search Console.
 
+## 📝 在后台发布内容（Pages CMS）
+
+本站的内容通过 [Pages CMS](https://pagescms.org/) 管理，**不需要本地编辑器，也不需要手动 `git push`**。项目根目录的 [`.pages.yml`](.pages.yml) 已经把四个内容集合映射成了可编辑的表单。
+
+### 发布流程
+
+1. 打开 <https://app.pagescms.org/>，用 GitHub 账号登录并授权本站仓库。
+2. 在左侧选择内容类型：`Blog`（技术文章）、`Notes`（碎碎念）、`Writing`（文学创作）、`Projects`（项目）。
+3. 编辑内容 → 点击 **Save / Publish**。Pages CMS 会把改动提交到 GitHub。
+4. GitHub 的提交触发 Cloudflare Pages 重新构建，站点随即更新。
+
+> 静态站点的内容更新**不是即时的**，需要等一次构建完成（通常一两分钟）。
+
+### 四个集合的要点
+
+| 集合     | 路径                     | 文件名模板         | 说明                                                               |
+| -------- | ------------------------ | ------------------ | ------------------------------------------------------------------ |
+| Blog     | `src/content/posts`      | `{fields.slug}.md` | URL 为 `/posts/{slug}/`。文件名即 URL，**slug 一旦发布就不要改**。 |
+| Notes    | `src/content/notes`      | `{fields.id}.md`   | `id` 是自动生成的 UUID，链接永不变动。标题可留空，可以只发图片。   |
+| Writing  | `src/content/writing`    | `{fields.slug}.md` | URL 为 `/writing/{slug}/`。                                        |
+| Projects | `src/data/projects.json` | —                  | 整个 JSON 文件是一个表单，`order` 小的排前面。                     |
+
+### 注意事项
+
+- **MDX 文件不在 CMS 中**：MDX 正文含 JSX 组件，CMS 的富文本编辑器会破坏它们。`src/content/posts/*.mdx` 只能在本地编辑。
+- **格式会被规范化**：CMS 读取文件后会重新序列化整个 frontmatter，键序、引号风格和空行不会保留。内容不会丢失，但**不要依赖具体的 YAML 排版**。
+- **图片上传到 `public/uploads/`**，文件名会被随机重命名。Markdown 里写 `/uploads/xxx.png` 这样的绝对路径。
+- **草稿不是保密机制**：仓库公开时，草稿源文件仍能在 GitHub 上看到。
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:

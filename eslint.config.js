@@ -18,5 +18,11 @@ export default [
     },
   },
   { rules: { "no-console": "error" } },
+  {
+    // The audit scripts are CLI tools — printing their findings is the whole
+    // point, so `console` is allowed there.
+    files: ["scripts/**/*.mjs"],
+    rules: { "no-console": "off" },
+  },
   { ignores: ["dist/**", ".astro/**", "public/pagefind/**"] },
 ];

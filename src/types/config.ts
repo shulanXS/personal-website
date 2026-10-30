@@ -13,6 +13,13 @@ interface SiteConfig {
   ogImage?: string;
   /** HTML lang attribute, defaults to "en" */
   lang?: string;
+  /**
+   * Interface language used for UI strings (navigation, buttons, labels).
+   * Independent from `lang`: `lang` is the Astro i18n locale used for URL
+   * building, `uiLang` is the language of the interface text itself.
+   * Defaults to "zh-CN".
+   */
+  uiLang?: "zh-CN" | "en";
   /** IANA timezone for post dates, e.g. "Asia/Bangkok" */
   timezone?: string;
   /** Text direction */
@@ -42,8 +49,6 @@ interface FeaturesConfig {
    * for the default layout OG image (build fails if missing).
    */
   dynamicOgImage?: boolean;
-  /** Show the /archives page and link it in nav. Defaults to true. */
-  showArchives?: boolean;
   /** Show back button on post detail pages. Defaults to true. */
   showBackButton?: boolean;
   /** "Edit page" link shown on post detail pages. */
@@ -96,10 +101,25 @@ interface AstroPaperConfig {
   site: SiteConfig;
   posts?: PostsConfig;
   features?: FeaturesConfig;
+  /**
+   * The content management backend.
+   *
+   * The site is edited in Pages CMS: the link opens the hosted CMS, the
+   * visitor signs in with GitHub and edits the collections declared in
+   * `.pages.yml`.
+   */
+  cms?: CmsConfig;
   /** Social profile links shown in header/footer */
   socials?: SocialLink[];
   /** Share links shown on post detail pages */
   shareLinks?: ShareLink[];
+}
+
+interface CmsConfig {
+  /** Base URL of the CMS, e.g. "https://app.pagescms.org/" */
+  url: string;
+  /** Show the link in the footer. Defaults to true. */
+  show?: boolean;
 }
 
 type ResolvedSiteConfig = Required<
@@ -110,6 +130,7 @@ type ResolvedSiteConfig = Required<
     | "description"
     | "author"
     | "lang"
+    | "uiLang"
     | "timezone"
     | "dir"
     | "ogImage"
@@ -121,6 +142,7 @@ export interface ResolvedAstroPaperConfig {
   site: ResolvedSiteConfig;
   posts: Required<PostsConfig>;
   features: Required<FeaturesConfig>;
+  cms: Required<CmsConfig>;
   socials: SocialLink[];
   shareLinks: ShareLink[];
 }

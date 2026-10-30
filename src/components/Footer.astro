@@ -1,7 +1,9 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import IconEdit from "@/assets/icons/IconEdit.svg";
 import Socials from "./Socials.astro";
 import { useTranslations } from "@/i18n";
+import config from "@/config";
 
 type Props = {
   noMarginTop?: boolean;
@@ -9,7 +11,7 @@ type Props = {
 
 const { noMarginTop = false, class: className, ...attrs } = Astro.props;
 
-const t = useTranslations(Astro.currentLocale);
+const t = useTranslations(config.site.uiLang);
 const currentYear = new Date().getFullYear();
 ---
 
@@ -18,13 +20,80 @@ const currentYear = new Date().getFullYear();
   {...attrs}
 >
   <div
-    class="border-border flex flex-col items-center justify-between border-t py-6 sm:flex-row-reverse sm:py-4"
+    class="border-border flex flex-col items-center justify-between gap-4 border-t py-6 sm:flex-row-reverse sm:flex-wrap sm:py-4"
   >
-    <Socials />
-    <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row">
-      <span>{t.footer.copyright} &#169; {currentYear}</span>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <span>{t.footer.allRightsReserved}</span>
+    <div class="max-w-full">
+      <Socials />
     </div>
+
+    <div
+      class="flex flex-col items-center gap-1 text-center sm:flex-row sm:gap-0"
+    >
+      <span class="whitespace-nowrap">
+        <span data-i18n="footer.copyright">{t.footer.copyright}</span>
+        &#169; {currentYear}
+        <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
+        <span data-i18n="footer.allRightsReserved">
+          {t.footer.allRightsReserved}
+        </span>
+      </span>
+
+      {
+        /*
+        The site name is repeated here so the footer identifies the site even
+        when it is read on its own — e.g. in a screenshot of the bottom of the
+        page.
+      */
+      }
+      <span class="text-muted-foreground text-sm">{config.site.title}</span>
+    </div>
+
+    <a
+      href="#top"
+      class="text-muted-foreground focus-outline hover:text-accent flex items-center gap-1 text-sm transition-colors"
+      aria-label={t.a11y.backToTop}
+      data-i18n="a11y.backToTop"
+      data-i18n-attr="aria-label"
+    >
+      <span data-i18n="a11y.backToTop">{t.a11y.backToTop}</span>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="size-4"
+      >
+        <path d="M12 19V5"></path>
+        <path d="m5 12 7-7 7 7"></path>
+      </svg>
+    </a>
+
+    {
+      /*
+      The content of the site is edited in Pages CMS. The link opens the
+      hosted CMS, where the visitor signs in with GitHub and picks the
+      collection they want to change.
+    */
+    }
+    {
+      config.cms.show && (
+        <a
+          href={config.cms.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-muted-foreground focus-outline hover:text-accent flex items-center gap-1 text-sm transition-colors"
+          title={t.footer.manageTitle}
+          aria-label={t.footer.manageTitle}
+          data-i18n="footer.manageTitle"
+          data-i18n-attr="aria-label"
+        >
+          <IconEdit class="size-4" aria-hidden="true" />
+          <span data-i18n="footer.manage">{t.footer.manage}</span>
+        </a>
+      )
+    }
   </div>
 </footer>

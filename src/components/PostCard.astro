@@ -1,0 +1,81 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getPostUrl } from "@/utils/getPostPaths";
+import { toTransitionName } from "@/utils/toTransitionName";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
+import Datetime from "./Datetime.astro";
+import TagChip from "./TagChip.astro";
+
+/**
+ * A technical article in the vertical timeline.
+ *
+ * The article list reads top to bottom like the notes timeline: the publish
+ * date sits in a narrow column on the left of the rule, the rule carries a
+ * node per entry, and the article itself fills the column on the right.
+ *
+ * The vertical order makes the *sequence* of the writing visible, which a
+ * two-column grid cannot show — in a grid the eye jumps between two
+ * unrelated columns and the chronology is lost.
+ */
+type Props = {
+  post: CollectionEntry<"posts">;
+};
+
+const { post } = Astro.props;
+const { data, id, filePath } = post;
+
+const href = getPostUrl(id, filePath, Astro.currentLocale);
+const tags = data.tags ?? [];
+const tagSlugs = tags.map(tagSlug);
+---
+
+<li class="app-list-entry" data-tagged-item data-tags={tagSlugs.join(",")}>
+  {
+    /*
+    The date lives in a narrow column on the left of the vertical rule, so
+    the moment an article was published is readable at a glance. On a phone
+    the columns stack instead, and the date sits above the content.
+    */
+  }
+  <div class="app-timeline-date">
+    <Datetime
+      pubDatetime={data.pubDatetime}
+      modDatetime={data.modDatetime ?? null}
+      bare
+      compact
+      class="sm:justify-end"
+    />
+  </div>
+
+  <article class="min-w-0">
+    <a
+      href={href}
+      class="text-accent inline-block text-lg font-medium decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+    >
+      <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
+    </a>
+
+    {
+      data.description && (
+        <p class="text-muted-foreground mt-1">{data.description}</p>
+      )
+    }
+
+    {
+      tags.length > 0 && (
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {tags.map(tag => (
+            <li>
+              <TagChip
+                slug={tagSlug(tag)}
+                name={tagDisplayName(tag)}
+                mode="static"
+                size="sm"
+              />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </article>
+</li>

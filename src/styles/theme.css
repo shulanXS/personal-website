@@ -7,28 +7,134 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
-  --font-app: var(--font-google-sans-code);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+
+  /*
+   * Typography.
+   *
+   * The site ships a Chinese interface, so the font stack has to cover CJK.
+   * The previous stack only contained "Google Sans Code" — a monospaced
+   * Latin-only webfont — which meant every Chinese glyph fell back to
+   * whatever the operating system picked, producing a visibly mismatched
+   * mix of a monospaced Latin face and a proportional Chinese face.
+   *
+   * Both the UI font and the reading font are now *system* stacks. That
+   * keeps the download at zero bytes, renders Chinese with the native,
+   * hinted font of each platform (PingFang on macOS, Microsoft YaHei on
+   * Windows, Noto Sans CJK on Linux), and puts Latin and Chinese on the
+   * same proportional rhythm so mixed text lines up on one baseline.
+   *
+   * The webfont is not wasted: it stays the monospace face for code, where
+   * its fixed advance width is exactly what is wanted.
+   */
+  --font-app: var(--font-system-sans);
+  --font-serif: var(--font-system-serif);
+  --font-mono:
+    var(--font-google-sans-code), ui-monospace, "SFMono-Regular", Menlo,
+    Consolas, "Liberation Mono", monospace;
 }
 
 /* Light theme values */
 :root,
 [data-theme="light"] {
-  --background: #fdfdfd;
+  --background: #f6f4f1;
   --foreground: #282728;
   --accent: #006cac;
   --accent-foreground: #ffffff;
   --muted: #e6e6e6;
-  --muted-foreground: #6b7280;
-  --border: #ece9e9;
+  --muted-foreground: #5b6472;
+  --border: #e4e1e1;
+
+  /*
+   * Surface levels.
+   *
+   * The page itself is a warm paper tone, not pure white — a pure white
+   * canvas makes every card on it look like it is floating on nothing.
+   * The two surface levels give the page a floor to stand on and the cards
+   * a top to sit on, so the eye reads them as separate layers.
+   *
+   * The card surface is a very slightly brighter, cooler tint of the page,
+   * which is what makes it read as "on top" rather than "cut out".
+   */
+  --surface: #fdfcfa;
+  --surface-raised: #ffffff;
+
+  /*
+   * Semantic tokens.
+   *
+   * The four lists — notes, posts, writing and projects — all share one
+   * spacing scale, one set of radii and one transition duration, so a card
+   * looks the same no matter which list it appears in.
+   */
+  --app-radius-sm: 0.375rem;
+  --app-radius: 0.625rem;
+  --app-radius-lg: 0.875rem;
+
+  --app-space-1: 0.25rem;
+  --app-space-2: 0.5rem;
+  --app-space-3: 0.75rem;
+  --app-space-4: 1rem;
+  --app-space-5: 1.25rem;
+  --app-space-6: 1.5rem;
+  --app-space-8: 2rem;
+  --app-space-12: 3rem;
+
+  /* The single duration every hover transition uses. */
+  --app-transition: 200ms;
+
+  /*
+   * Elevation.
+   *
+   * Two shadow levels only — a resting one for every card and a lifted one
+   * for hover. A third level would be decoration rather than information.
+   */
+  --app-shadow: 0 1px 2px rgb(40 39 40 / 0.04), 0 1px 3px rgb(40 39 40 / 0.03);
+  --app-shadow-lift:
+    0 4px 12px -2px rgb(40 39 40 / 0.08), 0 12px 28px -12px rgb(40 39 40 / 0.12);
 }
 
 /* Dark theme values */
 [data-theme="dark"] {
-  --background: #212737;
+  --background: #191d29;
   --foreground: #eaedf3;
   --accent: #ff6b01;
   --accent-foreground: #ffffff;
   --muted: #343f60;
-  --muted-foreground: #afb9ca;
-  --border: #ab4b08;
+  --muted-foreground: #b6c0cf;
+  --border: #3a4157;
+
+  /*
+   * The dark surfaces are *lighter* than the page, not darker — a card that
+   * is darker than its background disappears into it. The page is a deep
+   * blue-grey, the card a slightly raised panel on top of it.
+   */
+  --surface: #212737;
+  --surface-raised: #2a3145;
+
+  --app-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.2);
+  --app-shadow-lift:
+    0 4px 12px -2px rgb(0 0 0 / 0.4), 0 12px 28px -12px rgb(0 0 0 / 0.5);
+}
+
+/*
+ * Font stacks.
+ *
+ * `system-ui` comes first so that the platform's own UI font is used for
+ * Latin text — it is the face the reader already sees in every other
+ * application, so it never looks foreign. The Chinese faces that follow
+ * are listed in rough order of prevalence per platform; the browser picks
+ * the first one that is actually installed, so a single stack works
+ * everywhere without feature detection.
+ */
+:root {
+  --font-system-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "PingFang SC", "HarmonyOS Sans SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Source Han Sans SC", "WenQuanYi Micro Hei", sans-serif;
+
+  --font-system-serif:
+    Georgia, Cambria, "Times New Roman", "Songti SC", "STSong", SimSun,
+    "Noto Serif CJK SC", "Source Han Serif SC", "Noto Serif SC", serif;
 }

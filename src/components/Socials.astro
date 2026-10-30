@@ -8,6 +8,13 @@ const icons = import.meta.glob<{
   default: (_props: Record<string, unknown>) => unknown;
 }>("/src/assets/icons/socials/*.svg");
 
+/**
+ * The icons are resolved from the file system at build time, so an entry
+ * whose SVG is missing is skipped rather than breaking the build. Every
+ * social in the config ships an explicit `linkTitle`, which is the only
+ * source of truth for the accessible label — the fallback below is just a
+ * safety net for hand-edited configs.
+ */
 const items = await Promise.all(
   socials.map(async ({ name, url, linkTitle }) => {
     const mod = await icons[`/src/assets/icons/socials/${name}.svg`]?.();
@@ -20,17 +27,31 @@ const items = await Promise.all(
     return { url, title, Icon };
   })
 );
+
+const visible = items.filter(item => item.Icon);
+
+/*
+ * The icons wrap onto a second row when they do not fit. A scrolling row
+ * would be hidden behind the edge of the screen, and the visitor would
+ * never discover the platforms that are off-screen.
+ */
+const rowClasses =
+  "flex w-full flex-wrap items-center gap-0.5 sm:w-auto sm:justify-end";
 ---
 
-<div class="flex flex-wrap items-center gap-1">
-  {
-    items.map(({ url, title, Icon }) =>
-      Icon ? (
-        <LinkButton href={url} class="p-2 hover:rotate-6 sm:p-1" title={title}>
-          <Icon class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" />
+{
+  visible.length > 0 && (
+    <div class={rowClasses}>
+      {visible.map(({ url, title, Icon }) => (
+        <LinkButton
+          href={url}
+          class="hover:text-accent shrink-0 p-2 transition-colors duration-200 hover:rotate-6"
+          title={title}
+        >
+          <Icon class="inline-block size-5 fill-transparent stroke-current stroke-[1.75] opacity-80" />
           <span class="sr-only">{title}</span>
         </LinkButton>
-      ) : null
-    )
-  }
-</div>
+      ))}
+    </div>
+  )
+}

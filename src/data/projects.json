@@ -1,0 +1,31 @@
+{
+  "projects": [
+    {
+      "name": "个人网站",
+      "description": "基于 Astro + Tailwind CSS 的个人数字空间，涵盖技术博客、碎碎念、文学创作与项目展示。",
+      "techStack": ["Astro", "TypeScript", "Tailwind CSS"],
+      "tags": ["Astro", "个人网站", "复盘"],
+      "github": "https://github.com/",
+      "featured": true,
+      "order": 1
+    },
+    {
+      "name": "RAG 检索实验",
+      "description": "一个把个人笔记与文档接入向量检索的实验项目，用来验证问答式检索的准确率。",
+      "techStack": ["Python", "RAG", "LLM"],
+      "tags": ["RAG", "Python", "实验"],
+      "github": "https://github.com/",
+      "demo": "https://example.com/",
+      "featured": true,
+      "order": 2
+    },
+    {
+      "name": "标签检索组件",
+      "description": "一个可复用的前端标签过滤与跨集合检索组件，支持按内容类型分组展示结果。",
+      "techStack": ["TypeScript", "Web Components"],
+      "tags": ["TypeScript", "前端", "工具"],
+      "github": "https://github.com/",
+      "order": 3
+    }
+  ]
+}

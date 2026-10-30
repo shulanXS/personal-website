@@ -2,8 +2,9 @@
 import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
 import { useTranslations } from "@/i18n";
+import config from "@/config";
 
-const t = useTranslations(Astro.currentLocale);
+const t = useTranslations(config.site.uiLang);
 ---
 
 <div
@@ -28,9 +29,16 @@ const t = useTranslations(Astro.currentLocale);
       class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"
     ></span>
     <IconArrowLeft class="inline-block rotate-90 md:hidden" />
+    {
+      /*
+      The icon lives inside the labelled span, so the translation is applied to
+      a dedicated text node instead of the whole element. Replacing the
+      element's text content would delete the icon.
+    */
+    }
     <span class="group-hover:text-accent sr-only text-sm md:not-sr-only">
       <IconArrowNarrowUp class="inline-block size-4" />
-      {t.post.backToTop}
+      <span data-i18n="post.backToTop" data-i18n-text>{t.post.backToTop}</span>
     </span>
   </button>
 </div>

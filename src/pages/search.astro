@@ -6,7 +6,9 @@ import Header from "@/components/Header.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
+import TagBar from "@/components/TagBar.astro";
 import { getAssetPath } from "@/utils/withBase";
+import { getTagIndex } from "@/utils/tagIndex";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -24,7 +26,12 @@ const backUrl = config.features.showBackButton
 
 const pagefindBundlePath = getAssetPath("pagefind/");
 
-const t = useTranslations(locale);
+const t = useTranslations(config.site.uiLang);
+
+// The complete tag index of the site. It is embedded into the page so that
+// the client can group the results of a tag by collection without another
+// request.
+const tagIndex = await getTagIndex(locale);
 ---
 
 <Layout title={`${t.pages.searchTitle} | ${config.site.title}`}>
@@ -32,20 +39,82 @@ const t = useTranslations(locale);
 
   <Breadcrumb />
 
-  <Main pageTitle={t.pages.searchTitle} pageDesc={t.pages.searchDesc}>
-    <div
-      id="pagefind-search"
-      transition:persist
-      data-backurl={backUrl}
-      data-bundle-path={pagefindBundlePath}
-    >
+  <Main
+    pageTitle={t.pages.searchTitle}
+    pageDesc={t.pages.searchDesc}
+    titleKey="pages.searchTitle"
+    descKey="pages.searchDesc"
+  >
+    <div data-tag-scope="search">
+      <div
+        id="pagefind-search"
+        transition:persist
+        data-backurl={backUrl}
+        data-bundle-path={pagefindBundlePath}
+      >
+      </div>
+
+      <!--
+        The tag cloud sits directly below the search box. Clicking a tag
+        searches all four collections at once and groups the results by
+        collection.
+      -->
+      <section id="tags" class="mt-10 scroll-mt-8">
+        <h2
+          class="text-xl font-semibold tracking-wide"
+          data-i18n="search.tagsTitle"
+        >
+          {t.search.tagsTitle}
+        </h2>
+        <p
+          class="text-muted-foreground mt-1 mb-4 text-sm"
+          data-i18n="search.tagsDesc"
+        >
+          {t.search.tagsDesc}
+        </p>
+
+        <TagBar tags={tagIndex.tags} variant="cloud" mode="filter" />
+
+        <div id="tag-results" class="mt-8" hidden></div>
+      </section>
     </div>
   </Main>
 
   <Footer />
 </Layout>
 
+<script
+  type="application/json"
+  id="tag-index"
+  set:html={JSON.stringify(tagIndex)}
+/>
+
 <script>
+  import { runtimeTranslations } from "@/i18n";
+
+  /**
+   * Maps our dictionary onto the key names `@pagefind/default-ui` expects.
+   *
+   * Pagefind's result counters use the `[COUNT]` and `[SEARCH_TERM]`
+   * placeholders, so the dictionary entries have to use the same tokens.
+   */
+  function getPagefindTranslations(locale: string) {
+    const dict = runtimeTranslations[locale] ?? runtimeTranslations["en"];
+    const pf = dict?.pagefind;
+    if (!pf) return {};
+    return {
+      placeholder: pf.placeholder,
+      search_label: pf.searchLabel,
+      clear_search: pf.clearSearch,
+      searching: pf.searching,
+      zero_results: pf.zeroResults,
+      one_result: pf.oneResult,
+      many_results: pf.manyResults,
+      load_more: pf.loadMore,
+      filters_label: pf.filtersLabel,
+    };
+  }
+
   function initSearch() {
     const pageFindSearch: HTMLElement | null =
       document.querySelector("#pagefind-search");
@@ -63,22 +132,17 @@ const t = useTranslations(locale);
       // @ts-expect-error — Missing types for @pagefind/default-ui package.
       const { PagefindUI } = await import("@pagefind/default-ui");
 
-      // Display warning inn dev mode
-      if (import.meta.env.DEV) {
-        pageFindSearch.innerHTML = `
-            <div class="bg-muted/75 rounded p-4 space-y-4 mb-4">
-              <p><strong>DEV mode Warning! </strong>You need to build the project at least once to see the search results during development.</p>
-              <code class="block bg-black text-white px-2 py-1 rounded">pnpm run build</code>
-            </div>
-          `;
-      }
-
       // Init pagefind ui
+      //
+      // Pagefind's search widget ships its own English copy and is not part of
+      // the `src/i18n` pipeline, so its strings are passed in explicitly via
+      // the `translations` option.
       const search = new PagefindUI({
         element: "#pagefind-search",
         bundlePath,
         showImages: false,
         showSubResults: true,
+        translations: getPagefindTranslations(document.documentElement.lang),
         processTerm: function (term: string) {
           params.set("q", term); // Update the `q` parameter in the URL
           history.replaceState(history.state, "", "?" + params.toString()); // Push the new URL without reloading
@@ -120,6 +184,18 @@ const t = useTranslations(locale);
     initSearch();
   });
   initSearch();
+
+  // The Pagefind widget is not part of the `data-i18n` pipeline — it renders
+  // its own copy. When the interface language changes, the widget has to be
+  // rebuilt with the new translations.
+  document.addEventListener("ui:langchange", () => {
+    const container = document.querySelector("#pagefind-search");
+    if (!container) return;
+
+    // Tear the old widget down, then re-create it with the new language.
+    container.innerHTML = "";
+    initSearch();
+  });
 </script>
 
 <style is:global>

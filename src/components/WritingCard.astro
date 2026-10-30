@@ -1,0 +1,94 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getWritingUrl } from "@/utils/getPostPaths";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+import Datetime from "./Datetime.astro";
+import TagChip from "./TagChip.astro";
+
+type Props = {
+  work: CollectionEntry<"writing">;
+};
+
+const { work } = Astro.props;
+const { data } = work;
+
+const t = useTranslations(config.site.uiLang);
+
+const href = getWritingUrl(data.slug, Astro.currentLocale);
+
+const tags = data.tags ?? [];
+const tagSlugs = tags.map(tagSlug);
+---
+
+<li
+  class="app-list-entry border-border border-b last:border-b-0"
+  data-tagged-item
+  data-tags={tagSlugs.join(",")}
+>
+  <article class="flex flex-col gap-2">
+    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+      <h2 class="text-lg font-semibold">
+        <a
+          href={href}
+          class="text-accent decoration-dashed underline-offset-4 hover:underline"
+        >
+          {data.title}
+        </a>
+      </h2>
+      {
+        data.chapterNumber !== undefined && (
+          <span class="text-muted-foreground text-sm">
+            {/*
+              Only the label is marked for translation. The chapter number is
+              a sibling node so that swapping the label cannot drop it.
+            */}
+            <span data-i18n="writing.chapterLabel">
+              {t.writing.chapterLabel}
+            </span>
+            {data.chapterNumber !== undefined && ` ${data.chapterNumber}`}
+          </span>
+        )
+      }
+      {
+        data.status && (
+          <span
+            class="text-muted-foreground border-border rounded border px-2 py-0.5 text-xs"
+            data-i18n={
+              data.status === "ongoing"
+                ? "writing.ongoing"
+                : "writing.completed"
+            }
+          >
+            {data.status === "ongoing"
+              ? t.writing.ongoing
+              : t.writing.completed}
+          </span>
+        )
+      }
+    </div>
+    {data.description && <p>{data.description}</p>}
+    <div
+      class="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+    >
+      <Datetime pubDatetime={data.pubDatetime} />
+    </div>
+    {
+      tags.length > 0 && (
+        <ul class="mt-1 flex flex-wrap gap-2">
+          {tags.map(tag => (
+            <li>
+              <TagChip
+                slug={tagSlug(tag)}
+                name={tagDisplayName(tag)}
+                mode="static"
+                size="sm"
+              />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </article>
+</li>

@@ -1,10 +1,21 @@
 import type { ResolvedAstroPaperConfig } from "@/types/config";
 import { getAssetPath } from "./withBase";
 
-const publicFiles = import.meta.glob("/public/*", { eager: false });
+/**
+ * The image files in `public/`.
+ *
+ * The glob is restricted to the image extensions on purpose. A broader
+ * pattern (`/public/*`) makes Vite parse every matching file as a module,
+ * which fails for the files that are not JavaScript — most notably the
+ * `_redirects` file of a Cloudflare Pages deployment, whose wildcard syntax
+ * is not valid JavaScript.
+ */
+const publicImages = import.meta.glob(
+  "/public/*.{jpg,jpeg,png,webp,avif,gif,svg,ico}"
+);
 
 function existsInPublic(filename: string): boolean {
-  return `/public/${filename}` in publicFiles;
+  return `/public/${filename}` in publicImages;
 }
 
 /**

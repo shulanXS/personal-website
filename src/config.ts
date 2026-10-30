@@ -15,6 +15,7 @@ const config: ResolvedAstroPaperConfig = {
     ...userConfig.site,
     ogImage: userConfig.site.ogImage ?? DEFAULT_OG_IMAGE,
     lang: userConfig.site.lang ?? "en",
+    uiLang: userConfig.site.uiLang ?? "zh-CN",
     timezone: userConfig.site.timezone ?? "UTC",
     dir: userConfig.site.dir ?? "ltr",
     googleVerification:
@@ -29,10 +30,13 @@ const config: ResolvedAstroPaperConfig = {
   features: {
     lightAndDarkMode: userConfig.features?.lightAndDarkMode ?? true,
     dynamicOgImage: userConfig.features?.dynamicOgImage ?? true,
-    showArchives: userConfig.features?.showArchives ?? true,
     showBackButton: userConfig.features?.showBackButton ?? true,
     editPost: userConfig.features?.editPost ?? { enabled: false },
     search: userConfig.features?.search ?? "pagefind",
+  },
+  cms: {
+    url: userConfig.cms?.url ?? "https://app.pagescms.org/",
+    show: userConfig.cms?.show ?? true,
   },
   socials: userConfig.socials ?? [],
   shareLinks: userConfig.shareLinks ?? [],

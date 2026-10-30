@@ -1,0 +1,124 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import IconHash from "@/assets/icons/IconHash.svg";
+import config from "@/config";
+
+type Props = {
+  /** URL-safe identifier of the tag. */
+  slug: string;
+  /** The label as the author wrote it. */
+  name: string;
+  /**
+   * How the chip behaves when it is clicked.
+   *
+   * - "filter": filters the current listing page in place
+   * - "link":   navigates to the site-wide tag search
+   * - "static": renders as plain text — the tag is *not* clickable
+   *
+   * Tags are only an interaction on the pages that actually list entries by
+   * tag. Everywhere else — on a card in the home page, on the meta row of a
+   * post — they are metadata and read as plain text.
+   */
+  mode?: "filter" | "link" | "static";
+  size?: "sm" | "md" | "lg";
+  /** Optional count badge. */
+  count?: number;
+  /** Marks the chip as the currently active filter. */
+  active?: boolean;
+};
+
+const {
+  slug,
+  name,
+  mode = "static",
+  size = "sm",
+  count,
+  active = false,
+} = Astro.props;
+
+const locale = Astro.currentLocale ?? config.site.lang;
+
+/*
+ * The site-wide tag search lives on the search page.
+ *
+ * `getRelativeLocaleUrl` returns the URL of the *page*; the tag is passed as
+ * a query parameter. The trailing slash that the locale helper adds is
+ * removed so that the URL reads `/search?tag=astro` rather than
+ * `/search/?tag=astro`.
+ */
+const searchUrl = getRelativeLocaleUrl(locale, "search").replace(/\/$/, "");
+
+const sizeClasses = {
+  sm: "text-xs gap-0.5 px-2 py-0.5",
+  md: "text-sm gap-1 px-2.5 py-1",
+  lg: "text-base gap-1 px-3 py-1.5",
+};
+
+const iconClasses = {
+  sm: "size-3.5",
+  md: "size-4",
+  lg: "size-4.5",
+};
+
+/*
+ * A static tag is a label, not a control: it carries no border, no hover
+ * reaction and no pointer. It is styled like the muted metadata around it so
+ * that it reads as part of the text rather than as a button.
+ */
+const staticClasses = `inline-flex items-center text-muted-foreground select-none ${sizeClasses[size]}`;
+
+const base =
+  "inline-flex items-center rounded-full border transition-colors duration-200 select-none";
+
+const tone = active
+  ? "border-accent bg-accent/10 text-accent"
+  : "border-border text-muted-foreground hover:border-accent hover:text-accent";
+const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
+---
+
+{
+  mode === "static" ? (
+    <span class={staticClasses} data-tag-static={slug} title={`#${name}`}>
+      <IconHash class:list={["opacity-60", iconClasses[size]]} />
+      <span>{name}</span>
+      {count !== undefined && (
+        <span class="text-muted-foreground/80 ml-0.5 text-[0.85em] tabular-nums">
+          {count}
+        </span>
+      )}
+    </span>
+  ) : mode === "link" ? (
+    <a
+      href={`${searchUrl}?tag=${encodeURIComponent(slug)}`}
+      class={chipClasses}
+      data-tag-chip={slug}
+      data-tag-mode="link"
+      title={`#${name}`}
+    >
+      <IconHash class:list={["opacity-70", iconClasses[size]]} />
+      <span>{name}</span>
+      {count !== undefined && (
+        <span class="text-muted-foreground/80 ml-0.5 text-[0.85em] tabular-nums">
+          {count}
+        </span>
+      )}
+    </a>
+  ) : (
+    <button
+      type="button"
+      class={chipClasses}
+      data-tag-chip={slug}
+      data-tag-mode="filter"
+      aria-pressed={active ? "true" : "false"}
+      title={`#${name}`}
+    >
+      <IconHash class:list={["opacity-70", iconClasses[size]]} />
+      <span>{name}</span>
+      {count !== undefined && (
+        <span class="text-muted-foreground/80 ml-0.5 text-[0.85em] tabular-nums">
+          {count}
+        </span>
+      )}
+    </button>
+  )
+}

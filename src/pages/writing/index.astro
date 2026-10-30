@@ -1,0 +1,131 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import WritingCard from "@/components/WritingCard.astro";
+import TagBar from "@/components/TagBar.astro";
+import { getPublishedWriting } from "@/utils/content";
+import { getTagIndex } from "@/utils/tagIndex";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const t = useTranslations(config.site.uiLang);
+
+const works = await getPublishedWriting();
+
+// Group works by series so that chapters stay together and ordered.
+const standalone = works.filter(work => !work.data.series);
+const seriesMap = new Map<string, typeof works>();
+for (const work of works) {
+  const series = work.data.series;
+  if (!series) continue;
+  const list = seriesMap.get(series) ?? [];
+  list.push(work);
+  seriesMap.set(series, list);
+}
+
+const series = [...seriesMap.entries()]
+  .map(([name, chapters]) => ({
+    name,
+    chapters: chapters.sort(
+      (a, b) => (a.data.chapterNumber ?? 0) - (b.data.chapterNumber ?? 0)
+    ),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
+const writingTags = tags.filter(tag => tag.counts.writing > 0);
+---
+
+<Layout title={`${t.pages.writingTitle} | ${config.site.title}`} width="list">
+  <Header />
+
+  <Breadcrumb />
+
+  <Main
+    pageTitle={t.pages.writingTitle}
+    pageDesc={t.pages.writingDesc}
+    titleKey="pages.writingTitle"
+    descKey="pages.writingDesc"
+  >
+    <div data-tag-scope="collection" data-pagefind-ignore>
+      <TagBar tags={writingTags} source="writing" />
+
+      {
+        works.length === 0 ? (
+          <p class="text-muted-foreground" data-i18n="pages.writingEmpty">
+            {t.pages.writingEmpty}
+          </p>
+        ) : (
+          <>
+            {series.length > 0 && (
+              <section class="mt-8 mb-10">
+                <h2
+                  class="text-xl font-semibold tracking-wide"
+                  data-i18n="writing.series"
+                >
+                  {t.writing.series}
+                </h2>
+                {series.map(entry => (
+                  <div class="mt-4">
+                    <h3 class="text-muted-foreground flex items-center gap-2 text-sm font-semibold">
+                      {entry.name}
+                      <span
+                        class="border-border rounded border px-2 py-0.5 text-xs font-normal"
+                        data-i18n={
+                          entry.chapters[0]?.data.status === "ongoing"
+                            ? "writing.ongoing"
+                            : "writing.completed"
+                        }
+                      >
+                        {entry.chapters[0]?.data.status === "ongoing"
+                          ? t.writing.ongoing
+                          : t.writing.completed}
+                      </span>
+                    </h3>
+                    <ul
+                      class="border-border border-t"
+                      data-list-layout="series"
+                    >
+                      {entry.chapters.map(chapter => (
+                        <WritingCard work={chapter} />
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {standalone.length > 0 && (
+              <section class="mt-8">
+                <h2
+                  class="text-xl font-semibold tracking-wide"
+                  data-i18n="writing.standalone"
+                >
+                  {t.writing.standalone}
+                </h2>
+                <ul class="border-border border-t" data-list-layout="series">
+                  {standalone.map(work => (
+                    <WritingCard work={work} />
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        )
+      }
+
+      <p
+        class="text-muted-foreground mt-8 hidden"
+        data-tag-empty
+        data-i18n="tags.empty"
+      >
+        {t.tags.empty}
+      </p>
+    </div>
+  </Main>
+
+  <Footer />
+</Layout>

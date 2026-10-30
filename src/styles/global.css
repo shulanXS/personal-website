@@ -20,18 +20,585 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
+  /*
+   * The page texture.
+   *
+   * A flat fill reads as a screen; a very slight vertical gradient reads as
+   * a sheet of paper lit from above. The gradient is deliberately almost
+   * invisible — it is felt rather than seen — and it gives the page the
+   * depth that a pure white canvas cannot.
+   */
+  body {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--background) 96%, var(--foreground)) 0%,
+      var(--background) 22rem
+    );
+    background-attachment: fixed;
+  }
+
+  /*
+   * The grain.
+   *
+   * A tiled SVG noise pattern at a very low opacity. It breaks up the
+   * banding of the gradient and gives the surface a tactile, printed
+   * quality. The pattern is a data URI so that it costs no request.
+   */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /*
+   * Everything that is not the texture layer has to sit above it. The
+   * content of the page is stacked above the body background anyway, so
+   * only the direct children need a z-index of their own.
+   */
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Layout width scales.
+ *
+ * Every page picks one scale: the default narrow reading column, a wide
+ * screen for the home page and the project grid, a list scale for the
+ * paginated listings, a narrow "flow" column for the notes timeline, or a
+ * comfortable long-form column for literary work.
+ *
+ * The scale is stored in a custom property on `<html>` (set by `Layout.astro`)
+ * so that the header, the main content and the footer always use the *same*
+ * width. Previously the header and footer were hard-wired to the default
+ * scale while the main content could be wider, which left the page visibly
+ * misaligned.
+ *
+ * `max-w-app` stays a separate utility because the blog article body relies on
+ * it (`app-prose max-w-app`).
+ */
+@layer base {
+  html {
+    --app-max-width: var(--container-3xl);
+  }
+
+  html.app-w-wide {
+    --app-max-width: var(--container-6xl);
+  }
+
+  html.app-w-list {
+    --app-max-width: var(--container-5xl);
+  }
+
+  html.app-w-flow {
+    --app-max-width: var(--container-xl);
+  }
+
+  html.app-w-reading {
+    --app-max-width: var(--container-2xl);
+  }
 }
 
 @utility max-w-app {
   @apply max-w-3xl;
 }
 
+/** Wide container for the home page and the project grid. */
+@utility max-w-app-wide {
+  @apply max-w-6xl;
+}
+
+/** Reading-flow container for the notes timeline. */
+@utility max-w-app-flow {
+  @apply max-w-xl;
+}
+
+/** Long-form reading container for literary work. */
+@utility max-w-app-reading {
+  @apply max-w-2xl;
+}
+
 @utility app-layout {
-  @apply max-w-app mx-auto w-full px-4;
+  @apply mx-auto w-full px-4;
+  max-width: var(--app-max-width);
 }
 
 @utility active-nav {
   @apply underline decoration-wavy decoration-2 underline-offset-8;
+}
+
+/* ==========================================================================
+   Navigation motion
+   ==========================================================================
+   The navigation items change colour on hover. The transition is kept short
+   and the underline is the browser's own `text-decoration` wave, which sits
+   underneath the text and therefore never overlaps it.
+
+   The wave only covers the glyphs, so the *clickable* area is widened
+   separately — see the `::before` pseudo element below.
+   ========================================================================== */
+
+@layer components {
+  #menu-items > li > a {
+    position: relative;
+    /*
+     * `z-index` creates a stacking context for the link, so the `::before`
+     * pseudo element below can sit *behind* the label (with `z-index: -1`)
+     * without escaping behind the header background. That keeps the text
+     * selectable while the widened hit area stays clickable.
+     */
+    z-index: 0;
+    transition: color 200ms ease;
+  }
+
+  /*
+   * Widen the hit area of a navigation link.
+   *
+   * The wavy underline is drawn by `text-decoration` and only spans the width
+   * of the text. Without help, a visitor has to move the pointer exactly
+   * onto the characters to hit the link, which feels like a chore. This
+   * transparent pseudo element extends the target over the whole nav cell —
+   * including the gaps between items — while changing nothing visually.
+   *
+   * The horizontal inset stays below half of the gap between two items, so
+   * the hit areas of two neighbours never overlap.
+   */
+  #menu-items > li > a::before {
+    content: "";
+    position: absolute;
+    inset: -0.5rem -0.625rem;
+    border-radius: 0.375rem;
+    /* Transparent, yet still part of the hit test of the link. */
+    background: transparent;
+    /* Behind the label, so it never swallows a text selection. */
+    z-index: -1;
+  }
+
+  /*
+   * The wave shows up on hover and focus. The current page keeps it at all
+   * times via the `active-nav` utility.
+   */
+  #menu-items > li > a:hover,
+  #menu-items > li > a:focus-visible {
+    @apply underline decoration-wavy decoration-2 underline-offset-8;
+  }
+
+  /*
+   * Icon-only controls (search) draw their own underline through
+   * the `IconUnderline` component, so the shared wave is skipped — but they
+   * keep the widened hit area.
+   */
+  #menu-items > li > a:has(> svg) {
+    @apply no-underline;
+  }
+
+  #menu-items > li > a:has(> svg):hover,
+  #menu-items > li > a:has(> svg):focus-visible {
+    @apply no-underline;
+  }
+
+  /*
+   * The icon controls keep the wavy underline that `IconUnderline` provides,
+   * but it now grows out of the centre instead of appearing at once.
+   */
+  #menu-items > li > a svg {
+    transition:
+      transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 200ms ease;
+  }
+
+  #menu-items > li > a:hover svg,
+  #menu-items > li > a:focus-visible svg {
+    transform: scale(1.12);
+  }
+
+  /*
+   * Mobile menu.
+   *
+   * The menu is toggled by adding `data-open="true"` to the list. The items
+   * fade and slide in one after another, which makes the expansion read as
+   * an intentional reveal instead of a sudden pop.
+   */
+  #menu-items[data-open="true"] > li {
+    animation: nav-item-in 260ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  }
+
+  #menu-items[data-open="true"] > li:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(2) {
+    animation-delay: 30ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(3) {
+    animation-delay: 60ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(4) {
+    animation-delay: 90ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(5) {
+    animation-delay: 120ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(6) {
+    animation-delay: 150ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(7) {
+    animation-delay: 180ms;
+  }
+  #menu-items[data-open="true"] > li:nth-child(8) {
+    animation-delay: 210ms;
+  }
+
+  @keyframes nav-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.4rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /*
+   * The menu button swaps between a burger and a cross icon. The icon that
+   * becomes visible rotates into place, so the change reads as a turn rather
+   * than a hard swap.
+   */
+  #menu-btn svg {
+    transition:
+      transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 150ms ease;
+  }
+
+  #menu-btn[aria-expanded="true"] #close-icon {
+    animation: menu-icon-in 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes menu-icon-in {
+    from {
+      transform: rotate(-90deg) scale(0.7);
+      opacity: 0;
+    }
+    to {
+      transform: rotate(0deg) scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+/* ==========================================================================
+   Listing layouts
+   ==========================================================================
+   Every listing page uses the same pattern: a plain single-column list of
+   text entries on a phone, and a card grid on a wide screen. The card
+   treatment is applied through `data-list-layout` on the container, so the
+   markup stays free of one-off breakpoint classes.
+
+   The breakpoint is `lg` (1024px) rather than `sm`: at 640–1023px a
+   two-column grid of long titles and excerpts would be too cramped to read.
+   ========================================================================== */
+
+@layer components {
+  /*
+   * The grid of cards on wide screens.
+   *
+   * On a phone the listing is a single-column text flow — the entries read
+   * like a classic blog index. Only from `lg` upwards does the grid appear.
+   *
+   * The attribute sits on the `<ul>` itself, because the `<ul>` *is* the
+   * grid.
+   */
+  ul[data-list-layout="grid"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  @media (min-width: 64rem) {
+    ul[data-list-layout="grid"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /*
+   * The card itself.
+   *
+   * The surface only exists on a wide screen. On a phone the entry stays a
+   * plain list item, which keeps the column narrow and the text legible.
+   *
+   * Every card on the site — posts, writing, projects — uses this one
+   * treatment, so the radius, the border and the hover reaction are
+   * identical everywhere.
+   */
+  .post-card {
+    transition:
+      border-color var(--app-transition) ease,
+      transform var(--app-transition) ease,
+      box-shadow var(--app-transition) ease;
+  }
+
+  .post-card > p {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--muted-foreground);
+  }
+
+  @media (min-width: 64rem) {
+    .post-card {
+      border: 1px solid var(--border);
+      border-radius: var(--app-radius);
+      padding: var(--app-space-5);
+      background: var(--surface);
+      box-shadow: var(--app-shadow);
+    }
+
+    .post-card:hover {
+      border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+      background: var(--surface-raised);
+      transform: translateY(-2px);
+      box-shadow: var(--app-shadow-lift);
+    }
+  }
+
+  /*
+   * The shared card surface.
+   *
+   * The project cards are bordered on every screen, so they cannot use
+   * `.post-card` (which only draws its surface on a wide screen). The
+   * `.app-card` class carries the parts both treatments have in common:
+   * the radius, the border and the hover reaction.
+   */
+  .app-card {
+    border: 1px solid var(--border);
+    border-radius: var(--app-radius);
+    background: var(--surface);
+    box-shadow: var(--app-shadow);
+    transition:
+      border-color var(--app-transition) ease,
+      transform var(--app-transition) ease,
+      box-shadow var(--app-transition) ease;
+  }
+
+  .app-card:hover {
+    border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+    background: var(--surface-raised);
+    transform: translateY(-2px);
+    box-shadow: var(--app-shadow-lift);
+  }
+
+  /*
+   * The shared list entry.
+   *
+   * The notes and the writing are plain rows separated by a hairline. The
+   * shared class keeps the spacing and the separator identical between the
+   * two lists.
+   */
+  .app-list-entry {
+    padding-top: var(--app-space-6);
+    padding-bottom: var(--app-space-6);
+  }
+
+  /*
+   * The notes and article timelines.
+   *
+   * A single column, read from top to bottom, with a vertical rule on the
+   * left and a node dot per entry. The date sits in a narrow column to the
+   * left of the rule, so the moment an entry was written is obvious without
+   * having to read the whole entry.
+   *
+   * The rule is deliberately quiet: a hairline in the border color with a
+   * small hollow node. It guides the eye down the column without competing
+   * with the text or with the accent color of the links.
+   *
+   * Each entry is a raised panel. On the warm page tone the panel reads as
+   * a sheet of paper lying on the desk rather than as text floating in
+   * white space.
+   *
+   * The three parts — rule, date, panel — are laid out with a grid so that
+   * the date column is exactly as wide as it needs to be, whatever the
+   * length of the timestamp.
+   */
+  ul[data-list-layout="timeline"] {
+    position: relative;
+  }
+
+  ul[data-list-layout="timeline"] > li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: var(--app-space-5);
+  }
+
+  /*
+   * The date column.
+   *
+   * On a wide screen it is a narrow column on the left of the rule; on a
+   * phone the columns stack and the date sits above the content.
+   */
+  ul[data-list-layout="timeline"] .app-timeline-date {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  /* The panel that holds one entry. */
+  ul[data-list-layout="timeline"] > li > article {
+    border: 1px solid var(--border);
+    border-radius: var(--app-radius);
+    background: var(--surface);
+    box-shadow: var(--app-shadow);
+    padding: var(--app-space-4) var(--app-space-5);
+    transition:
+      border-color var(--app-transition) ease,
+      background-color var(--app-transition) ease,
+      box-shadow var(--app-transition) ease;
+  }
+
+  ul[data-list-layout="timeline"] > li:hover > article {
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+    background: var(--surface-raised);
+    box-shadow: var(--app-shadow-lift);
+  }
+
+  @media (min-width: 40rem) {
+    ul[data-list-layout="timeline"] > li {
+      grid-template-columns: 3.75rem 1fr;
+    }
+
+    ul[data-list-layout="timeline"] .app-timeline-date {
+      text-align: right;
+    }
+
+    /* The rule that runs through all the nodes. */
+    ul[data-list-layout="timeline"]::before {
+      content: "";
+      position: absolute;
+      left: 4.375rem;
+      top: 0.75rem;
+      bottom: 0.75rem;
+      width: 1px;
+      background: var(--border);
+    }
+
+    /* The dot that marks the entry on the rule. */
+    ul[data-list-layout="timeline"] > li::before {
+      content: "";
+      position: absolute;
+      left: 4.1875rem;
+      top: 1.0625rem;
+      width: 0.375rem;
+      height: 0.375rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      transition:
+        border-color 200ms ease,
+        background-color 200ms ease,
+        transform 200ms ease;
+    }
+
+    ul[data-list-layout="timeline"] > li:hover::before {
+      border-color: var(--accent);
+      background: var(--accent);
+      transform: scale(1.35);
+    }
+  }
+
+  /*
+   * The literary works. A chapter list is a plain list on a phone; on a
+   * wide screen the chapters of a series sit side by side.
+   */
+  @media (min-width: 64rem) {
+    ul[data-list-layout="series"] {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2.5rem;
+    }
+  }
+
+  /*
+   * The panel treatment for the writing list.
+   *
+   * The literary works sit on the same warm page tone as everything else,
+   * so each one gets the same raised panel the other lists use. The series
+   * grid keeps its own rhythm on top of that.
+   */
+  ul[data-list-layout="series"] > li {
+    padding-top: var(--app-space-3);
+    padding-bottom: var(--app-space-3);
+  }
+
+  ul[data-list-layout="series"] > li > article {
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--app-radius);
+    background: var(--surface);
+    box-shadow: var(--app-shadow);
+    padding: var(--app-space-4) var(--app-space-5);
+    transition:
+      border-color var(--app-transition) ease,
+      background-color var(--app-transition) ease,
+      box-shadow var(--app-transition) ease;
+  }
+
+  ul[data-list-layout="series"] > li:hover > article {
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+    background: var(--surface-raised);
+    box-shadow: var(--app-shadow-lift);
+  }
+
+  /*
+   * The tag bar.
+   *
+   * On a phone the chips wrap tightly; on a wide screen they get more
+   * breathing room and the bar becomes a bordered surface.
+   */
+  .tag-bar {
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .tag-bar {
+      gap: 0.5rem;
+    }
+  }
+
+  /*
+   * The grouped tag results on the search page. On a wide screen the four
+   * collections sit next to each other instead of one below the other.
+   */
+  @media (min-width: 64rem) {
+    #tag-results {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2rem 2.5rem;
+      align-items: start;
+    }
+  }
+}
+
+/*
+ * Respect the user's motion preference.
+ *
+ * The site previously only honoured this in the image lightbox. Every
+ * animation and transition now degrades to an instant state change.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 :target {

@@ -1,0 +1,80 @@
+---
+import TagChip from "./TagChip.astro";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+import type { TagInfo, TagSource } from "@/utils/tagIndex";
+
+type Props = {
+  /** The aggregated tags of the whole site. */
+  tags: TagInfo[];
+  /**
+   * "bar"  — a compact row of chips, used at the top of a listing page
+   * "cloud" — a roomier cloud with counts, used on the search page
+   */
+  variant?: "bar" | "cloud";
+  /** How the chips behave when clicked. */
+  mode?: "filter" | "link";
+  /**
+   * Restricts the bar to the tags of a single content type.
+   *
+   * On a listing page only the tags that actually occur in that collection
+   * are useful — offering a tag that leads to an empty page is noise.
+   */
+  source?: TagSource;
+};
+
+const { tags, variant = "bar", mode = "filter", source } = Astro.props;
+
+const t = useTranslations(config.site.uiLang);
+
+const visibleTags = source ? tags.filter(tag => tag.counts[source] > 0) : tags;
+
+const size = variant === "cloud" ? "md" : "sm";
+
+/*
+ * The "all" chip has to look exactly like the tag chips next to it, otherwise
+ * the reset button reads as a different kind of control. It carries the same
+ * size and the same tone as an inactive chip.
+ */
+const allChipClasses =
+  variant === "cloud"
+    ? "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-sm"
+    : "inline-flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-xs";
+---
+
+{
+  visibleTags.length > 0 && (
+    <div
+      class="tag-bar border-border flex flex-wrap items-center gap-2"
+      data-tag-bar
+      data-tag-variant={variant}
+      data-tag-mode={mode}
+    >
+      {mode === "filter" && (
+        <button
+          type="button"
+          class:list={[
+            allChipClasses,
+            "border-border text-muted-foreground hover:border-accent hover:text-accent border transition-colors duration-200",
+          ]}
+          data-tag-chip=""
+          data-tag-mode="filter"
+          aria-pressed="true"
+          data-i18n="tags.all"
+        >
+          {t.tags.all}
+        </button>
+      )}
+
+      {visibleTags.map(tag => (
+        <TagChip
+          slug={tag.slug}
+          name={tag.name}
+          mode={mode}
+          size={size}
+          count={variant === "cloud" ? tag.total : undefined}
+        />
+      ))}
+    </div>
+  )
+}

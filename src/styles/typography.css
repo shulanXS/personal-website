@@ -5,12 +5,30 @@
   .app-prose {
     @apply prose;
 
+    /*
+     * Reading typography.
+     *
+     * The site is Chinese-first, so the prose defaults need to be tuned for
+     * CJK: a looser line height (CJK glyphs are full-width and square, so
+     * Latin-leading values feel cramped), a slight letter-spacing trim on
+     * headings (full-width glyphs already carry generous side bearing) and
+     * `text-wrap: pretty` so the last line of a paragraph does not end up as
+     * a single orphaned character.
+     */
+    font-family: var(--font-app);
+    line-height: 1.85;
+    text-wrap: pretty;
+
     h1,
     h2,
     h3,
     h4,
     th {
-      @apply text-foreground mb-3;
+      @apply text-foreground;
+      margin-bottom: var(--app-space-3);
+      letter-spacing: 0.01em;
+      line-height: 1.4;
+      text-wrap: balance;
     }
 
     h3 {
@@ -25,6 +43,16 @@
     table,
     code {
       @apply text-foreground;
+    }
+
+    /*
+     * The space between two paragraphs.
+     *
+     * One shared value for the whole prose block, so the rhythm of the text
+     * does not change from one section to the next.
+     */
+    p {
+      margin-bottom: var(--app-space-4);
     }
 
     a {
@@ -108,6 +136,28 @@
     pre {
       @apply focus-visible:outline-accent focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-dashed;
     }
+  }
+
+  /*
+   * Literary work reads better in a serif face — on Chinese systems that is
+   * 宋体/思源宋体, which gives long-form fiction a distinctly different
+   * texture from the sans-serif used by the technical blog.
+   *
+   * This is a sibling of `.app-prose` rather than a nested modifier, because
+   * the class is applied to the same element that carries `.app-prose`.
+   */
+  .app-prose-serif {
+    font-family: var(--font-serif);
+    line-height: 2;
+    letter-spacing: 0.02em;
+  }
+
+  .app-prose-serif h1,
+  .app-prose-serif h2,
+  .app-prose-serif h3,
+  .app-prose-serif h4 {
+    font-family: var(--font-serif);
+    letter-spacing: 0.04em;
   }
 
   /* ===== Code Blocks & Syntax Highlighting ===== */

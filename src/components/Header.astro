@@ -2,11 +2,11 @@
 import { getRelativeLocaleUrl } from "astro:i18n";
 import IconUnderline from "@/assets/icons/IconUnderline.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
-import IconArchive from "@/assets/icons/IconArchive.svg";
 import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconX from "@/assets/icons/IconX.svg";
+import SlothLogo from "@/assets/sloth-logo.svg";
 import LinkButton from "./LinkButton.astro";
 import { stripBase, stripLocale } from "@/utils/withBase";
 import { useTranslations } from "@/i18n";
@@ -15,7 +15,14 @@ import config from "@/config";
 const { site, features } = config;
 
 const locale = Astro.currentLocale ?? config.site.lang;
-const t = useTranslations(locale);
+
+// The interface language is independent from the Astro i18n locale.
+const uiLang = site.uiLang;
+const t = useTranslations(uiLang);
+
+// The toggle switches to the other available language.
+const nextLang = uiLang === "zh-CN" ? "en" : "zh-CN";
+const nextLangLabel = t.a11y.langName[nextLang] ?? nextLang;
 
 // Strip the base prefix so isActive comparisons work regardless of deploy subdirectory.
 // e.g. with base "/blog": "/blog/posts/slug" → "/posts/slug"
@@ -43,16 +50,20 @@ const isActive = (path: string) => {
 </a>
 
 <header
-  class="app-layout flex flex-col items-center justify-between sm:flex-row"
+  class="app-layout sticky top-0 z-40 flex flex-col items-center justify-between bg-transparent sm:flex-row"
 >
   <div
-    class="border-border bg-background relative flex w-full items-baseline justify-between border-b py-4 sm:items-center sm:py-6"
+    class="border-border bg-surface/85 relative flex w-full items-baseline justify-between border-b py-4 backdrop-blur-xl sm:items-center sm:py-5"
   >
     <a
       href={getRelativeLocaleUrl(locale, "")}
-      class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
+      class="absolute flex items-center gap-2 py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
     >
-      {site.title}
+      <SlothLogo
+        class="stroke-accent size-7 shrink-0 sm:size-8"
+        aria-hidden="true"
+      />
+      <span>{site.title}</span>
     </a>
     <nav
       id="nav-menu"
@@ -62,77 +73,79 @@ const isActive = (path: string) => {
         id="menu-btn"
         class="focus-outline self-end p-2 sm:hidden"
         aria-label={t.a11y.openMenu}
-        aria-expanded="false"
-        aria-controls="menu-items"
+        data-i18n="a11y.openMenu"
+        data-i18n-attr="aria-label"
+        data-label-open-key="a11y.openMenu"
+        data-label-close-key="a11y.closeMenu"
         data-label-open={t.a11y.openMenu}
         data-label-close={t.a11y.closeMenu}
+        aria-expanded="false"
+        aria-controls="menu-items"
       >
         <IconX id="close-icon" class="hidden" />
         <IconMenuDeep id="menu-icon" />
       </button>
       <ul
         id="menu-items"
-        class="[&>li>a]:hover:text-accent mt-4 hidden w-44 grid-cols-2 place-content-center gap-2 sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0 sm:[&>li]:h-8 [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium sm:[&>li>a]:px-2 sm:[&>li>a]:py-1"
+        class="[&>li>a]:hover:text-accent mt-4 hidden w-full grid-cols-2 place-content-center gap-x-2 gap-y-1 sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0 sm:[&>li]:h-8 [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium sm:[&>li>a]:px-2 sm:[&>li>a]:py-1"
       >
         <li class="col-span-2">
           <a
             href={getRelativeLocaleUrl(locale, "posts")}
             class:list={{ "active-nav": isActive("/posts") }}
           >
-            {t.nav.posts}
+            <span data-i18n="nav.posts">{t.nav.posts}</span>
           </a>
         </li>
         <li class="col-span-2">
           <a
-            href={getRelativeLocaleUrl(locale, "tags")}
-            class:list={{ "active-nav": isActive("/tags") }}
+            href={getRelativeLocaleUrl(locale, "notes")}
+            class:list={{ "active-nav": isActive("/notes") }}
           >
-            {t.nav.tags}
+            <span data-i18n="nav.notes">{t.nav.notes}</span>
           </a>
         </li>
         <li class="col-span-2">
           <a
-            href={getRelativeLocaleUrl(locale, "about")}
-            class:list={{ "active-nav": isActive("/about") }}
+            href={getRelativeLocaleUrl(locale, "writing")}
+            class:list={{ "active-nav": isActive("/writing") }}
           >
-            {t.nav.about}
+            <span data-i18n="nav.writing">{t.nav.writing}</span>
+          </a>
+        </li>
+        <li class="col-span-2">
+          <a
+            href={getRelativeLocaleUrl(locale, "projects")}
+            class:list={{ "active-nav": isActive("/projects") }}
+          >
+            <span data-i18n="nav.projects">{t.nav.projects}</span>
           </a>
         </li>
         {
-          features.showArchives && (
-            <li class="col-span-2">
-              <LinkButton
-                href={getRelativeLocaleUrl(locale, "archives")}
-                class:list={[
-                  "focus-outline flex size-full justify-center p-3 sm:relative sm:size-8 sm:p-0",
-                  { "active-nav": isActive("/archives") },
-                ]}
-                title={t.nav.archives}
-                aria-label={t.nav.archives}
-              >
-                <IconArchive class="hidden sm:absolute sm:top-1/2 sm:left-1/2 sm:block sm:size-6 sm:-translate-x-1/2 sm:-translate-y-1/2" />
-                <span class="sm:sr-only">{t.nav.archives}</span>
-                {isActive("/archives") && (
-                  <IconUnderline
-                    aria-hidden="true"
-                    class="scale-125 max-sm:hidden sm:absolute sm:bottom-0 sm:w-6"
-                  />
-                )}
-              </LinkButton>
-            </li>
-          )
+          /*
+          The three icon-only controls share one list item. On mobile the list
+          is a two-column grid, so giving each control its own item would
+          leave an orphan cell; keeping them together in a single full-width
+          item avoids that.
+        */
         }
-        {
-          features.search !== false && (
-            <li class="col-span-1 flex items-center justify-center">
+        <li
+          class="col-span-2 flex items-center justify-center gap-6 sm:col-span-1 sm:gap-5"
+        >
+          {
+            features.search !== false && (
               <LinkButton
                 href={getRelativeLocaleUrl(locale, "search")}
                 class:list={["focus-outline relative size-8"]}
                 title={t.nav.search}
                 aria-label={t.nav.search}
+                data-i18n="nav.search"
+                data-i18n-attr="aria-label"
               >
                 <IconSearch class="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2" />
-                <span class="sr-only">{t.nav.search}</span>
+                <span class="sr-only" data-i18n="nav.search">
+                  {t.nav.search}
+                </span>
                 {isActive("/search") && (
                   <IconUnderline
                     aria-hidden="true"
@@ -140,41 +153,87 @@ const isActive = (path: string) => {
                   />
                 )}
               </LinkButton>
-            </li>
-          )
-        }
-        {
-          features.lightAndDarkMode && (
-            <li class="col-span-1 flex items-center justify-center">
+            )
+          }
+          {
+            features.lightAndDarkMode && (
               <button
                 id="theme-btn"
                 class="focus-outline hover:[&>svg]:stroke-accent relative size-12 p-4 sm:size-8"
                 title={t.a11y.toggleTheme}
-                aria-label="auto"
+                aria-label={t.a11y.toggleTheme}
+                data-i18n="a11y.toggleTheme"
+                data-i18n-attr="title,aria-label"
                 aria-live="polite"
               >
                 <IconMoon class="absolute top-[50%] left-[50%] translate-[-50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                 <IconSunHigh class="absolute top-[50%] left-[50%] translate-[-50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
               </button>
-            </li>
-          )
-        }
+            )
+          }
+          {
+            /*
+            The button shows the language it switches *to*. The target is
+            recomputed at runtime whenever the active language changes — a
+            server-rendered target would stay frozen and make it impossible to
+            switch back.
+          */
+          }
+          <button
+            id="lang-btn"
+            class="focus-outline hover:text-accent flex size-8 items-center justify-center text-sm font-medium"
+            title={t.a11y.switchLanguage}
+            aria-label={t.a11y.switchLanguage}
+            data-i18n="a11y.switchLanguage"
+            data-i18n-attr="title,aria-label"
+            data-lang-target={nextLang}
+          >
+            <span data-lang-label-text>{nextLangLabel}</span>
+          </button>
+        </li>
       </ul>
     </nav>
   </div>
 </header>
 
 <script>
+  import { flatRuntimeTranslations } from "@/i18n";
+
+  function currentLang(): string {
+    try {
+      const stored = localStorage.getItem("uiLang");
+      if (stored && stored in flatRuntimeTranslations) return stored;
+    } catch {
+      // localStorage unavailable — fall back to the server-rendered label.
+    }
+    const injected = (window as unknown as { __uiLang?: string }).__uiLang;
+    if (injected && injected in flatRuntimeTranslations) return injected;
+    return "";
+  }
+
+  function labelFor(key: string, fallback: string): string {
+    const dict = flatRuntimeTranslations[currentLang()];
+    return dict?.[key] ?? fallback;
+  }
+
   function toggleNav() {
     const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
-    const menuItems = document.querySelector("#menu-items");
+    const menuItems = document.querySelector<HTMLElement>("#menu-items");
     const menuIcon = document.querySelector("#menu-icon");
     const closeIcon = document.querySelector("#close-icon");
 
     if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
 
-    const openLabel = menuBtn.dataset.labelOpen ?? "Open menu";
-    const closeLabel = menuBtn.dataset.labelClose ?? "Close menu";
+    // Read the labels on every click so that switching the interface language
+    // immediately affects the tooltip/label of the menu button too.
+    const openLabel = labelFor(
+      menuBtn.dataset.labelOpenKey ?? "",
+      menuBtn.dataset.labelOpen ?? "Open menu"
+    );
+    const closeLabel = labelFor(
+      menuBtn.dataset.labelCloseKey ?? "",
+      menuBtn.dataset.labelClose ?? "Close menu"
+    );
 
     menuBtn.addEventListener("click", () => {
       const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
@@ -186,7 +245,26 @@ const isActive = (path: string) => {
       menuItems.classList.toggle("grid");
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");
+
+      // The stylesheet keys the mobile expand/collapse animation off this
+      // attribute rather than off the `hidden` class, so that the transition
+      // can be triggered deterministically.
+      menuItems.dataset.open = openMenu ? "false" : "true";
     });
+  }
+
+  // Keep the menu button's label in sync when the interface language changes
+  // — the open/close state decides which of the two labels applies.
+  function refreshMenuLabel() {
+    const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
+    if (!menuBtn) return;
+    const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+    menuBtn.setAttribute(
+      "aria-label",
+      isOpen
+        ? labelFor(menuBtn.dataset.labelCloseKey ?? "", "Close menu")
+        : labelFor(menuBtn.dataset.labelOpenKey ?? "", "Open menu")
+    );
   }
 
   function handleSkipToContent() {
@@ -223,4 +301,7 @@ const isActive = (path: string) => {
 
   handleSkipToContent();
   document.addEventListener("astro:after-swap", handleSkipToContent);
+
+  refreshMenuLabel();
+  document.addEventListener("ui:langchange", refreshMenuLabel);
 </script>

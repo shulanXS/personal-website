@@ -2,30 +2,117 @@
 import type { CollectionEntry } from "astro:content";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { toTransitionName } from "@/utils/toTransitionName";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
 import Datetime from "./Datetime.astro";
+import TagChip from "./TagChip.astro";
+
+/**
+ * Unified card model.
+ *
+ * Every listing on the site (posts, notes, writing, projects) renders through
+ * this shape so that cards look and behave the same everywhere. Keeping the
+ * model separate from the content collections also means a new content type
+ * does not need its own card implementation.
+ */
+export type CardItem = {
+  /** Target URL. */
+  href: string;
+  /** Card headline. */
+  title: string;
+  /** Publication date, rendered in the card meta row. */
+  date: Date;
+  /** Optional supporting text below the title. */
+  description?: string | undefined;
+  /** Optional tag labels. */
+  tags?: string[] | undefined;
+  /** Optional cover image URL. */
+  image?: string | undefined;
+  /** Transition name for View Transitions. */
+  transitionName?: string | undefined;
+};
 
 type Props = {
   variant?: "h2" | "h3";
-} & CollectionEntry<"posts">;
+  /**
+   * "plain" — the classic single-column list entry
+   * "card"  — a bordered card, used by the multi-column desktop layouts
+   */
+  layout?: "plain" | "card";
+} & Partial<CardItem> &
+  Partial<CollectionEntry<"posts">>;
 
-const { variant: Heading = "h2", id, data, filePath } = Astro.props;
+const { variant: Heading = "h2", layout = "plain" } = Astro.props;
 
-const { title, description, ...props } = data;
+// The component accepts two shapes: a plain card model, or a posts collection
+// entry (the legacy `<Card {...post} />` usage). Normalise both into the
+// card model so the markup below only deals with one shape.
+const props = Astro.props as Partial<CardItem> &
+  Partial<CollectionEntry<"posts">>;
+
+const isPostEntry = !props.href && props.data !== undefined;
+
+const resolvedHref =
+  props.href ?? (isPostEntry ? getPostUrl(props.id!, props.filePath) : "#");
+const resolvedTitle = props.title ?? props.data?.title ?? "";
+const resolvedDate =
+  props.date ??
+  props.data?.pubDatetime ??
+  props.data?.modDatetime ??
+  new Date();
+const resolvedDescription = props.description ?? props.data?.description;
+const resolvedTags = props.tags ?? props.data?.tags ?? [];
+const resolvedTransition =
+  props.transitionName ??
+  (isPostEntry ? toTransitionName(props.id!) : undefined);
+
+// The tag slugs the card carries. They are written onto the element so that
+// the client-side filter can match against them without reading the DOM
+// text.
+const tagSlugs = resolvedTags.map(tagSlug);
 ---
 
-<li class="my-6">
+<li
+  class:list={[layout === "card" && "post-card", layout === "plain" && "my-6"]}
+  data-tagged-item
+  data-tags={tagSlugs.join(",")}
+>
   <a
-    href={getPostUrl(id, filePath, Astro.currentLocale)}
+    href={resolvedHref}
     class:list={[
       "text-accent inline-block text-lg font-medium",
       "decoration-dashed underline-offset-4 hover:underline",
       "focus-visible:no-underline focus-visible:underline-offset-0",
     ]}
   >
-    <Heading transition:name={toTransitionName(id)}>
-      {title}
+    <Heading transition:name={resolvedTransition}>
+      {resolvedTitle}
     </Heading>
   </a>
-  <Datetime {...props} />
-  <p>{description}</p>
+  {
+    /*
+    `modDatetime` has to be forwarded, otherwise the "Updated:" prefix that
+    `Datetime` renders for modified posts silently disappears.
+  */
+  }
+  <Datetime
+    pubDatetime={props.data?.pubDatetime ?? resolvedDate}
+    modDatetime={props.data?.modDatetime ?? null}
+  />
+  {resolvedDescription && <p>{resolvedDescription}</p>}
+  {
+    resolvedTags.length > 0 && (
+      <ul class="mt-3 flex flex-wrap gap-2">
+        {resolvedTags.map(tag => (
+          <li>
+            <TagChip
+              slug={tagSlug(tag)}
+              name={tagDisplayName(tag)}
+              mode="static"
+              size="sm"
+            />
+          </li>
+        ))}
+      </ul>
+    )
+  }
 </li>

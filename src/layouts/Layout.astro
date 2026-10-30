@@ -12,6 +12,13 @@ type Props = {
   description?: string;
   ogImage?: string;
   canonicalURL?: string;
+  /**
+   * Width scale of the page shell.
+   *
+   * The scale is applied to `<html>` so that the header, the main content and
+   * the footer all share the same container width.
+   */
+  width?: "default" | "wide" | "list" | "flow" | "reading";
 };
 
 const { site } = config;
@@ -21,30 +28,51 @@ const {
   description = site.description,
   ogImage = resolveDefaultOgImagePath(config),
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  width = "default",
 } = Astro.props;
+
+const widthClass = {
+  default: "",
+  wide: "app-w-wide",
+  list: "app-w-list",
+  flow: "app-w-flow",
+  reading: "app-w-reading",
+}[width];
 
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
 const rssHref = getRelativeLocaleUrl(
   Astro.currentLocale ?? config.site.lang,
   "rss.xml"
 );
+
+// The interface language is independent from the Astro i18n locale:
+// `site.lang` drives URL building, `site.uiLang` drives the interface text.
+const uiLang = site.uiLang;
 ---
 
 <!doctype html>
 <html
   dir={site.dir ?? "ltr"}
-  lang={Astro.currentLocale ?? site.lang}
-  class="overflow-y-scroll scroll-smooth"
+  lang={uiLang}
+  data-timezone={site.timezone}
+  class:list={["overflow-y-scroll scroll-smooth", widthClass]}
 >
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href={getAssetPath("favicon.svg")} />
-    <link rel="icon" href={getAssetPath("favicon.ico")} />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Font -->
+    <!--
+      Font.
+
+      The webfont is only used for code (see `--font-mono` in `theme.css`);
+      the UI and body text use the platform's own system fonts so that the
+      Chinese interface renders with the native, hinted CJK face.
+      Preloading the Latin subset is still worthwhile because code blocks
+      appear above the fold on most posts.
+    -->
     <Font
       cssVariable="--font-google-sans-code"
       preload={[{ subset: "latin", weight: 400, style: "normal" }]}
@@ -101,7 +129,12 @@ const rssHref = getRelativeLocaleUrl(
     -->
     <script is:inline>
       (function () {
-        const stored = localStorage.getItem("theme");
+        let stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {
+          // localStorage unavailable (private mode / disabled) — fall through.
+        }
         const prefersDark = window.matchMedia(
           "(prefers-color-scheme: dark)"
         ).matches;
@@ -114,14 +147,53 @@ const rssHref = getRelativeLocaleUrl(
       })();
     </script>
 
+    <!--
+      Inline language-preference script.
+
+      Two jobs:
+      1. Set `<html lang>` before the first paint so that the browser renders
+         the correct font and hyphenation rules immediately.
+      2. Remember the stored language in `window.__uiLang`, so the runtime
+         switcher in `src/scripts/i18n.ts` can apply the right strings as soon
+         as the body has been parsed.
+
+      The actual text replacement cannot happen here: this script runs while
+      the parser is still inside `<head>`, so the `<body>` — and with it every
+      `[data-i18n]` element — does not exist yet. Doing it later would cause a
+      visible flash of the server-rendered language, so instead the body
+      script (`@/scripts/i18n`) applies the stored language as its very first
+      action, before the browser paints the interactive page.
+    -->
+    <script is:inline define:vars={{ defaultUiLang: uiLang }}>
+      (function () {
+        var lang = defaultUiLang;
+        try {
+          var stored = localStorage.getItem("uiLang");
+          if (stored) lang = stored;
+        } catch (e) {
+          // localStorage unavailable — keep the default language.
+        }
+
+        var root = document.firstElementChild;
+        if (root) root.setAttribute("lang", lang);
+
+        // Expose the resolved language so the runtime script does not have to
+        // read localStorage again (and so both stay in sync).
+        window.__uiLang = lang;
+      })();
+    </script>
+
     <ClientRouter />
   </head>
   <body
+    id="top"
     class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
   >
     <slot />
     <script>
       import "@/scripts/theme";
+      import "@/scripts/i18n";
+      import "@/scripts/tagFilter";
     </script>
   </body>
 </html>

@@ -3,7 +3,12 @@ const LIGHT = "light";
 const DARK = "dark";
 
 function getPreferredTheme(): string {
-  const stored = localStorage.getItem(THEME_KEY);
+  let stored: string | null = null;
+  try {
+    stored = localStorage.getItem(THEME_KEY);
+  } catch {
+    // localStorage may be unavailable (private mode, disabled cookies).
+  }
   if (stored) return stored;
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? DARK
@@ -16,7 +21,11 @@ let themeValue: string =
   getPreferredTheme();
 
 function persist(): void {
-  localStorage.setItem(THEME_KEY, themeValue);
+  try {
+    localStorage.setItem(THEME_KEY, themeValue);
+  } catch {
+    // Ignore storage failures — the theme still applies for this page view.
+  }
   reflect();
 }
 
@@ -24,7 +33,6 @@ function reflect(): void {
   const root = document.firstElementChild;
   root?.setAttribute("data-theme", themeValue);
   root?.classList.toggle("dark", themeValue === DARK);
-  document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
 
   // Fill <meta name="theme-color"> with the computed background colour so
   // Android's browser chrome matches the page background.

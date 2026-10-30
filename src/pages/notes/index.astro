@@ -1,0 +1,78 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import NoteCard from "@/components/NoteCard.astro";
+import TagBar from "@/components/TagBar.astro";
+import { getPublishedNotes } from "@/utils/content";
+import { getTagIndex } from "@/utils/tagIndex";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const t = useTranslations(config.site.uiLang);
+
+const notes = await getPublishedNotes();
+
+const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
+const noteTags = tags.filter(tag => tag.counts.notes > 0);
+---
+
+<Layout title={`${t.pages.notesTitle} | ${config.site.title}`} width="list">
+  <Header />
+
+  <Breadcrumb />
+
+  <Main
+    pageTitle={t.pages.notesTitle}
+    pageDesc={t.pages.notesDesc}
+    titleKey="pages.notesTitle"
+    descKey="pages.notesDesc"
+  >
+    <div data-tag-scope="collection">
+      {
+        /*
+        The tag bar is a control, not content — it must stay out of the search
+        index. The list itself *is* indexed, so that a note can be found by
+        its words even though it has no page of its own.
+
+        Every note carries a heading, so Pagefind reports each note as its
+        own sub result and the reader lands on the exact entry.
+      */
+      }
+      <div data-pagefind-ignore>
+        <TagBar tags={noteTags} source="notes" />
+      </div>
+
+      {
+        notes.length === 0 ? (
+          <p class="text-muted-foreground" data-i18n="pages.notesEmpty">
+            {t.pages.notesEmpty}
+          </p>
+        ) : (
+          <ul
+            class="mt-6"
+            data-list-layout="timeline"
+            data-pagefind-body
+            data-pagefind-meta="type:notes"
+          >
+            {notes.map(note => (
+              <NoteCard note={note} />
+            ))}
+          </ul>
+        )
+      }
+
+      <p
+        class="text-muted-foreground mt-8 hidden"
+        data-tag-empty
+        data-i18n="tags.empty"
+      >
+        {t.tags.empty}
+      </p>
+    </div>
+  </Main>
+
+  <Footer />
+</Layout>
