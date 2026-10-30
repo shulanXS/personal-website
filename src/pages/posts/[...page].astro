@@ -49,7 +49,7 @@ const siblingPageUrls = Array.from(
   );
 ---
 
-<Layout title={`${t.pages.postsTitle} | ${config.site.title}`} width="flow">
+<Layout title={`${t.pages.postsTitle} | ${config.site.title}`} width="list">
   <Header />
 
   <Breadcrumb />
@@ -66,7 +66,7 @@ const siblingPageUrls = Array.from(
     >
       <TagBar tags={postTags} source="posts" />
 
-      <ul class="mt-6" data-list-layout="timeline">
+      <ul class="mt-6" data-list-layout="vertical">
         {page.data.map(post => <PostCard post={post} />)}
       </ul>
 

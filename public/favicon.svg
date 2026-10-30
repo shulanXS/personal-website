@@ -1,14 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
   <defs>
     <!--
-      The eye patches are drawn as solid shapes, and the closed eyes are
-      punched out of them with a mask. That way the eyes read as part of the
-      markings instead of as a separate pair of spectacles.
+      The eye patches are solid shapes, and the closed, contented eyes are
+      punched out of them with a mask. Because the eyes are cut *into* the
+      markings rather than drawn on top of them, they read as part of the
+      face instead of as a separate pair of spectacles.
     -->
     <mask id="sloth-eyes">
       <rect width="128" height="128" fill="black" />
-      <path d="M46.4 60.8q5.6-6 11.2 0" stroke="white" stroke-width="4.5" />
-      <path d="M70.4 60.8q5.6-6 11.2 0" stroke="white" stroke-width="4.5" />
+      <g stroke="white" stroke-width="6.5" stroke-linecap="round" fill="none">
+        <path d="M46 63.2q6-6.8 12 0" />
+        <path d="M70 63.2q6-6.8 12 0" />
+      </g>
     </mask>
   </defs>
 
@@ -19,23 +22,30 @@
   -->
   <rect width="128" height="128" rx="28" fill="#1d1f26" />
 
-  <g stroke="#f5f3ef" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+  <g
+    stroke="#f5f3ef"
+    stroke-width="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  >
     <!-- The branch the sloth hangs from. -->
-    <path d="M10.4 18.4C56 8 72 8 117.6 18.4" />
-    <!-- The two long arms. -->
-    <path d="M40.8 16.4C40.8 36.8 45.6 48 52 58.4" />
-    <path d="M87.2 16.4C87.2 36.8 82.4 48 76 58.4" />
-    <!-- The head. -->
-    <path d="M64 52c17.2 0 29.2 12.4 29.2 28.4S81.2 108.8 64 108.8 34.8 96.4 34.8 80.4 46.8 52 64 52Z" />
-    <!-- The broad flat nose and the slow smile. -->
-    <path d="M58.4 74.8q5.6 7.6 11.2 0" />
-    <path d="M64 81.2v3.2" />
-    <path d="M55.2 84.8q8.8 8.4 17.6 0" />
+    <path d="M18.4 20.8c30.4-6.8 60.8-6.8 91.2 0" />
+    <path d="M43.6 18c0 19.2 4.4 32 9.6 41.6" />
+    <path d="M84.4 18c0 19.2-4.4 32-9.6 41.6" />
+
+    <!-- The round face. -->
+    <path
+      d="M64 47.6c16.4 0 28.4 11.6 28.4 25.6S80.4 98.8 64 98.8 35.6 87.2 35.6 73.2 47.6 47.6 64 47.6Z"
+    />
+
+    <!-- The slow, contented smile. -->
+    <path d="M57.6 77.6q6.4 6.4 12.8 0" />
   </g>
 
   <!-- The dark markings around the eyes — the sloth's signature. -->
-  <g fill="#f5f3ef" stroke="none" mask="url(#sloth-eyes)">
-    <ellipse cx="52" cy="60.8" rx="11.6" ry="13.6" />
-    <ellipse cx="76" cy="60.8" rx="11.6" ry="13.6" />
+  <g fill="#f5f3ef" mask="url(#sloth-eyes)">
+    <ellipse cx="52" cy="62.4" rx="10.8" ry="12.4" />
+    <ellipse cx="76" cy="62.4" rx="10.8" ry="12.4" />
   </g>
 </svg>

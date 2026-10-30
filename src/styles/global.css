@@ -68,35 +68,39 @@
 
 /* Layout width scales.
  *
- * Every page picks one scale: the default narrow reading column, a wide
- * screen for the home page and the project grid, a list scale for the
- * paginated listings, a narrow "flow" column for the notes timeline, or a
- * comfortable long-form column for literary work.
+ * The site has two nested widths, and keeping them apart is what makes the
+ * pages feel like one site rather than a set of unrelated templates:
  *
- * The scale is stored in a custom property on `<html>` (set by `Layout.astro`)
- * so that the header, the main content and the footer always use the *same*
- * width. Previously the header and footer were hard-wired to the default
- * scale while the main content could be wider, which left the page visibly
- * misaligned.
+ * - The *shell* is the frame: the header, the navigation and the footer.
+ *   It is the same width on every single page, so the site reads as one
+ *   application with a fixed chrome around it. Before this, the shell
+ *   inherited the width of whatever the page happened to render, so the
+ *   navigation was 576px wide on an article page and 1152px on the home
+ *   page — the same header, drawn at a different size on every click.
  *
- * `max-w-app` stays a separate utility because the blog article body relies on
- * it (`app-prose max-w-app`).
+ * - The *content* width is chosen per page: a narrow reading column for
+ *   an article, a comfortable column for the notes timeline, a wide one
+ *   for the home page. The content is centred inside the shell.
+ *
+ * The shell width is stored on `<html>` so that the header, the main
+ * content and the footer can never disagree about it.
  */
 @layer base {
   html {
+    --app-shell-width: var(--container-6xl);
     --app-max-width: var(--container-3xl);
   }
 
   html.app-w-wide {
-    --app-max-width: var(--container-6xl);
-  }
-
-  html.app-w-list {
     --app-max-width: var(--container-5xl);
   }
 
+  html.app-w-list {
+    --app-max-width: var(--container-4xl);
+  }
+
   html.app-w-flow {
-    --app-max-width: var(--container-xl);
+    --app-max-width: var(--container-3xl);
   }
 
   html.app-w-reading {
@@ -110,12 +114,12 @@
 
 /** Wide container for the home page and the project grid. */
 @utility max-w-app-wide {
-  @apply max-w-6xl;
+  @apply max-w-5xl;
 }
 
 /** Reading-flow container for the notes timeline. */
 @utility max-w-app-flow {
-  @apply max-w-xl;
+  @apply max-w-3xl;
 }
 
 /** Long-form reading container for literary work. */
@@ -123,9 +127,27 @@
   @apply max-w-2xl;
 }
 
+/**
+ * The content column.
+ *
+ * The width comes from the page's own scale, and the column is always
+ * centred inside the shell.
+ */
 @utility app-layout {
-  @apply mx-auto w-full px-4;
+  @apply mx-auto w-full px-4 sm:px-6;
   max-width: var(--app-max-width);
+}
+
+/**
+ * The shell.
+ *
+ * The frame around the content: header, navigation and footer. It is the
+ * same width everywhere, which is what makes the site feel consistent
+ * from one page to the next.
+ */
+@utility app-shell {
+  @apply mx-auto w-full px-5 sm:px-8;
+  max-width: var(--app-shell-width);
 }
 
 @utility active-nav {
@@ -406,109 +428,189 @@
   }
 
   /*
-   * The notes and article timelines.
+   * The vertical list.
    *
-   * A single column, read from top to bottom, with a vertical rule on the
-   * left and a node dot per entry. The date sits in a narrow column to the
-   * left of the rule, so the moment an entry was written is obvious without
-   * having to read the whole entry.
+   * Every entry is one self-contained block, and the blocks are stacked
+   * vertically down the page. Inside a block the elements run top to bottom
+   * as well — date, title, summary, tags — so the eye travels straight
+   * down a single column and never has to zig-zag between a left-hand
+   * gutter and a right-hand body.
    *
-   * The rule is deliberately quiet: a hairline in the border color with a
-   * small hollow node. It guides the eye down the column without competing
-   * with the text or with the accent color of the links.
-   *
-   * Each entry is a raised panel. On the warm page tone the panel reads as
-   * a sheet of paper lying on the desk rather than as text floating in
-   * white space.
-   *
-   * The three parts — rule, date, panel — are laid out with a grid so that
-   * the date column is exactly as wide as it needs to be, whatever the
-   * length of the timestamp.
+   * This is the layout of the technical articles. The date is a quiet line
+   * above the title rather than a column beside it, so the title is always
+   * the first thing the eye lands on.
    */
-  ul[data-list-layout="timeline"] {
+  ul[data-list-layout="vertical"] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  ul[data-list-layout="vertical"] > li {
     position: relative;
   }
 
-  ul[data-list-layout="timeline"] > li {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr;
-    column-gap: var(--app-space-5);
-  }
-
-  /*
-   * The date column.
-   *
-   * On a wide screen it is a narrow column on the left of the rule; on a
-   * phone the columns stack and the date sits above the content.
-   */
-  ul[data-list-layout="timeline"] .app-timeline-date {
-    color: var(--muted-foreground);
-    font-size: 0.8125rem;
-    line-height: 1.5;
-  }
-
-  /* The panel that holds one entry. */
-  ul[data-list-layout="timeline"] > li > article {
+  ul[data-list-layout="vertical"] > li > article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-2);
     border: 1px solid var(--border);
     border-radius: var(--app-radius);
     background: var(--surface);
     box-shadow: var(--app-shadow);
-    padding: var(--app-space-4) var(--app-space-5);
+    padding: var(--app-space-5);
     transition:
       border-color var(--app-transition) ease,
       background-color var(--app-transition) ease,
       box-shadow var(--app-transition) ease;
   }
 
-  ul[data-list-layout="timeline"] > li:hover > article {
+  ul[data-list-layout="vertical"] > li:hover > article {
     border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
     background: var(--surface-raised);
     box-shadow: var(--app-shadow-lift);
   }
 
-  @media (min-width: 40rem) {
-    ul[data-list-layout="timeline"] > li {
-      grid-template-columns: 3.75rem 1fr;
-    }
+  /* The date above the title. */
+  ul[data-list-layout="vertical"] .app-vertical-date {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
 
-    ul[data-list-layout="timeline"] .app-timeline-date {
-      text-align: right;
-    }
+  /*
+   * The sticky note.
+   *
+   * A note is a slip of paper stuck onto the page, so it is drawn like
+   * one: a sheet of warm paper, a torn-looking bottom edge, a folded
+   * corner, and a soft shadow that lifts it off the wall behind.
+   *
+   * The colours are deliberately muted and slightly desaturated — an old
+   * note, not a fresh Post-it. Each note gets a slight rotation so that a
+   * column of them reads as a pile of hand-placed slips rather than a
+   * grid of identical rectangles.
+   */
+  ul[data-list-layout="notes"] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-5);
+  }
 
-    /* The rule that runs through all the nodes. */
-    ul[data-list-layout="timeline"]::before {
-      content: "";
-      position: absolute;
-      left: 4.375rem;
-      top: 0.75rem;
-      bottom: 0.75rem;
-      width: 1px;
-      background: var(--border);
-    }
+  ul[data-list-layout="notes"] > li {
+    position: relative;
+    /*
+    The rotation is what makes the notes feel hand-placed. It is small
+    enough that the text stays perfectly horizontal — the *sheet* is
+    tilted, the writing on it is not.
+    */
+    --note-tilt: -0.4deg;
+  }
 
-    /* The dot that marks the entry on the rule. */
-    ul[data-list-layout="timeline"] > li::before {
-      content: "";
-      position: absolute;
-      left: 4.1875rem;
-      top: 1.0625rem;
-      width: 0.375rem;
-      height: 0.375rem;
-      border-radius: 9999px;
-      border: 1px solid var(--border);
-      background: var(--background);
-      transition:
-        border-color 200ms ease,
-        background-color 200ms ease,
-        transform 200ms ease;
-    }
+  ul[data-list-layout="notes"] > li:nth-child(3n + 2) {
+    --note-tilt: 0.35deg;
+  }
 
-    ul[data-list-layout="timeline"] > li:hover::before {
-      border-color: var(--accent);
-      background: var(--accent);
-      transform: scale(1.35);
-    }
+  ul[data-list-layout="notes"] > li:nth-child(3n + 3) {
+    --note-tilt: 0.5deg;
+  }
+
+  ul[data-list-layout="notes"] > li > article {
+    position: relative;
+    transform: rotate(var(--note-tilt));
+    /*
+    The paper. A warm cream that is a shade *darker* than the page, so the
+    note reads as a separate sheet rather than as a hole in the page.
+    */
+    background: var(--note-paper);
+    border: 1px solid var(--note-edge);
+    border-radius: 2px;
+    /*
+    A wider shadow at the bottom than at the top — the note is lifted off
+    the page, so the light falls on the top edge and the shadow pools
+    underneath.
+    */
+    box-shadow:
+      0 1px 1px rgb(60 50 35 / 0.06),
+      0 4px 10px -2px rgb(60 50 35 / 0.14),
+      0 12px 28px -12px rgb(60 50 35 / 0.18);
+    padding: var(--app-space-5) var(--app-space-5) var(--app-space-8);
+    transition:
+      transform var(--app-transition) ease,
+      box-shadow var(--app-transition) ease,
+      background-color var(--app-transition) ease;
+  }
+
+  /*
+   * The folded corner.
+   *
+   * A triangle in the bottom right, drawn with a clip path. The colour is
+   * the page tone, so it looks as if the corner has been folded back and
+   * the page behind it shows through.
+   *
+   * It sits *behind* the text (a negative z-index) and the article has a
+   * little extra padding at the bottom, so the fold never lands on a
+   * character.
+   */
+  ul[data-list-layout="notes"] > li > article::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: var(--background);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* The writing on the paper has to sit above the folded corner. */
+  ul[data-list-layout="notes"] > li > article > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /*
+   * The pin.
+   *
+   * A small disc at the top centre of the note. It is the one purely
+   * decorative element on the page, and it earns its place by stating
+   * what the object is supposed to be.
+   */
+  ul[data-list-layout="notes"] > li > article::before {
+    content: "";
+    position: absolute;
+    top: -0.4375rem;
+    left: 50%;
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-left: -0.4375rem;
+    border-radius: 9999px;
+    background: var(--note-pin);
+    box-shadow:
+      0 1px 2px rgb(60 50 35 / 0.25),
+      inset 0 -1px 1px rgb(0 0 0 / 0.15);
+  }
+
+  ul[data-list-layout="notes"] > li:hover > article {
+    transform: rotate(0deg) translateY(-2px);
+    box-shadow:
+      0 2px 2px rgb(60 50 35 / 0.06),
+      0 8px 18px -4px rgb(60 50 35 / 0.18),
+      0 20px 40px -16px rgb(60 50 35 / 0.22);
+  }
+
+  /*
+   * The date on a note.
+   *
+   * Written along the top edge of the paper, the way a date would be
+   * written by hand on the corner of a slip of paper.
+   */
+  ul[data-list-layout="notes"] .app-note-date {
+    color: var(--note-ink-faint);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
   }
 
   /*

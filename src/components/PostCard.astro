@@ -7,15 +7,17 @@ import Datetime from "./Datetime.astro";
 import TagChip from "./TagChip.astro";
 
 /**
- * A technical article in the vertical timeline.
+ * A technical article in the vertical list.
  *
- * The article list reads top to bottom like the notes timeline: the publish
- * date sits in a narrow column on the left of the rule, the rule carries a
- * node per entry, and the article itself fills the column on the right.
+ * Every article is one self-contained block, and the blocks are stacked
+ * vertically down the page. Inside a block the elements also run top to
+ * bottom — the date, then the title, then the summary, then the tags — so
+ * the eye travels straight down the column instead of zig-zagging between
+ * a left-hand date gutter and a right-hand body.
  *
- * The vertical order makes the *sequence* of the writing visible, which a
- * two-column grid cannot show — in a grid the eye jumps between two
- * unrelated columns and the chronology is lost.
+ * The date sits above the title rather than beside it, which is what keeps
+ * the block readable as a single unit: the title is the first thing the
+ * eye lands on, and the timestamp is the quiet line above it.
  */
 type Props = {
   post: CollectionEntry<"posts">;
@@ -30,40 +32,32 @@ const tagSlugs = tags.map(tagSlug);
 ---
 
 <li class="app-list-entry" data-tagged-item data-tags={tagSlugs.join(",")}>
-  {
-    /*
-    The date lives in a narrow column on the left of the vertical rule, so
-    the moment an article was published is readable at a glance. On a phone
-    the columns stack instead, and the date sits above the content.
-    */
-  }
-  <div class="app-timeline-date">
-    <Datetime
-      pubDatetime={data.pubDatetime}
-      modDatetime={data.modDatetime ?? null}
-      bare
-      compact
-      class="sm:justify-end"
-    />
-  </div>
+  <article class="flex flex-col gap-2">
+    <div class="app-vertical-date">
+      <Datetime
+        pubDatetime={data.pubDatetime}
+        modDatetime={data.modDatetime ?? null}
+        bare
+        compact
+      />
+    </div>
 
-  <article class="min-w-0">
     <a
       href={href}
-      class="text-accent inline-block text-lg font-medium decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+      class="text-accent inline-block text-xl font-semibold decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
     >
       <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
     </a>
 
     {
       data.description && (
-        <p class="text-muted-foreground mt-1">{data.description}</p>
+        <p class="text-muted-foreground leading-relaxed">{data.description}</p>
       )
     }
 
     {
       tags.length > 0 && (
-        <ul class="mt-3 flex flex-wrap gap-2">
+        <ul class="mt-1 flex flex-wrap gap-2">
           {tags.map(tag => (
             <li>
               <TagChip

@@ -180,25 +180,34 @@ function appendSiblingItems(
   for (const item of items) {
     if (list.querySelector(`a[href="${item.url}"]`)) continue;
 
+    /*
+    The appended entry has to look exactly like the entries that are already
+    on the page, or the last page of a filtered listing would break the
+    rhythm of the list. The markup therefore mirrors the vertical layout:
+    an `<article>` wrapper holding the date and the link.
+    */
     const li = document.createElement("li");
-    li.className = "post-card";
     li.setAttribute("data-tagged-item", "");
     li.setAttribute("data-tags", item.tags);
+
+    const article = document.createElement("article");
+    article.className = "flex flex-col gap-2";
+
+    if (item.date) {
+      const meta = document.createElement("div");
+      meta.className = "app-vertical-date";
+      meta.textContent = item.date;
+      article.appendChild(meta);
+    }
 
     const link = document.createElement("a");
     link.href = item.url;
     link.className =
-      "text-accent inline-block text-lg font-medium decoration-dashed underline-offset-4 hover:underline";
+      "text-accent inline-block text-xl font-semibold decoration-dashed underline-offset-4 hover:underline";
     link.textContent = item.title;
-    li.appendChild(link);
+    article.appendChild(link);
 
-    if (item.date) {
-      const meta = document.createElement("span");
-      meta.className = "text-muted-foreground block text-sm";
-      meta.textContent = item.date;
-      li.appendChild(meta);
-    }
-
+    li.appendChild(article);
     list.appendChild(li);
     li.setAttribute("data-appended", "true");
   }

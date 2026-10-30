@@ -61,6 +61,24 @@
   --surface-raised: #ffffff;
 
   /*
+   * The sticky-note tokens.
+   *
+   * A note is a slip of paper, so its paper is a *warmer and slightly
+   * darker* cream than the page — the opposite direction from a card,
+   * which is brighter than the page. That difference is what makes a note
+   * read as paper laid on top of the page, rather than as a white card.
+   *
+   * The ink is a soft brown-grey rather than the near-black of the body
+   * text. Notes are meant to feel like something jotted down, not like a
+   * published article.
+   */
+  --note-paper: #fbf3dd;
+  --note-edge: #e8dcbb;
+  --note-pin: #c2714f;
+  --note-ink: #4a4034;
+  --note-ink-faint: #8a7c63;
+
+  /*
    * Semantic tokens.
    *
    * The four lists — notes, posts, writing and projects — all share one
@@ -111,6 +129,19 @@
    */
   --surface: #212737;
   --surface-raised: #2a3145;
+
+  /*
+   * The dark-mode sticky notes.
+   *
+   * A note on a dark page is still a sheet of paper, but a dim one — it
+   * keeps the warm cast, just turned down. The pin stays a warm terracotta
+   * so it still reads as a pushpin.
+   */
+  --note-paper: #33301f;
+  --note-edge: #454028;
+  --note-pin: #c0714f;
+  --note-ink: #e0d8c4;
+  --note-ink-faint: #a2977c;
 
   --app-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.2);
   --app-shadow-lift:

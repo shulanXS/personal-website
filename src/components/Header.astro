@@ -50,10 +50,18 @@ const isActive = (path: string) => {
 </a>
 
 <header
-  class="app-layout sticky top-0 z-40 flex flex-col items-center justify-between bg-transparent sm:flex-row"
+  class="app-shell sticky top-0 z-40 flex flex-col items-center justify-between"
 >
+  {
+    /*
+    The bar spans the full width of the shell, and only its *contents* are
+    padded. Padding the bar itself would inset the border as well, which is
+    what made the header look like a narrow strip floating in the corner
+    instead of the top edge of the page.
+    */
+  }
   <div
-    class="border-border bg-surface/85 relative flex w-full items-baseline justify-between border-b py-4 backdrop-blur-xl sm:items-center sm:py-5"
+    class="border-border bg-surface/85 relative flex w-full items-baseline justify-between border-b px-5 py-4 backdrop-blur-xl sm:items-center sm:px-8 sm:py-5"
   >
     <a
       href={getRelativeLocaleUrl(locale, "")}

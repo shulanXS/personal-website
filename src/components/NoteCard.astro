@@ -37,28 +37,18 @@ const indexTitle = (
 ).replace(/[\r\n:;]+/g, " ");
 ---
 
-<li
-  class="app-list-entry border-border border-b last:border-b-0"
-  data-tagged-item
-  data-tags={tagSlugs.join(",")}
->
-  {
-    /*
-    The date lives in a narrow column on the left of the vertical rule, so
-    the moment a note was written is readable at a glance. On a phone the
-    columns stack instead, and the date sits above the content.
-    */
-  }
-  <div class="app-timeline-date" data-pagefind-ignore>
-    <Datetime
-      pubDatetime={data.pubDatetime}
-      bare
-      compact
-      class="sm:justify-end"
-    />
-  </div>
-
+<li data-tagged-item data-tags={tagSlugs.join(",")}>
   <article class="min-w-0">
+    {
+      /*
+      The date is written along the top of the paper, the way it would be
+      written by hand on the corner of a slip of paper.
+    */
+    }
+    <div class="app-note-date" data-pagefind-ignore>
+      <Datetime pubDatetime={data.pubDatetime} bare compact />
+    </div>
+
     {
       /*
         The heading gives every note its own search result. For a note that
@@ -72,7 +62,7 @@ const indexTitle = (
     }
     {
       data.title ? (
-        <h2 id={`note-${id}`} class="text-lg font-semibold">
+        <h2 id={`note-${id}`} class="text-lg font-semibold text-(--note-ink)">
           {data.title}
         </h2>
       ) : (
@@ -85,7 +75,7 @@ const indexTitle = (
       data.content && (
         <p
           class:list={[
-            "text-foreground break-words whitespace-pre-wrap",
+            "break-words whitespace-pre-wrap text-(--note-ink)",
             { "line-clamp-6": !expanded && isLong },
           ]}
           data-note-body

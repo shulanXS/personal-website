@@ -157,7 +157,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
               >
                 {t.home.recentNotes}
               </h2>
-              <ul class="mt-4" data-list-layout="timeline">
+              <ul class="mt-4" data-list-layout="notes">
                 {notes.slice(0, postsConfig.perIndex).map(note => (
                   <NoteCard note={note} />
                 ))}
@@ -195,7 +195,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
               >
                 {t.home.recentPosts}
               </h2>
-              <ul data-list-layout="timeline">
+              <ul data-list-layout="vertical">
                 {recentPosts.slice(0, postsConfig.perIndex).map(post => (
                   <PostCard post={post} />
                 ))}
