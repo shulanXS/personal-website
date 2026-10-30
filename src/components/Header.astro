@@ -61,11 +61,11 @@ const isActive = (path: string) => {
     */
   }
   <div
-    class="border-border bg-surface/85 relative flex w-full items-baseline justify-between border-b px-5 py-4 backdrop-blur-xl sm:items-center sm:px-8 sm:py-5"
+    class="app-header-bar border-border relative flex w-full items-baseline justify-between border-b px-5 py-4 sm:items-center sm:px-8 sm:py-5"
   >
     <a
       href={getRelativeLocaleUrl(locale, "")}
-      class="absolute flex items-center gap-2 py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
+      class="app-header-brand relative flex items-center gap-2.5 py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:my-auto sm:text-2xl sm:leading-none"
     >
       <SlothLogo
         class="stroke-accent size-7 shrink-0 sm:size-8"
@@ -75,11 +75,11 @@ const isActive = (path: string) => {
     </a>
     <nav
       id="nav-menu"
-      class="flex w-full flex-col items-center sm:ms-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0"
+      class="flex w-full flex-col items-center lg:ms-auto lg:w-auto lg:flex-row lg:justify-end lg:py-0"
     >
       <button
         id="menu-btn"
-        class="focus-outline self-end p-2 sm:hidden"
+        class="focus-outline self-end p-2 lg:hidden"
         aria-label={t.a11y.openMenu}
         data-i18n="a11y.openMenu"
         data-i18n-attr="aria-label"
@@ -95,7 +95,7 @@ const isActive = (path: string) => {
       </button>
       <ul
         id="menu-items"
-        class="[&>li>a]:hover:text-accent mt-4 hidden w-full grid-cols-2 place-content-center gap-x-2 gap-y-1 sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0 sm:[&>li]:h-8 [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium sm:[&>li>a]:px-2 sm:[&>li>a]:py-1"
+        class="[&>li>a]:hover:text-accent mt-4 hidden w-full grid-cols-2 place-content-center gap-x-2 gap-y-1 lg:mt-0 lg:flex lg:w-auto lg:gap-y-0 lg:[&>li]:h-8 [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium lg:[&>li>a]:px-2 lg:[&>li>a]:py-1"
       >
         <li class="col-span-2">
           <a
@@ -138,7 +138,7 @@ const isActive = (path: string) => {
         */
         }
         <li
-          class="col-span-2 flex items-center justify-center gap-6 sm:col-span-1 sm:gap-5"
+          class="col-span-2 flex items-center justify-center gap-6 lg:col-span-1 lg:gap-5"
         >
           {
             features.search !== false && (
@@ -167,7 +167,7 @@ const isActive = (path: string) => {
             features.lightAndDarkMode && (
               <button
                 id="theme-btn"
-                class="focus-outline hover:[&>svg]:stroke-accent relative size-12 p-4 sm:size-8"
+                class="focus-outline hover:[&>svg]:stroke-accent relative size-12 p-4 lg:size-8"
                 title={t.a11y.toggleTheme}
                 aria-label={t.a11y.toggleTheme}
                 data-i18n="a11y.toggleTheme"

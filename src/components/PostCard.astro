@@ -31,8 +31,8 @@ const tags = data.tags ?? [];
 const tagSlugs = tags.map(tagSlug);
 ---
 
-<li class="app-list-entry" data-tagged-item data-tags={tagSlugs.join(",")}>
-  <article class="flex flex-col gap-2">
+<li data-tagged-item data-tags={tagSlugs.join(",")}>
+  <article class="flex flex-col gap-2.5">
     <div class="app-vertical-date">
       <Datetime
         pubDatetime={data.pubDatetime}
@@ -44,20 +44,22 @@ const tagSlugs = tags.map(tagSlug);
 
     <a
       href={href}
-      class="text-accent inline-block text-xl font-semibold decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+      class="text-accent inline-block text-xl leading-snug font-semibold decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
     >
       <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
     </a>
 
     {
       data.description && (
-        <p class="text-muted-foreground leading-relaxed">{data.description}</p>
+        <p class="text-muted-foreground text-[0.9375rem] leading-relaxed">
+          {data.description}
+        </p>
       )
     }
 
     {
       tags.length > 0 && (
-        <ul class="mt-1 flex flex-wrap gap-2">
+        <ul class="mt-0.5 flex flex-wrap gap-1.5">
           {tags.map(tag => (
             <li>
               <TagChip
