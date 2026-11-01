@@ -1,7 +1,7 @@
 ---
 import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
-import { getRelativeLocaleUrl } from "astro:i18n";
+import { fileUrl } from "@/utils/routes";
 import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
 import { getAssetPath } from "@/utils/withBase";
 import { useTranslations } from "@/i18n";
@@ -43,10 +43,7 @@ const widthClass = {
 }[width];
 
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
-const rssHref = getRelativeLocaleUrl(
-  Astro.currentLocale ?? config.site.lang,
-  "rss.xml"
-);
+const rssHref = fileUrl(Astro.currentLocale ?? config.site.lang, "rss.xml");
 
 // The interface language is independent from the Astro i18n locale:
 // `site.lang` drives URL building, `site.uiLang` drives the interface text.

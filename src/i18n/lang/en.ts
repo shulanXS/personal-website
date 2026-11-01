@@ -185,18 +185,22 @@ export default {
       {
         label: "Blog",
         desc: "Longer pieces on applied AI, web development and engineering practice.",
+        route: "posts",
       },
       {
         label: "Notes",
         desc: "Thoughts, reading notes and daily fragments, written as they come.",
+        route: "notes",
       },
       {
         label: "Writing",
         desc: "Novels, essays and short stories.",
+        route: "writing",
       },
       {
         label: "Projects",
         desc: "Things I have built, open-sourced or experimented with.",
+        route: "projects",
       },
     ],
     contactTitle: "Get in touch",

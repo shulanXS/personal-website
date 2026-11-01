@@ -39,3 +39,8 @@ compose.override.yaml
 *-tmp.mjs
 outline-test.html
 design-proposals-*.html
+
+# cloudflare local state
+# The cache that `wrangler dev` and the local D1/R2/KV emulators write
+# while previewing. It is machine-local and regenerated on every run.
+.wrangler/

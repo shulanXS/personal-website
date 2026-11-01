@@ -1,6 +1,6 @@
-import { getRelativeLocaleUrl } from "astro:i18n";
 import { BLOG_PATH, NOTES_PATH, WRITING_PATH } from "@/content.config";
 import { slugifyStr } from "./slugify";
+import { routeUrl, routeUrlWith } from "./routes";
 import config from "@/config";
 
 /**
@@ -51,19 +51,16 @@ export function getPostSlug(id: string, filePath: string | undefined): string {
 
 /**
  * Returns a fully navigable URL for use in `<a href>` and RSS links.
- * Applies both locale routing and the configured Astro base via
- * `getRelativeLocaleUrl`.
- * e.g. `/posts/my-post` or `/en/posts/my-post`
+ * Applies both locale routing and the configured Astro base, and always ends
+ * with a trailing slash so that it matches the canonical URL of the page.
+ * e.g. `/posts/my-post/` or `/en/posts/my-post/`
  */
 export function getPostUrl(
   id: string,
   filePath: string | undefined,
   locale: string | undefined = config.site.lang
 ): string {
-  return getRelativeLocaleUrl(
-    locale,
-    `posts/${buildSlugPath(id, filePath, BLOG_PATH)}`
-  );
+  return routeUrlWith(locale, "posts", buildSlugPath(id, filePath, BLOG_PATH));
 }
 
 /*
@@ -73,7 +70,7 @@ export function getPostUrl(
 export function getNotesUrl(
   locale: string | undefined = config.site.lang
 ): string {
-  return getRelativeLocaleUrl(locale, "notes");
+  return routeUrl(locale, "notes");
 }
 
 /**
@@ -88,7 +85,7 @@ export function getWritingUrl(
   slug: string,
   locale: string | undefined = config.site.lang
 ): string {
-  return getRelativeLocaleUrl(locale, `writing/${slugifyStr(slug)}`);
+  return routeUrlWith(locale, "writing", slugifyStr(slug));
 }
 
 export { NOTES_PATH, WRITING_PATH };

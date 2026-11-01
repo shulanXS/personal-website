@@ -1,5 +1,5 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
+import { routeUrl } from "@/utils/routes";
 import config from "@/config";
 
 type Props = {
@@ -23,7 +23,7 @@ const {
 const locale = Astro.currentLocale ?? config.site.lang;
 const backUrl = config.features.showBackButton
   ? Astro.url.pathname
-  : getRelativeLocaleUrl(locale, "");
+  : routeUrl(locale, "home");
 ---
 
 <main

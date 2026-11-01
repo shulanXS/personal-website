@@ -1,5 +1,4 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
 import MonogramLogo from "@/assets/monogram-logo.svg";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
@@ -7,6 +6,7 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
+import { routeUrl } from "@/utils/routes";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -121,36 +121,19 @@ const t = useTranslations(config.site.uiLang);
 
       <ul class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {
-          t.about.hereItems.map((item, index) => {
-            const targets = ["posts", "notes", "writing", "projects"];
-            const href = targets[index]
-              ? getRelativeLocaleUrl(locale, targets[index])
-              : undefined;
-
-            const body = (
-              <>
+          t.about.hereItems.map(item => (
+            <li class="border-border bg-surface rounded-[var(--app-radius)] border p-4">
+              <a
+                href={routeUrl(locale, item.route)}
+                class="hover:text-accent block transition-colors"
+              >
                 <h3 class="text-accent font-medium">{item.label}</h3>
                 <p class="text-muted-foreground mt-1 text-sm leading-relaxed">
                   {item.desc}
                 </p>
-              </>
-            );
-
-            return (
-              <li class="border-border bg-surface rounded-[var(--app-radius)] border p-4">
-                {href ? (
-                  <a
-                    href={href}
-                    class="hover:text-accent block transition-colors"
-                  >
-                    {body}
-                  </a>
-                ) : (
-                  body
-                )}
-              </li>
-            );
-          })
+              </a>
+            </li>
+          ))
         }
       </ul>
     </section>

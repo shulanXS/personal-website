@@ -194,18 +194,22 @@ export default {
       {
         label: "技术文章",
         desc: "关于 AI 应用、Web 开发与工程实践的长文。",
+        route: "posts",
       },
       {
         label: "碎碎念",
         desc: "随时记下的想法、阅读笔记与日常片段。",
+        route: "notes",
       },
       {
         label: "文学创作",
         desc: "小说、散文与短篇故事。",
+        route: "writing",
       },
       {
         label: "项目",
         desc: "做过、开源过或正在折腾的东西。",
+        route: "projects",
       },
     ],
     contactTitle: "联系我",

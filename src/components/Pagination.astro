@@ -4,6 +4,7 @@ import type { CollectionEntry } from "astro:content";
 import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import LinkButton from "./LinkButton.astro";
+import { canonicalizeUrl } from "@/utils/routes";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -14,6 +15,12 @@ type Props = {
 const { page } = Astro.props;
 
 const t = useTranslations(config.site.uiLang);
+
+// The pagination URLs come from Astro, which decides on the trailing slash
+// by itself. They are normalised here so that a page link is always the
+// canonical URL of that page.
+const prevUrl = canonicalizeUrl(page.url.prev);
+const nextUrl = canonicalizeUrl(page.url.next);
 ---
 
 {
@@ -27,7 +34,7 @@ const t = useTranslations(config.site.uiLang);
     >
       <LinkButton
         disabled={!page.url.prev}
-        href={page.url.prev as string}
+        href={prevUrl}
         class:list={["select-none", { "opacity-50": !page.url.prev }]}
         aria-label={t.a11y.goToPreviousPage}
         data-i18n="a11y.goToPreviousPage"
@@ -39,7 +46,7 @@ const t = useTranslations(config.site.uiLang);
       {page.currentPage} / {page.lastPage}
       <LinkButton
         disabled={!page.url.next}
-        href={page.url.next as string}
+        href={nextUrl}
         class:list={["select-none", { "opacity-50": !page.url.next }]}
         aria-label={t.a11y.goToNextPage}
         data-i18n="a11y.goToNextPage"

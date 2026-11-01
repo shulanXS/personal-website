@@ -210,10 +210,20 @@ export interface UIStrings {
     hereTitle: string;
     /** The items of the list of things the site holds. */
     hereItems: {
-      /** The name of one thing the site holds. */
+      /**
+       * The name of one thing the site holds.
+       */
       label: string;
       /** What that thing is. */
       desc: string;
+      /**
+       * The route the item links to.
+       *
+       * The route is part of the dictionary rather than being paired with
+       * the items by position: a positional pairing breaks silently the
+       * moment one translation adds, removes or reorders an item.
+       */
+      route: "posts" | "notes" | "writing" | "projects";
     }[];
     /** The heading above the contact links. */
     contactTitle: string;

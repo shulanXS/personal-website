@@ -196,4 +196,4 @@ AstroPaper v6 retains its minimal, clean look while rebuilding the internals aro
 
 - [Predefined Color Schemes](/posts/predefined-color-schemes/)
 - [How to configure AstroPaper theme](/posts/how-to-configure-astropaper-theme/)
-- [Adding new posts in AstroPaper](/posts/adding-new-posts-in-astropaper-theme)
+- [Adding new posts in AstroPaper](/posts/adding-new-posts-in-astropaper-theme/)

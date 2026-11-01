@@ -1,5 +1,4 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import MonogramLogo from "@/assets/monogram-logo.svg";
 import Layout from "@/layouts/Layout.astro";
@@ -17,6 +16,7 @@ import {
   getPublishedWriting,
 } from "@/utils/content";
 import { getPostUrl } from "@/utils/getPostPaths";
+import { routeUrl } from "@/utils/routes";
 import { getFeaturedProjects } from "@/utils/getProjects";
 import { formatDate } from "@/utils/formatDate";
 import { useTranslations } from "@/i18n";
@@ -35,7 +35,7 @@ const projects = getFeaturedProjects();
 const featuredPosts = posts.filter(({ data }) => data.featured);
 const recentPosts = posts.filter(({ data }) => !data.featured);
 
-const homePath = getRelativeLocaleUrl(locale, "");
+const homePath = routeUrl(locale, "home");
 ---
 
 <Layout width="wide">
@@ -274,19 +274,19 @@ const homePath = getRelativeLocaleUrl(locale, "");
     </div>
 
     <div class="my-8 flex flex-wrap justify-center gap-4 text-center">
-      <LinkButton href={getRelativeLocaleUrl(locale, "notes")}>
+      <LinkButton href={routeUrl(locale, "notes")}>
         <span data-i18n="home.allNotes">{t.home.allNotes}</span>
         <IconArrowRight class="inline-block rtl:-rotate-180" />
       </LinkButton>
-      <LinkButton href={getRelativeLocaleUrl(locale, "posts")}>
+      <LinkButton href={routeUrl(locale, "posts")}>
         <span data-i18n="home.allPosts">{t.home.allPosts}</span>
         <IconArrowRight class="inline-block rtl:-rotate-180" />
       </LinkButton>
-      <LinkButton href={getRelativeLocaleUrl(locale, "writing")}>
+      <LinkButton href={routeUrl(locale, "writing")}>
         <span data-i18n="home.allWriting">{t.home.allWriting}</span>
         <IconArrowRight class="inline-block rtl:-rotate-180" />
       </LinkButton>
-      <LinkButton href={getRelativeLocaleUrl(locale, "projects")}>
+      <LinkButton href={routeUrl(locale, "projects")}>
         <span data-i18n="home.allProjects">{t.home.allProjects}</span>
         <IconArrowRight class="inline-block rtl:-rotate-180" />
       </LinkButton>

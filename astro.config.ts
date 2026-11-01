@@ -29,6 +29,27 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
+  /**
+   * Every page URL ends with a slash.
+   *
+   * This is not a cosmetic choice — it is what keeps the site consistent.
+   * Astro has two independent URL generators, and they disagree unless this
+   * is set:
+   *
+   *   * `getRelativeLocaleUrl()` appends a slash whenever the build format is
+   *     `directory` (the default), no matter what `trailingSlash` says.
+   *   * The pagination generator (`getRouteGenerator()`) appends a slash
+   *     *only* when `trailingSlash === "always"`.
+   *
+   * With the default `"ignore"`, the first one produces `/notes/` while the
+   * second produces `/posts` — two different shapes for the same kind of
+   * page. Cloudflare Pages then canonicalises `/posts` back to `/posts/`,
+   * and any hand-written redirect that points one shape at the other
+   * becomes an infinite loop.
+   *
+   * `"always"` makes both generators agree, so a page has exactly one URL.
+   */
+  trailingSlash: "always",
   integrations: [mdx(), sitemap()],
   i18n: {
     locales: ["en"],

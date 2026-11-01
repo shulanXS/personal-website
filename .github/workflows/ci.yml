@@ -44,3 +44,16 @@ jobs:
 
       - name: "🚀 Build the project"
         run: pnpm run build
+
+      # The build already runs the redirect audit, but it is repeated here
+      # as its own step so that a failure points at the redirects rather
+      # than at the build as a whole.
+      - name: "🔀 Auditing redirects against Cloudflare's routing engine"
+        run: pnpm run redirects:audit
+
+      # The generated file must never drift from its source. If someone
+      # edits `public/_redirects` by hand, this step catches it.
+      - name: "🔀 Checking that public/_redirects is up to date"
+        run: |
+          pnpm run redirects:write
+          git diff --exit-code -- public/_redirects
