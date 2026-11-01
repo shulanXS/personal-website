@@ -1140,6 +1140,45 @@
   }
 }
 
+@layer components {
+  /*
+   * The toast.
+   *
+   * A small confirmation that appears at the bottom of the screen when
+   * something has been copied to the clipboard. It is announced politely
+   * rather than loudly, so a screen reader hears "已复制到剪贴板" instead of
+   * nothing at all.
+   *
+   * The element is created on demand by the script that needs it, so it
+   * only exists on the pages where something is actually copied.
+   */
+  #app-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 60;
+    transform: translate(-50%, 0.75rem);
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--app-radius);
+    background: var(--surface-raised);
+    color: var(--foreground);
+    box-shadow: var(--app-shadow);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--app-transition) ease,
+      transform var(--app-transition) ease;
+  }
+
+  #app-toast[data-visible="true"] {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 :target {
   scroll-margin-block: 1rem;
 }

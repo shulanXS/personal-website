@@ -35,6 +35,9 @@ export default {
     wechat: "微信",
     mail: "发送邮件",
     mailTo: "发送邮件给车文杰",
+    copyToClipboard: "复制到剪贴板",
+    copied: "已将微信号复制到剪贴板",
+    copyFailed: "复制失败，请手动复制",
   },
   post: {
     publishedAt: "发布于",
@@ -215,6 +218,12 @@ export default {
     contactTitle: "联系我",
     contactDesc:
       "如果你对上面某段内容有想法，或者只是想打个招呼，都可以直接找我。",
+    contactLabels: {
+      github: "GitHub",
+      wechat: "微信",
+      email: "邮箱",
+    },
+    contactCopyHint: "点击复制",
   },
   a11y: {
     skipToContent: "跳到主要内容",

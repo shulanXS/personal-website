@@ -72,7 +72,21 @@ interface SocialLink {
    * e.g. "github" → src/assets/icons/socials/github.svg
    */
   name: string;
-  url: string;
+  /**
+   * The address the button opens.
+   *
+   * Omit it for a platform that has no web presence — a WeChat ID, a phone
+   * number — and use `copy` instead.
+   */
+  url?: string;
+  /**
+   * A value copied to the clipboard when the button is clicked.
+   *
+   * Used for the platforms that cannot be linked to: a WeChat ID, for
+   * instance, is not a URL. The button becomes a copy button and confirms
+   * the copy with a short toast.
+   */
+  copy?: string;
   /**
    * Accessible label for the icon link (aria-label, title attribute).
    * Auto-generated if omitted: "{site.title} on GitHub", "Send an email to {site.title}", etc.

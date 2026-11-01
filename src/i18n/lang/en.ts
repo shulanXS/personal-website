@@ -25,6 +25,9 @@ export default {
     wechat: "WeChat",
     mail: "Send an email",
     mailTo: "Send an email to Wenjie Che",
+    copyToClipboard: "Copy to clipboard",
+    copied: "Copied to clipboard",
+    copyFailed: "Copy failed — please copy it manually",
   },
   post: {
     publishedAt: "Published at",
@@ -206,6 +209,12 @@ export default {
     contactTitle: "Get in touch",
     contactDesc:
       "If you have thoughts on anything above, or just want to say hello, you can reach me directly.",
+    contactLabels: {
+      github: "GitHub",
+      wechat: "WeChat",
+      email: "Email",
+    },
+    contactCopyHint: "Click to copy",
   },
   a11y: {
     skipToContent: "Skip to content",

@@ -48,6 +48,12 @@ export interface UIStrings {
     mail: string;
     /** The label of the mail button, with the name of the site in it. */
     mailTo: string;
+    /** The label of a button that copies a value (e.g. a WeChat ID). */
+    copyToClipboard: string;
+    /** The toast shown after a value has been copied. */
+    copied: string;
+    /** The toast shown when the clipboard could not be written to. */
+    copyFailed: string;
   };
   post: {
     publishedAt: string;
@@ -229,6 +235,19 @@ export interface UIStrings {
     contactTitle: string;
     /** The sentence above the contact links. */
     contactDesc: string;
+    /**
+     * The labels of the visible contact details.
+     *
+     * The icons alone do not tell a visitor *what* to write to: a WeChat ID
+     * and an address have to be readable, not just clickable.
+     */
+    contactLabels: {
+      github: string;
+      wechat: string;
+      email: string;
+    };
+    /** The hint next to a value that can be copied. */
+    contactCopyHint: string;
   };
   a11y: {
     skipToContent: string;

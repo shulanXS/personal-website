@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "pnpm run redirects:write && astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/ && pnpm run redirects:audit",
+    "build": "npm run redirects:write && astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/ && npm run redirects:audit",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",

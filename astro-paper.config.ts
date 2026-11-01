@@ -95,13 +95,14 @@ export default defineAstroPaperConfig({
    */
   socials: [
     // --- Code & development -------------------------------------------
-    { name: "github", url: "https://github.com/", linkTitle: "GitHub" },
+    { name: "github", url: "https://github.com/shulanXS", linkTitle: "GitHub" },
 
     // --- Chinese platforms --------------------------------------------
-    { name: "wechat", url: "https://weixin.qq.com/", linkTitle: "微信" },
+    // A WeChat ID cannot be linked to, so the button copies it instead.
+    { name: "wechat", copy: "shulan203", linkTitle: "微信" },
 
     // --- Contact -------------------------------------------------------
-    { name: "mail", url: "mailto:yourmail@gmail.com", linkTitle: "发送邮件" },
+    { name: "mail", url: "mailto:chewenjiedaily@gmail.com", linkTitle: "发送邮件" },
   ],
   shareLinks: [
     { name: "wechat", url: "https://service.weixin.qq.com/share?url=", linkTitle: "分享到微信" },
