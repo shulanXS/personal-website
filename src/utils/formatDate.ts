@@ -30,17 +30,46 @@ const DATE_FORMATS: Record<string, string> = {
 };
 
 /**
- * The compact date layout used on the notes timeline.
+ * The compact date layout.
  *
- * The timeline reserves a narrow column next to the vertical rule for the
- * date. The layout is numeric so it stays short, and it carries the time
- * down to the minute — on a personal timeline the hour a note was written
- * is part of the meaning, not decoration.
+ * The layout is numeric so it stays short, and it carries the time down to
+ * the minute — on a personal site the hour something was written is part of
+ * the meaning, not decoration.
  */
 const COMPACT_DATE_FORMATS: Record<string, string> = {
   "zh-CN": "YYYY.MM.DD HH:mm",
   en: "YYYY.MM.DD HH:mm",
 };
+
+/*
+ * The two halves of the compact layout, split apart.
+ *
+ * The notes timeline puts its date in a narrow column next to the vertical
+ * rule. The full compact layout is fifteen characters wide, and the column
+ * is not — the overflow crossed the rule and ran into the entry beside it.
+ * The timeline therefore stacks the day above the moment of the day, which
+ * makes the column exactly as wide as the day itself.
+ */
+const STACKED_DATE_FORMATS: Record<string, string> = {
+  "zh-CN": "YYYY.MM.DD",
+  en: "YYYY.MM.DD",
+};
+
+const STACKED_TIME_FORMATS: Record<string, string> = {
+  "zh-CN": "HH:mm",
+  en: "HH:mm",
+};
+
+/**
+ * The date and the time of a note, split into the two lines of the
+ * timeline column.
+ */
+export interface StackedDate {
+  /** The day, e.g. "2026.10.28". */
+  date: string;
+  /** The moment of the day, e.g. "17:30". */
+  time: string;
+}
 
 /**
  * Formats a date for the given interface language.
@@ -74,4 +103,25 @@ export function formatCompactDate(
   const locale = DAYJS_LOCALES[uiLang] ?? "en";
   const format = COMPACT_DATE_FORMATS[uiLang] ?? COMPACT_DATE_FORMATS.en;
   return dayjs(date).tz(timezone).locale(locale).format(format);
+}
+
+/**
+ * Formats a date as the two stacked lines of the notes timeline.
+ *
+ * The day sits on the first line and the moment of the day on the second.
+ * The two are returned separately rather than as one string, because the
+ * markup has to put them into two different elements — the client-side
+ * language switch rewrites them independently as well.
+ */
+export function formatStackedDate(
+  date: string | Date,
+  uiLang: string,
+  timezone?: string
+): StackedDate {
+  const locale = DAYJS_LOCALES[uiLang] ?? "en";
+  const d = dayjs(date).tz(timezone).locale(locale);
+  return {
+    date: d.format(STACKED_DATE_FORMATS[uiLang] ?? STACKED_DATE_FORMATS.en),
+    time: d.format(STACKED_TIME_FORMATS[uiLang] ?? STACKED_TIME_FORMATS.en),
+  };
 }

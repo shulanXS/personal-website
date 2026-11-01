@@ -27,7 +27,7 @@ const tagSlugs = tags.map(tagSlug);
 ---
 
 <li
-  class="app-card hover:border-accent flex h-full flex-col p-5"
+  class="app-card flex h-full flex-col p-5"
   data-tagged-item
   data-tags={tagSlugs.join(",")}
 >
@@ -37,7 +37,7 @@ const tagSlugs = tags.map(tagSlug);
         src={project.screenshot}
         alt={`${project.name} screenshot`}
         loading="lazy"
-        class="border-border mb-4 aspect-[16/10] w-full rounded border object-cover"
+        class="border-border mb-4 aspect-[16/9] w-full rounded border object-cover sm:aspect-[16/10]"
       />
     )
   }

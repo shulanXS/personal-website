@@ -85,27 +85,61 @@ const staticChip = await page.locator("[data-tag-static]").count();
 const clickableOnDetail = await page.locator("a[data-tag-chip], button[data-tag-chip]").count();
 ok("详情页标签为静态文本", staticChip > 0 && clickableOnDetail === 0, `[static=${staticChip} clickable=${clickableOnDetail}]`);
 
-// --- 9. No leftover /about or /tags links ------------------------------
+// --- 9. The about page is reachable, and no leftover /tags links -------
+// The "about" page exists again: it is a page of the site, linked from the
+// navigation and from the footer. What must not exist any more are the
+// standalone tag pages — the tags live on the search page now.
 await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
 const aboutLinks = await page.locator('a[href*="/about"]').count();
 const tagPageLinks = await page.locator('a[href="/tags/"], a[href*="/tags/"]').count();
-ok("无残留 /about 链接", aboutLinks === 0, `[n=${aboutLinks}]`);
+ok("关于我 页面已链接", aboutLinks > 0, `[n=${aboutLinks}]`);
 ok("无残留 /tags/ 链接", tagPageLinks === 0, `[n=${tagPageLinks}]`);
+
+await page.goto(`${BASE}/about/`, { waitUntil: "networkidle" });
+const aboutOk = await page.evaluate(() => ({
+  title: document.querySelector("h1")?.textContent?.trim(),
+  sections: document.querySelectorAll("main section").length,
+  socials: document.querySelectorAll("main a[data-social], main a[href^='mailto']").length,
+}));
+ok("关于我 页面渲染正常", !!aboutOk.title && aboutOk.sections >= 3,
+   `[title=${aboutOk.title} sections=${aboutOk.sections}]`);
 
 // --- 10. Date shows hours and minutes ---------------------------------
 await page.goto(`${BASE}/posts/`, { waitUntil: "networkidle" });
+/*
+ * The listing carries the *compact* date, which is the same numeric form
+ * in every language. The full language-specific date is rendered on the
+ * detail page, so that is where the long format is checked.
+ */
+const listDateText = await page.locator("[data-date-compact]").first().textContent();
+ok("列表时间精确到时分", /\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}/.test(listDateText ?? ""), `"${listDateText?.trim()}"`);
+
+await page.goto(`${BASE}/posts/astro-paper-v5/`, { waitUntil: "networkidle" });
 const dateText = await page.locator("[data-date]").first().textContent();
 ok("时间精确到时分", /\d{4}年\d{1,2}月\d{1,2}日 \d{2}:\d{2}/.test(dateText ?? ""), `"${dateText?.trim()}"`);
 
-// --- 11. Mobile menu animation attribute ------------------------------
+// --- 11. The navigation is always on screen ----------------------------
+// There is no burger button any more: the links are visible on a phone
+// too, so the visitor can reach every section without opening anything.
 await ctx.close();
 const mctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await mctx.newPage();
 await mp.goto(`${BASE}/`, { waitUntil: "networkidle" });
-await mp.click("#menu-btn");
 await mp.waitForTimeout(200);
-const open = await mp.locator("#menu-items").getAttribute("data-open");
-ok("移动端菜单 data-open", open === "true", `[data-open=${open}]`);
+const mobileNav = await mp.evaluate(() => {
+  const vw = document.documentElement.clientWidth;
+  const links = [...document.querySelectorAll("#menu-items > li > a")];
+  return {
+    total: links.length,
+    hidden: links.filter(a => {
+      const b = a.getBoundingClientRect();
+      return b.width === 0 || b.height === 0 || b.right > vw + 2 || b.left < -2;
+    }).length,
+    burger: !!document.querySelector("#menu-btn"),
+  };
+});
+ok("移动端导航常驻可见", mobileNav.total === 5 && mobileNav.hidden === 0 && !mobileNav.burger,
+   `[links=${mobileNav.total} hidden=${mobileNav.hidden} burger=${mobileNav.burger}]`);
 
 console.log("\nERRORS:", errors.length ? errors.join("\n") : "none");
 await browser.close();

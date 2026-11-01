@@ -22,11 +22,7 @@ const tags = data.tags ?? [];
 const tagSlugs = tags.map(tagSlug);
 ---
 
-<li
-  class="app-list-entry border-border border-b last:border-b-0"
-  data-tagged-item
-  data-tags={tagSlugs.join(",")}
->
+<li class="app-list-entry" data-tagged-item data-tags={tagSlugs.join(",")}>
   <article class="flex flex-col gap-2">
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <h2 class="text-lg font-semibold">

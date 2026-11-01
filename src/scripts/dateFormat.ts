@@ -122,6 +122,29 @@ export function refreshDates(uiLang: string): void {
     const formatted = formatCompactDateForLang(iso, uiLang, timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
+
+  /*
+  The notes timeline stacks the day and the moment of the day into two
+  separate elements, because its date column is narrower than a full
+  timestamp. Each element is rewritten on its own.
+  */
+  for (const el of document.querySelectorAll<HTMLElement>(
+    "[data-date-stacked]"
+  )) {
+    const iso = el.dataset.dateStacked;
+    if (!iso) continue;
+    const formatted = formatStackedDateForLang(iso, uiLang, timeZone);
+    if (formatted !== el.textContent?.trim()) el.textContent = formatted;
+  }
+
+  for (const el of document.querySelectorAll<HTMLElement>(
+    "[data-date-stacked-time]"
+  )) {
+    const iso = el.dataset.dateStackedTime;
+    if (!iso) continue;
+    const formatted = formatStackedTimeForLang(iso, uiLang, timeZone);
+    if (formatted !== el.textContent?.trim()) el.textContent = formatted;
+  }
 }
 
 /**
@@ -153,4 +176,65 @@ export function formatCompactDateForLang(
     parts.find(p => p.type === type)?.value ?? "";
 
   return `${lookup("year")}.${lookup("month")}.${lookup("day")} ${lookup("hour")}:${lookup("minute")}`;
+}
+
+/**
+ * Formats the day of a timestamp in the stacked layout of the notes timeline.
+ *
+ * The numeric form is the same in every language, so no locale-specific
+ * parts have to be assembled here.
+ */
+export function formatStackedDateForLang(
+  iso: string,
+  _uiLang: string,
+  timeZone?: string
+): string {
+  const parts = getStackedParts(iso, timeZone);
+  if (!parts) return iso;
+  return `${parts.year}.${parts.month}.${parts.day}`;
+}
+
+/**
+ * Formats the moment of the day in the stacked layout of the notes timeline.
+ */
+export function formatStackedTimeForLang(
+  iso: string,
+  _uiLang: string,
+  timeZone?: string
+): string {
+  const parts = getStackedParts(iso, timeZone);
+  if (!parts) return iso;
+  return `${parts.hour}:${parts.minute}`;
+}
+
+/**
+ * Splits a timestamp into the parts the stacked layout needs.
+ */
+function getStackedParts(
+  iso: string,
+  timeZone?: string
+): Record<string, string> | null {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    ...(timeZone ? { timeZone } : {}),
+  }).formatToParts(date);
+
+  const lookup = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find(p => p.type === type)?.value ?? "";
+
+  return {
+    year: lookup("year"),
+    month: lookup("month"),
+    day: lookup("day"),
+    hour: lookup("hour"),
+    minute: lookup("minute"),
+  };
 }

@@ -1,56 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <defs>
-    <!--
-      The eye patches are solid shapes, and the closed, contented eyes are
-      punched out of them with a mask. Because the eyes are cut *into* the
-      markings rather than drawn on top of them, they read as part of the
-      face instead of as a separate pair of spectacles.
-    -->
-    <mask id="sloth-eyes">
-      <rect width="128" height="128" fill="black" />
-      <g stroke="white" stroke-width="6" stroke-linecap="round" fill="none">
-        <path d="M47.6 62.4q5.6-6.4 11.2 0" />
-        <path d="M69.2 62.4q5.6-6.4 11.2 0" />
-      </g>
-    </mask>
-  </defs>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
   <!--
-    The artwork drawn in the light ink of the site.
+    The favicon drawn in the light ink of the site.
 
-    This is the variant for a *dark* tab bar, where the dark version of
-    the logo would disappear. It is declared in the document head with
+    This is the variant for a *dark* tab bar, where the dark version of the
+    logo would disappear. It is declared in the document head with
     `media="(prefers-color-scheme: dark)"`, so the browser picks the one
     that matches the reader's system theme.
   -->
   <g
     stroke="#f5f3ef"
-    stroke-width="6.5"
+    stroke-width="2.7"
     stroke-linecap="round"
     stroke-linejoin="round"
     fill="none"
   >
-    <!-- The branch the sloth hangs from. -->
-    <path d="M18.4 20.8c30.4-6.8 60.8-6.8 91.2 0" />
-    <path d="M43.6 18c0 19.2 4.4 32 9.6 41.6" />
-    <path d="M84.4 18c0 19.2-4.4 32-9.6 41.6" />
-
-    <!-- The round face. -->
-    <path
-      d="M64 46.4c17.6 0 30.4 12 30.4 26.4S81.6 99.2 64 99.2 33.6 87.2 33.6 72.8 46.4 46.4 64 46.4Z"
-    />
-
-    <!-- The slow, contented smile. -->
-    <path d="M57.6 78.4q6.4 6.4 12.8 0" />
-  </g>
-
-  <!--
-    The dark markings around the eyes  the sloth's signature. They are
-    kept well inside the outline of the face, so the markings never
-    overlap the line of the jaw.
-  -->
-  <g fill="#f5f3ef" mask="url(#sloth-eyes)">
-    <ellipse cx="53.2" cy="61.6" rx="8.8" ry="10" />
-    <ellipse cx="74.8" cy="61.6" rx="8.8" ry="10" />
+    <path d="M37.02 13.07A17 17 0 1 0 37.02 34.93" />
+    <path d="M12.6 18.4 15.6 29.8 18.8 19.8 22 29.8 25 18.4" />
+    <path d="M33.6 18.4v7.4c0 2.6-2.1 4-5.3 4" />
   </g>
 </svg>

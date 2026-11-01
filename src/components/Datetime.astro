@@ -5,7 +5,11 @@ import timezone from "dayjs/plugin/timezone";
 import IconCalendar from "@/assets/icons/IconCalendar.svg";
 import config from "@/config";
 import { useTranslations } from "@/i18n";
-import { formatDate, formatCompactDate } from "@/utils/formatDate";
+import {
+  formatDate,
+  formatCompactDate,
+  formatStackedDate,
+} from "@/utils/formatDate";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -30,6 +34,19 @@ type Props = {
    * "2026年6月3日 14:05" would wrap.
    */
   compact?: boolean;
+  /**
+   * Split the compact date into two lines: the day on top, the time
+   * underneath it.
+   *
+   * The timeline column is narrower than a full timestamp, so the date and
+   * the time cannot share one line — the overflow crossed the vertical rule
+   * and ran into the entry beside it. Two lines keep the column exactly as
+   * wide as the day itself.
+   *
+   * The two lines live in two separate elements, so the client-side
+   * language switch can rewrite them independently.
+   */
+  stacked?: boolean;
 };
 
 const {
@@ -40,6 +57,7 @@ const {
   timezone: postTimezone,
   bare = false,
   compact = false,
+  stacked = false,
 } = Astro.props;
 
 const t = useTranslations(config.site.uiLang);
@@ -50,23 +68,50 @@ const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
   postTimezone ?? config.site.timezone
 );
 
-// The month name follows the interface language, so the Chinese UI shows
-// "9 10月 2025" instead of the English "9 Oct, 2025".
-const date = compact
-  ? formatCompactDate(
-      isModified ? modDatetime : pubDatetime,
+const stamp = isModified ? modDatetime : pubDatetime;
+
+/*
+ * The month name follows the interface language, so the Chinese UI shows
+ * "9 10月 2025" instead of the English "9 Oct, 2025".
+ *
+ * The three layouts are kept apart rather than merged into one variable:
+ * the stacked one has two parts instead of one string, and the type of the
+ * union would hide that from the template.
+ */
+const stackedDate = stacked
+  ? formatStackedDate(
+      stamp,
       config.site.uiLang,
       postTimezone ?? config.site.timezone
     )
-  : formatDate(
-      isModified ? modDatetime : pubDatetime,
-      config.site.uiLang,
-      postTimezone ?? config.site.timezone
-    );
+  : null;
+
+const date = stacked
+  ? ""
+  : compact
+    ? formatCompactDate(
+        stamp,
+        config.site.uiLang,
+        postTimezone ?? config.site.timezone
+      )
+    : formatDate(
+        stamp,
+        config.site.uiLang,
+        postTimezone ?? config.site.timezone
+      );
 ---
 
 <div
-  class:list={["text-muted-foreground flex items-center gap-x-2", className]}
+  class:list={[
+    "text-muted-foreground",
+    /*
+      The stacked layout runs the day and the moment of the day down a
+      single column instead of across a row, so that the pair stays as
+      narrow as the day alone.
+    */
+    stacked ? "app-timeline-stacked" : "flex items-center gap-x-2",
+    className,
+  ]}
 >
   {
     !bare && (
@@ -100,12 +145,38 @@ const date = compact
       </>
     )
   }
-  <time
-    class:list={["text-sm", { "sm:text-base": size === "lg" }]}
-    datetime={datetime.toISOString()}
-    data-date={compact ? undefined : datetime.toISOString()}
-    data-date-compact={compact ? datetime.toISOString() : undefined}
-  >
-    {date}
-  </time>
+  {
+    /*
+      The stacked layout puts the day and the moment of the day into two
+      elements of their own, so that the client-side language switch can
+      rewrite each of them separately.
+    */
+    stacked && stackedDate ? (
+      <>
+        <time
+          class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+          datetime={datetime.toISOString()}
+          data-date-stacked={datetime.toISOString()}
+        >
+          {stackedDate.date}
+        </time>
+        <time
+          class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+          datetime={datetime.toISOString()}
+          data-date-stacked-time={datetime.toISOString()}
+        >
+          {stackedDate.time}
+        </time>
+      </>
+    ) : (
+      <time
+        class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+        datetime={datetime.toISOString()}
+        data-date={compact ? undefined : datetime.toISOString()}
+        data-date-compact={compact ? datetime.toISOString() : undefined}
+      >
+        {date}
+      </time>
+    )
+  }
 </div>

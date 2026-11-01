@@ -1,13 +1,30 @@
 import type { UIStrings } from "../types";
 
 export default {
+  site: {
+    title: "Wenjie Che",
+    /**
+     * The name of the person, written in the language of the interface.
+     */
+    name: "Wenjie Che",
+    author: "Wenjie Che",
+    description:
+      "Wenjie Che, a master's student working on applied AI. Writing about technology, reading notes and fiction.",
+  },
   nav: {
     home: "Home",
     posts: "Blog",
     notes: "Notes",
     writing: "Writing",
     projects: "Projects",
+    about: "About",
     search: "Search",
+  },
+  socials: {
+    github: "GitHub",
+    wechat: "WeChat",
+    mail: "Send an email",
+    mailTo: "Send an email to Wenjie Che",
   },
   post: {
     publishedAt: "Published at",
@@ -102,6 +119,10 @@ export default {
   footer: {
     copyright: "Copyright",
     allRightsReserved: "All rights reserved.",
+    /** The heading of the navigation column in the footer. */
+    navTitle: "Navigation",
+    /** The heading of the column that lists the most recent writing. */
+    recentTitle: "Recent",
     /** The label of the link that opens the content management backend. */
     manage: "Manage Content",
     /** The accessible title of the CMS link. */
@@ -132,6 +153,56 @@ export default {
     searchTitle: "Search",
     searchDesc: "Search any article ...",
   },
+  about: {
+    title: "About",
+    desc: "Who I am, what I do, and why this site exists.",
+    identity: "Master's student · Applied AI",
+    lead: "Hi, I'm Che Wenjie, a master's student working on applied AI. I care about how technology actually reaches everyday life, and I believe a technology only matters once ordinary people actually use it.",
+    sections: [
+      {
+        title: "What I do",
+        body: [
+          "My research focuses on wiring large models into real product flows — not stopping at a working demo, but making them stable, explainable and usable in concrete work.",
+          "I write technical articles to organise what I have learned and where I got stuck; I also write fiction, which is the other road I keep my language alive on.",
+        ],
+      },
+      {
+        title: "This site",
+        body: [
+          "This is my personal corner of the web. The technical articles are for people who are building things themselves; the notes hold the thoughts that have not grown into articles yet; the writing is the other half of my life outside of work.",
+          "I try to make every article worth reading: I would rather write slowly than often.",
+        ],
+      },
+      {
+        title: "Right now",
+        body: [
+          "The books I am reading, the small projects I am making and the tools I keep coming back to all end up in the notes. If any of it interests you, I would be glad to talk about it.",
+        ],
+      },
+    ],
+    hereTitle: "What lives here",
+    hereItems: [
+      {
+        label: "Blog",
+        desc: "Longer pieces on applied AI, web development and engineering practice.",
+      },
+      {
+        label: "Notes",
+        desc: "Thoughts, reading notes and daily fragments, written as they come.",
+      },
+      {
+        label: "Writing",
+        desc: "Novels, essays and short stories.",
+      },
+      {
+        label: "Projects",
+        desc: "Things I have built, open-sourced or experimented with.",
+      },
+    ],
+    contactTitle: "Get in touch",
+    contactDesc:
+      "If you have thoughts on anything above, or just want to say hello, you can reach me directly.",
+  },
   a11y: {
     skipToContent: "Skip to content",
     openMenu: "Open menu",
@@ -147,6 +218,8 @@ export default {
     breadcrumb: "breadcrumb",
     rssFeed: "RSS Feed",
     backToTop: "Back to top",
+    /** The accessible label of the navigation column in the footer. */
+    footerNav: "Footer navigation",
   },
   pagefind: {
     placeholder: "Search",

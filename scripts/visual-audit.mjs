@@ -13,6 +13,7 @@ const PAGES = [
   ["writing", "/writing/"],
   ["writing-detail", "/writing/chapter-one/"],
   ["projects", "/projects/"],
+  ["about", "/about/"],
   ["search", "/search/"],
   ["404", "/404/"],
 ];
@@ -29,14 +30,27 @@ for (const [vpName, viewport] of VIEWPORTS) {
   const ctx = await browser.newContext({ viewport });
   const page = await ctx.newPage();
 
+  /*
+   * The path the page is currently on.
+   *
+   * The 404 page answers with the 404 status, and the browser reports that
+   * as a console error. It is the page doing exactly what it should, so it
+   * is not counted as a fault of the site.
+   */
+  let currentPath = "";
+
   const consoleErrors = [];
   page.on("console", m => {
-    if (m.type() === "error") consoleErrors.push(`${m.text()}`);
+    if (m.type() !== "error") return;
+    if (m.text().includes("Failed to load resource") && currentPath === "/404/")
+      return;
+    consoleErrors.push(`${m.text()}`);
   });
   page.on("pageerror", e => consoleErrors.push(`PAGEERROR: ${e.message}`));
 
   for (const [name, path] of PAGES) {
     consoleErrors.length = 0;
+    currentPath = path;
     try {
       await page.goto(BASE + path, { waitUntil: "networkidle", timeout: 20000 });
     } catch (e) {
@@ -117,10 +131,10 @@ page.on("pageerror", e => errs.push(`PAGEERROR: ${e.message}`));
 page.on("console", m => { if (m.type() === "error") errs.push(m.text()); });
 
 await page.goto(BASE + "/", { waitUntil: "networkidle" });
-const before = await page.locator("header nav a").first().innerText();
+const before = await page.locator("header #menu-items > li > a").first().innerText();
 await page.locator("#lang-btn").click();
 await page.waitForTimeout(600);
-const after = await page.locator("header nav a").first().innerText();
+const after = await page.locator("header #menu-items > li > a").first().innerText();
 const htmlLang = await page.evaluate(() => document.documentElement.lang);
 console.log(`LANG SWITCH: "${before}" -> "${after}"  html.lang=${htmlLang}`);
 if (before === after) problems.push(`LANG SWITCH: header text did not change (${before})`);
@@ -132,7 +146,7 @@ const themeAttr = await page.evaluate(() => document.documentElement.getAttribut
 console.log(`THEME TOGGLE -> ${themeAttr}`);
 
 // navigate via client router
-await page.locator("header nav a").first().click();
+await page.locator("header #menu-items > li > a").first().click();
 await page.waitForTimeout(1200);
 const url = page.url();
 console.log(`CLIENT NAV -> ${url}`);

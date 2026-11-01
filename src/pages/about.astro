@@ -1,0 +1,188 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import MonogramLogo from "@/assets/monogram-logo.svg";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import Socials from "@/components/Socials.astro";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(config.site.uiLang);
+---
+
+<Layout title={`${t.about.title} | ${t.site.title}`} width="flow">
+  <Header />
+
+  <Breadcrumb />
+
+  <Main
+    pageTitle={t.about.title}
+    pageDesc={t.about.desc}
+    titleKey="about.title"
+    descKey="about.desc"
+  >
+    {
+      /*
+      The card that holds the identity: the monogram, the name, the
+      identity line and the circular social buttons.
+
+      The mark is the same geometric monogram that appears in the header,
+      so the page and the frame belong to one another.
+      */
+    }
+    <section
+      class="border-border bg-surface rounded-[var(--app-radius-lg)] border p-6 shadow-xs sm:p-8"
+    >
+      <div
+        class="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left"
+      >
+        <MonogramLogo
+          class="text-foreground size-16 shrink-0 sm:size-20"
+          aria-hidden="true"
+        />
+
+        <div class="min-w-0">
+          <h2 class="text-xl font-semibold sm:text-2xl" data-i18n="site.name">
+            {t.site.name}
+          </h2>
+          <p
+            class="text-muted-foreground mt-1 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-medium tracking-[0.18em] uppercase sm:justify-start"
+            data-i18n="about.identity"
+          >
+            <span
+              class="bg-accent inline-block size-1.5 shrink-0 rounded-full"
+              aria-hidden="true"></span>
+            {t.about.identity}
+          </p>
+        </div>
+
+        <div
+          class="flex shrink-0 items-center justify-center sm:ms-auto sm:justify-end"
+        >
+          <Socials align="center" size="sm" />
+        </div>
+      </div>
+    </section>
+
+    {
+      /*
+      The lead paragraph.
+
+      It is set larger than the rest of the text, because it is the one
+      sentence that has to be read even if nothing else is.
+      */
+    }
+    <p class="mt-8 text-lg leading-relaxed" data-i18n="about.lead">
+      {t.about.lead}
+    </p>
+
+    {
+      /*
+      The biography.
+
+      Each section is a titled block. The sections are separated by a
+      hairline rather than by a gap alone, so that the page keeps a clear
+      rhythm when it is read on a phone.
+      */
+    }
+    <div class="mt-10">
+      {
+        t.about.sections.map(section => (
+          <section class="border-border border-t pt-6 pb-2 first:border-t-0 first:pt-0">
+            <h2 class="text-lg font-semibold tracking-wide">{section.title}</h2>
+            {section.body.map(paragraph => (
+              <p class="text-foreground mt-3 leading-relaxed">{paragraph}</p>
+            ))}
+          </section>
+        ))
+      }
+    </div>
+
+    {
+      /*
+      What the site holds.
+
+      A short list of the four collections, each linking to its own
+      listing page — the about page is the place where the reader finds
+      out what the site is *for*.
+      */
+    }
+    <section class="border-border mt-10 border-t pt-8">
+      <h2
+        class="text-lg font-semibold tracking-wide"
+        data-i18n="about.hereTitle"
+      >
+        {t.about.hereTitle}
+      </h2>
+
+      <ul class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {
+          t.about.hereItems.map((item, index) => {
+            const targets = ["posts", "notes", "writing", "projects"];
+            const href = targets[index]
+              ? getRelativeLocaleUrl(locale, targets[index])
+              : undefined;
+
+            const body = (
+              <>
+                <h3 class="text-accent font-medium">{item.label}</h3>
+                <p class="text-muted-foreground mt-1 text-sm leading-relaxed">
+                  {item.desc}
+                </p>
+              </>
+            );
+
+            return (
+              <li class="border-border bg-surface rounded-[var(--app-radius)] border p-4">
+                {href ? (
+                  <a
+                    href={href}
+                    class="hover:text-accent block transition-colors"
+                  >
+                    {body}
+                  </a>
+                ) : (
+                  body
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+
+    {
+      /*
+      The contact block.
+
+      The social buttons are the same circular ones that appear in the
+      header area and in the footer, so the way to reach the author looks
+      the same everywhere on the site.
+      */
+    }
+    <section class="border-border mt-10 border-t pt-8">
+      <h2
+        class="text-lg font-semibold tracking-wide"
+        data-i18n="about.contactTitle"
+      >
+        {t.about.contactTitle}
+      </h2>
+      <p
+        class="text-muted-foreground mt-3 leading-relaxed"
+        data-i18n="about.contactDesc"
+      >
+        {t.about.contactDesc}
+      </p>
+
+      <div class="mt-5">
+        <Socials align="start" size="md" />
+      </div>
+    </section>
+  </Main>
+
+  <Footer />
+</Layout>

@@ -71,6 +71,63 @@
   --app-radius: 0.625rem;
   --app-radius-lg: 0.875rem;
 
+  /*
+   * The radius of a note bubble.
+   *
+   * It is deliberately larger than `--app-radius-lg`. The bubble's
+   * top-left corner is not a plain corner: it is the arc the tail is
+   * built out of, and the tail's own curve has a radius of 1rem. A
+   * tighter corner on the bubble would cut across that curve, and the
+   * two would meet in a visible step rather than in one continuous line.
+   */
+  --app-radius-bubble: 1.1875rem;
+
+  /*
+   * The fill of a note bubble.
+   *
+   * It is a pure white in the light theme, and the regular card surface
+   * in the dark one. The bubble is the one surface of the site that is
+   * allowed to be brighter than the page it sits on: it is a sheet of
+   * paper, and it has to read as a separate object rather than as a
+   * panel cut out of the page. The tail is filled with the same colour,
+   * so the two have to be one tone — a tail that is a shade off would
+   * read as a separate shape glued to the bubble.
+   */
+  --app-bubble-fill: #ffffff;
+
+  /*
+   * The outline of a note bubble's tail.
+   *
+   * A mask rather than a border, because the tail's outline has to follow
+   * two arcs: the wedge's outer curve and the cut's inner curve. A
+   * border can only ever be a rectangle; a stroke can follow any path.
+   *
+   * The path is in the mask box's own coordinates — the box is 34 by 26
+   * pixels, its origin 11px to the left of and 3px above the bubble's
+   * top-left corner. Every number in it is a half-pixel out from the
+   * shape it traces, because the bubble's own outline is a ring drawn
+   * *outside* the bubble's box: the ring's centre line sits half a pixel
+   * beyond the box, so the tail's stroke has to sit half a pixel beyond
+   * the tail's shape too. That is what makes the two lines coincide
+   * instead of running alongside each other.
+   *
+   * The path traces the outline of the *whole* silhouette — the bubble
+   * and the tail as one shape — rather than the tail alone:
+   *
+   *   from the point where the tail's curve leaves the bubble's corner,
+   *   up and around the tail's outer arc to its top edge,
+   *   down the tip and around the cut's inner curve,
+   *   down the bubble's left edge to the bubble's own corner.
+   *
+   * The bubble's own corner is deliberately NOT drawn. The tail's fill
+   * lies over that part of the bubble's ring, so the ring alone would
+   * leave a gap in the outline exactly where the two shapes meet —
+   * and drawing the corner here would put a line straight across the
+   * tail. The cut's curve is what the outline follows there instead,
+   * because it is the edge of the shape that is actually on show.
+   */
+  --app-note-tail-outline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 26'%3E%3Cpath d='M16.893 7.562A16.5 16.5 0 0 0 5 2.5L2.5 2.5L2.5 3.619A9.5 9.5 0 0 1 10.5 13L10.5 22' fill='none' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E");
+
   --app-space-1: 0.25rem;
   --app-space-2: 0.5rem;
   --app-space-3: 0.75rem;
@@ -86,12 +143,12 @@
   /*
    * Elevation.
    *
-   * Two shadow levels only — a resting one for every card and a lifted one
-   * for hover. A third level would be decoration rather than information.
+   * One shadow level only — the resting one that every card carries. The
+   * cards do not move under the pointer, so there is no lifted shadow to
+   * draw: a card that rose towards the viewer would read as a separate
+   * object rather than as a panel lying on the page.
    */
   --app-shadow: 0 1px 2px rgb(40 39 40 / 0.04), 0 1px 3px rgb(40 39 40 / 0.03);
-  --app-shadow-lift:
-    0 4px 12px -2px rgb(40 39 40 / 0.08), 0 12px 28px -12px rgb(40 39 40 / 0.12);
 }
 
 /* Dark theme values */
@@ -112,9 +169,14 @@
   --surface: #212737;
   --surface-raised: #2a3145;
 
+  /*
+   * The bubble is a shade brighter than the card surface in the dark
+   * theme too — the same rule as the light one, where the bubble is the
+   * brightest surface on the page.
+   */
+  --app-bubble-fill: #2a3145;
+
   --app-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.2);
-  --app-shadow-lift:
-    0 4px 12px -2px rgb(0 0 0 / 0.4), 0 12px 28px -12px rgb(0 0 0 / 0.5);
 }
 
 /*

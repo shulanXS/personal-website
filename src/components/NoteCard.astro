@@ -41,113 +41,150 @@ const indexTitle = (
   {
     /*
     The date lives in a narrow column on the left of the vertical rule, so
-    the moment a note was written is readable at a glance. On a phone the
-    columns stack instead, and the date sits above the content.
-    */
+    the moment a note was written is readable at a glance. The day and the
+    time are stacked on top of each other, because the column is narrower
+    than a full timestamp.
+
+    That column only exists from `sm` upwards. Below it the date is
+    rendered *inside* the entry instead — see the second `Datetime` below.
+    Putting it inside the panel rather than above it means that a note and
+    its date are one object: on a phone the date used to sit between two
+    panels, and it was not clear which panel it belonged to.
+  */
   }
-  <div class="app-timeline-date" data-pagefind-ignore>
-    <Datetime pubDatetime={data.pubDatetime} bare compact />
+  <div class="app-timeline-date hidden sm:block" data-pagefind-ignore>
+    <Datetime pubDatetime={data.pubDatetime} bare stacked />
   </div>
 
-  <article class="min-w-0">
-    {
-      /*
-        The heading gives every note its own search result. For a note that
-        has a title it is the visible title; for an untitled note it is a
-        hidden fallback so that the entry is still findable and still shows
-        up as a sub result under the listing.
+  {
+    /*
+    The entry itself is a bubble.
 
-        The `id` matters: Pagefind turns a heading with an id into a
-        sub result that links straight to this note.
+    There is no avatar: the shape of the bubble alone is what makes the
+    note read as a message. The tail on the left points into the empty
+    space where the speaker would be.
+  */
+  }
+  <article class="app-note min-w-0">
+    <div class="app-note-column min-w-0">
+      {
+        /*
+        The date, for the narrow screens where there is no column for it.
+        It sits above the bubble, so that the bubble keeps its own clean
+        shape.
       */
-    }
-    {
-      data.title ? (
-        <h2 id={`note-${id}`} class="text-lg font-semibold">
-          {data.title}
-        </h2>
-      ) : (
-        <h2 id={`note-${id}`} class="sr-only">
-          {indexTitle}
-        </h2>
-      )
-    }
-    {
-      data.content && (
-        <p
-          class:list={[
-            "text-foreground break-words whitespace-pre-wrap",
-            { "line-clamp-6": !expanded && isLong },
-          ]}
-          data-note-body
-        >
-          {data.content}
-        </p>
-      )
-    }
-    {
-      data.images && data.images.length > 0 && (
-        <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {data.images.map((src, index) => {
-            const alt = data.imageAlts?.[index] ?? "";
-            return (
-              <li>
-                <img
-                  src={src}
-                  alt={alt}
-                  loading="lazy"
-                  width={400}
-                  height={300}
-                  class="border-border h-full w-full rounded border object-cover"
-                />
-              </li>
-            );
-          })}
-        </ul>
-      )
-    }
-    {
-      isLong && (
-        <div
-          class="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
-          data-pagefind-ignore
-        >
-          <button
-            type="button"
-            class="text-accent focus-outline decoration-dashed underline-offset-4 hover:underline"
-            data-note-expand
-            aria-expanded="false"
-          >
-            <span data-note-label-expand data-i18n="notes.expand">
-              {t.notes.expand}
-            </span>
-            <span data-note-label-collapse data-i18n="notes.collapse" hidden>
-              {t.notes.collapse}
-            </span>
-          </button>
-        </div>
-      )
-    }
-    {
-      tags.length > 0 && (
-        <ul class="mt-1 flex flex-wrap gap-2" data-pagefind-ignore>
-          {tags.map(tag => (
-            <li>
-              <TagChip
-                slug={tagSlug(tag)}
-                name={tagDisplayName(tag)}
-                mode="static"
-                size="sm"
-              />
-            </li>
-          ))}
-        </ul>
-      )
-    }
+      }
+      <div class="app-timeline-date mb-1.5 sm:hidden" data-pagefind-ignore>
+        <Datetime pubDatetime={data.pubDatetime} bare stacked />
+      </div>
+
+      <div class="app-note-bubble">
+        {
+          /*
+            The heading gives every note its own search result. For a note
+            that has a title it is the visible title; for an untitled note
+            it is a hidden fallback so that the entry is still findable and
+            still shows up as a sub result under the listing.
+
+            The `id` matters: Pagefind turns a heading with an id into a
+            sub result that links straight to this note.
+          */
+        }
+        {
+          data.title ? (
+            <h2 id={`note-${id}`} class="text-lg font-semibold">
+              {data.title}
+            </h2>
+          ) : (
+            <h2 id={`note-${id}`} class="sr-only">
+              {indexTitle}
+            </h2>
+          )
+        }
+        {
+          data.content && (
+            <p
+              class:list={[
+                "text-foreground break-words whitespace-pre-wrap",
+                { "line-clamp-6": !expanded && isLong },
+              ]}
+              data-note-body
+            >
+              {data.content}
+            </p>
+          )
+        }
+        {
+          data.images && data.images.length > 0 && (
+            <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {data.images.map((src, index) => {
+                const alt = data.imageAlts?.[index] ?? "";
+                return (
+                  <li>
+                    <img
+                      src={src}
+                      alt={alt}
+                      loading="lazy"
+                      width={400}
+                      height={300}
+                      class="border-border h-full w-full rounded border object-cover"
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          )
+        }
+        {
+          isLong && (
+            <div
+              class="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+              data-pagefind-ignore
+            >
+              <button
+                type="button"
+                class="text-accent focus-outline decoration-dashed underline-offset-4 hover:underline"
+                data-note-expand
+                aria-expanded="false"
+              >
+                <span data-note-label-expand data-i18n="notes.expand">
+                  {t.notes.expand}
+                </span>
+                <span
+                  data-note-label-collapse
+                  data-i18n="notes.collapse"
+                  hidden
+                >
+                  {t.notes.collapse}
+                </span>
+              </button>
+            </div>
+          )
+        }
+        {
+          tags.length > 0 && (
+            <ul class="mt-1 flex flex-wrap gap-2" data-pagefind-ignore>
+              {tags.map(tag => (
+                <li>
+                  <TagChip
+                    slug={tagSlug(tag)}
+                    name={tagDisplayName(tag)}
+                    mode="static"
+                    size="sm"
+                  />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </div>
   </article>
 </li>
 
 <script>
+  import { initLightbox } from "@/scripts/lightbox";
+
   /*
    * Long notes are clamped to six lines on the listing pages. The button
    * below expands them in place — no navigation, no page reload — and
@@ -183,5 +220,18 @@ const indexTitle = (
       });
   }
 
+  /*
+   * The images of a note open in the shared lightbox, so that a picture
+   * can be read at full size without leaving the timeline.
+   *
+   * The lightbox is bound to the list rather than to a single entry, so
+   * that every picture of the page can be opened. The binding is marked on
+   * the list itself, which keeps it from being attached twice.
+   */
+  function setupNoteLightbox() {
+    initLightbox({ containerSelector: 'ul[data-list-layout="notes"]' });
+  }
+
   document.addEventListener("astro:page-load", setupNoteExpand);
+  document.addEventListener("astro:page-load", setupNoteLightbox);
 </script>

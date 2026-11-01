@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import IconEdit from "@/assets/icons/IconEdit.svg";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import MonogramLogo from "@/assets/monogram-logo.svg";
 import Socials from "./Socials.astro";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -13,87 +14,93 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
 
 const t = useTranslations(config.site.uiLang);
 const currentYear = new Date().getFullYear();
+const locale = Astro.currentLocale ?? config.site.lang;
 ---
 
 <footer
-  class:list={["app-shell", { "mt-auto": !noMarginTop }, className]}
+  class:list={["w-full", { "mt-auto": !noMarginTop }, className]}
   {...attrs}
 >
-  <div
-    class="border-border flex flex-col items-center justify-between gap-4 border-t py-6 sm:flex-row-reverse sm:flex-wrap sm:py-4"
-  >
-    <div class="max-w-full">
-      <Socials />
-    </div>
+  {
+    /*
+    The rule and the contents of the footer are aligned with the chrome
+    column, so that the footer begins on the same vertical line as the
+    navigation above it — on every page, whatever the width of the page
+    body happens to be.
+    */
+  }
+  <div class="app-chrome border-border border-t">
+    {
+      /*
+      The footer is one centred column of three lines:
 
-    <div
-      class="flex flex-col items-center gap-1 text-center sm:flex-row sm:gap-0"
-    >
-      <span class="whitespace-nowrap">
-        <span data-i18n="footer.copyright">{t.footer.copyright}</span>
-        &#169; {currentYear}
-        <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-        <span data-i18n="footer.allRightsReserved">
-          {t.footer.allRightsReserved}
-        </span>
-      </span>
+        1. the brand — the mark, the name and the way to reach the author;
+        2. one sentence about the site;
+        3. the legal line.
+
+      Everything is centred on every screen. A footer split into columns
+      gives the eye three things to read at once and pulls the attention
+      away from the page above; one centred stack reads as a single quiet
+      sign-off at the end of the page.
+      */
+    }
+    <div class="flex flex-col items-center gap-6 py-10 sm:py-12">
+      {
+        /*
+        The brand line.
+
+        The mark and the name are the same object — the mark is a monogram
+        of the name — so they sit together on one line, and the circular
+        social buttons follow them, separated by a hair's breadth more.
+        */
+      }
+      <div class="flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
+        <a
+          href={getRelativeLocaleUrl(locale, "")}
+          class="app-header-brand flex items-center gap-2.5 text-lg font-semibold whitespace-nowrap"
+        >
+          <MonogramLogo
+            class="text-foreground size-8 shrink-0"
+            aria-hidden="true"
+          />
+          <span data-i18n="site.title">{t.site.title}</span>
+        </a>
+
+        <Socials align="center" size="sm" />
+      </div>
 
       {
         /*
-        The site name is repeated here so the footer identifies the site even
-        when it is read on its own — e.g. in a screenshot of the bottom of the
-        page.
-      */
+        The description.
+
+        The width is capped, so that the sentence keeps a comfortable
+        measure on a wide screen instead of stretching into a thin line of
+        text across the whole viewport.
+        */
       }
-      <span class="text-muted-foreground text-sm">{config.site.title}</span>
-    </div>
-
-    <a
-      href="#top"
-      class="text-muted-foreground focus-outline hover:text-accent flex items-center gap-1 text-sm transition-colors"
-      aria-label={t.a11y.backToTop}
-      data-i18n="a11y.backToTop"
-      data-i18n-attr="aria-label"
-    >
-      <span data-i18n="a11y.backToTop">{t.a11y.backToTop}</span>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="size-4"
+      <p
+        class="text-muted-foreground max-w-md text-center text-sm leading-relaxed"
+        data-i18n="site.description"
       >
-        <path d="M12 19V5"></path>
-        <path d="m5 12 7-7 7 7"></path>
-      </svg>
-    </a>
+        {t.site.description}
+      </p>
 
-    {
-      /*
-      The content of the site is edited in Pages CMS. The link opens the
-      hosted CMS, where the visitor signs in with GitHub and picks the
-      collection they want to change.
-    */
-    }
-    {
-      config.cms.show && (
-        <a
-          href={config.cms.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-muted-foreground focus-outline hover:text-accent flex items-center gap-1 text-sm transition-colors"
-          title={t.footer.manageTitle}
-          aria-label={t.footer.manageTitle}
-          data-i18n="footer.manageTitle"
-          data-i18n-attr="aria-label"
-        >
-          <IconEdit class="size-4" aria-hidden="true" />
-          <span data-i18n="footer.manage">{t.footer.manage}</span>
-        </a>
-      )
-    }
+      {
+        /*
+        The legal line.
+
+        The year and the name are rendered by the server, so they never go
+        stale. Only the last phrase is translated.
+        */
+      }
+      <p class="text-muted-foreground text-center text-xs sm:text-sm">
+        &#169; {currentYear}
+        <span data-i18n="site.author">{t.site.author}</span>
+        <span aria-hidden="true">&nbsp;·&nbsp;</span>
+        <span data-i18n="footer.allRightsReserved">
+          {t.footer.allRightsReserved}
+        </span>
+      </p>
+    </div>
   </div>
 </footer>

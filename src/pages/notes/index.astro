@@ -19,7 +19,7 @@ const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
 const noteTags = tags.filter(tag => tag.counts.notes > 0);
 ---
 
-<Layout title={`${t.pages.notesTitle} | ${config.site.title}`} width="list">
+<Layout title={`${t.pages.notesTitle} | ${t.site.title}`} width="list">
   <Header />
 
   <Breadcrumb />

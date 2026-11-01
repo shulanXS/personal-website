@@ -3,7 +3,25 @@ import { defineAstroPaperConfig } from "./src/types/config";
 export default defineAstroPaperConfig({
   site: {
     url: "https://astro-paper.pages.dev/",
+    /**
+     * The name of the site.
+     *
+     * This is the *fallback* — the value used for the metadata that is
+     * generated at build time (the RSS feed, the Open Graph image) and for
+     * the structured data of a page. The name that is actually *shown* on
+     * the site comes from the interface dictionary (`site.title`), so that
+     * it can be read as "Wenjie Che" in the English interface.
+     *
+     * Keep the two in sync.
+     */
     title: "车文杰",
+    /**
+     * The one-line description of the site.
+     *
+     * Like the title, this is the fallback for the build-time metadata.
+     * The description shown in the footer comes from the interface
+     * dictionary (`site.description`).
+     */
     description:
       "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与文学创作。",
     author: "车文杰",
@@ -38,25 +56,33 @@ export default defineAstroPaperConfig({
     lightAndDarkMode: true,
     dynamicOgImage: true,
     showBackButton: true,
-    editPost: {
-      enabled: true,
-      url: "https://app.pagescms.org/",
-    },
     search: "pagefind",
   },
   /**
    * The content management backend.
    *
    * Pages CMS reads the `.pages.yml` file in the project root and turns the
-   * four content collections into editable forms. The footer links to it,
-   * so publishing a new post does not need a local editor.
+   * four content collections into editable forms. The site is *not* linked
+   * to it: the "管理内容" buttons have been removed from the footer and from
+   * the article pages, because a visitor has no business editing the site
+   * and the links only ever led to a sign-in screen.
+   *
+   * The setting is kept so that the backend can be re-enabled from here if
+   * the link is ever wanted back.
    */
   cms: {
     url: "https://app.pagescms.org/",
-    show: true,
+    show: false,
   },
   /**
    * Social profile links shown in the header and the footer.
+   *
+   * The list is deliberately short. A wall of fifteen icons is not a
+   * contact list, it is noise: on a phone it wraps onto three rows and
+   * pushes the rest of the page out of the way, and on a wide screen it
+   * draws the eye away from the writing. Three links — a way to write,
+   * a way to see the code, and a way to talk — say everything a visitor
+   * needs to know.
    *
    * Every URL below is a PLACEHOLDER — replace it with the real account
    * before publishing. The icon is picked from `src/assets/icons/socials/`
@@ -66,31 +92,13 @@ export default defineAstroPaperConfig({
    * `linkTitle` is the accessible label of the icon link. Without it the
    * title falls back to an English placeholder ("车文杰 on Github"), which
    * does not fit a Chinese interface.
-   *
-   * The list is deliberately short — a wall of icons is noise. Add a
-   * platform here only if it is actually used.
    */
   socials: [
     // --- Code & development -------------------------------------------
     { name: "github", url: "https://github.com/", linkTitle: "GitHub" },
-    { name: "gitee", url: "https://gitee.com/", linkTitle: "Gitee" },
 
     // --- Chinese platforms --------------------------------------------
     { name: "wechat", url: "https://weixin.qq.com/", linkTitle: "微信" },
-    { name: "weibo", url: "https://weibo.com/", linkTitle: "微博" },
-    { name: "zhihu", url: "https://www.zhihu.com/", linkTitle: "知乎" },
-    { name: "bilibili", url: "https://space.bilibili.com/", linkTitle: "哔哩哔哩" },
-    { name: "xiaohongshu", url: "https://www.xiaohongshu.com/", linkTitle: "小红书" },
-    { name: "douban", url: "https://www.douban.com/", linkTitle: "豆瓣" },
-
-    // --- International platforms ---------------------------------------
-    { name: "x", url: "https://x.com/", linkTitle: "X" },
-    { name: "mastodon", url: "https://joinmastodon.org/", linkTitle: "Mastodon" },
-    { name: "threads", url: "https://www.threads.net/", linkTitle: "Threads" },
-    { name: "linkedin", url: "https://www.linkedin.com/", linkTitle: "LinkedIn" },
-    { name: "youtube", url: "https://www.youtube.com/", linkTitle: "YouTube" },
-    { name: "instagram", url: "https://www.instagram.com/", linkTitle: "Instagram" },
-    { name: "reddit", url: "https://www.reddit.com/", linkTitle: "Reddit" },
 
     // --- Contact -------------------------------------------------------
     { name: "mail", url: "mailto:yourmail@gmail.com", linkTitle: "发送邮件" },

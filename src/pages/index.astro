@@ -1,8 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
-import IconRss from "@/assets/icons/IconRss.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
-import SlothLogo from "@/assets/sloth-logo.svg";
+import MonogramLogo from "@/assets/monogram-logo.svg";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -51,7 +50,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
     <!-- Hero -->
     <section id="hero" class="border-border border-b pt-10 pb-10">
       <div
-        class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start"
+        class="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center lg:grid-cols-[minmax(0,1fr)_auto]"
       >
         <div class="max-w-2xl">
           {
@@ -78,7 +77,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
             >
               {t.home.greeting}
             </span>
-            {config.site.title}
+            <span data-i18n="site.name">{t.site.name}</span>
           </h1>
 
           <p class="mt-5 text-lg leading-relaxed" data-i18n="home.intro">
@@ -103,39 +102,44 @@ const homePath = getRelativeLocaleUrl(locale, "");
             {
               socials.length > 0 && (
                 <div class="flex max-w-full min-w-0 items-center">
-                  <Socials />
+                  <Socials align="start" size="md" />
                 </div>
               )
             }
-            <a
-              target="_blank"
-              href={`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`}
-              class="focus-outline hover:text-accent text-muted-foreground inline-flex items-center gap-1.5 text-sm"
-              aria-label={t.a11y.rssFeed}
-              title={t.a11y.rssFeed}
-              data-i18n="a11y.rssFeed"
-              data-i18n-attr="aria-label"
-            >
-              <IconRss
-                width={18}
-                height={18}
-                class="scale-110 stroke-current stroke-[2.5] rtl:-rotate-90"
-              />
-              <span data-i18n="home.rss">RSS</span>
-            </a>
           </div>
         </div>
 
         {
           /*
-          The logo doubles as the portrait of the site: a sloth hanging from
-          a branch, unhurried — the nickname the author goes by.
-        */
+          The logo doubles as the portrait of the site: the geometric
+          monogram of the author's name, drawn in the same thin, single
+          colour as the mark in the header.
+
+          It is large enough to hold its own against the text column beside
+          it, and it is centred against that column rather than pinned to
+          its top, so that the two halves of the hero read as one balanced
+          pair instead of a headline with an ornament hanging off it.
+
+          Behind it sits a very faint halo — neutral, like the mark itself
+          — so that the figure sits on the page instead of floating in
+          front of it. The halo is drawn inside the padding of the box
+          rather than outside it: a negative margin would push it past the
+          edge of the viewport on a narrow screen, and the page would
+          scroll sideways.
+          */
         }
-        <SlothLogo
-          class="stroke-accent hidden size-28 shrink-0 opacity-90 lg:block"
-          aria-hidden="true"
-        />
+        <div class="relative hidden shrink-0 p-6 md:block lg:p-10">
+          <div
+            class="pointer-events-none absolute inset-0 rounded-full"
+            style="background: radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--foreground) 7%, transparent), transparent 68%);"
+            aria-hidden="true"
+          >
+          </div>
+          <MonogramLogo
+            class="text-foreground relative size-32 shrink-0 opacity-80 lg:size-56"
+            aria-hidden="true"
+          />
+        </div>
       </div>
     </section>
 
@@ -258,11 +262,11 @@ const homePath = getRelativeLocaleUrl(locale, "");
               >
                 {t.home.recentWriting}
               </h2>
-              <ul class="border-border border-t">
+              <ul class="border-border border-t" data-list-layout="writing">
                 {writing.slice(0, postsConfig.perIndex).map(work => (
                   <WritingCard work={work} />
                 ))}
-              </ul>
+              </ul>{" "}
             </section>
           )
         }

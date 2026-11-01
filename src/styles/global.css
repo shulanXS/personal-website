@@ -71,24 +71,48 @@
  * The site has two nested widths, and keeping them apart is what makes the
  * pages feel like one site rather than a set of unrelated templates:
  *
- * - The *shell* is the frame: the header, the navigation and the footer.
- *   It is the same width on every single page, so the site reads as one
- *   application with a fixed chrome around it. Before this, the shell
+ * - The *chrome* is the frame: the header bar, the navigation and the
+ *   footer. It is the same width on every single page, so the site reads as
+ *   one application with a fixed chrome around it. Before this, the chrome
  *   inherited the width of whatever the page happened to render, so the
  *   navigation was 576px wide on an article page and 1152px on the home
  *   page — the same header, drawn at a different size on every click.
  *
  * - The *content* width is chosen per page: a narrow reading column for
  *   an article, a comfortable column for the notes timeline, a wide one
- *   for the home page. The content is centred inside the shell.
+ *   for the home page. The content is centred inside the chrome.
  *
- * The shell width is stored on `<html>` so that the header, the main
- * content and the footer can never disagree about it.
+ * Both widths are stored on `<html>` so that the header, the main content
+ * and the footer can never disagree about them.
  */
 @layer base {
   html {
-    --app-shell-width: var(--container-6xl);
     --app-max-width: var(--container-3xl);
+    /*
+     * The horizontal padding of the content column.
+     *
+     * The content column is a border box with this much padding on either
+     * side, so its *text* is the border box minus twice this amount.
+     */
+    --app-content-padding: 1rem;
+    /*
+     * The width of the *chrome* — the header bar and the footer.
+     *
+     * The chrome is deliberately independent of `--app-max-width`: the
+     * content column changes width from page to page (a narrow reading
+     * column on an article, a wide one on the home page), but the frame
+     * around it must not. If the chrome followed the content, the very same
+     * navigation would be drawn at a different width on every click — the
+     * header on the projects page would look wider than the one on the notes
+     * page, and the site would stop reading as one application.
+     */
+    --app-chrome-width: var(--container-6xl);
+  }
+
+  @media (min-width: 40rem) {
+    html {
+      --app-content-padding: 1.5rem;
+    }
   }
 
   html.app-w-wide {
@@ -134,24 +158,33 @@
  * centred inside the shell.
  */
 @utility app-layout {
-  @apply mx-auto w-full px-4 sm:px-6;
+  @apply mx-auto w-full;
   max-width: var(--app-max-width);
+  padding-inline: var(--app-content-padding);
 }
 
 /**
- * The shell.
+ * The chrome column.
  *
- * The frame around the content: header, navigation and footer. It is the
- * same width everywhere, which is what makes the site feel consistent
- * from one page to the next.
+ * The header and the footer use it, and — unlike `app-content` — its width
+ * does *not* follow the page. The content column is chosen per page (a
+ * narrow reading column for an article, a wide one for the home page), but
+ * the frame that holds the navigation has to stay the same everywhere, so
+ * that the bar looks identical on every page.
+ *
+ * The bar itself reaches the full width of the viewport; this utility is
+ * the row *inside* it that the brand and the navigation are laid out on.
  */
-@utility app-shell {
-  @apply mx-auto w-full px-5 sm:px-8;
-  max-width: var(--app-shell-width);
+@utility app-chrome {
+  @apply mx-auto w-full;
+  max-width: var(--app-chrome-width);
+  padding-inline: var(--app-content-padding);
 }
 
 @utility active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-8;
+  @apply underline decoration-wavy decoration-2;
+  /* The offset is measured in `em`, so that it scales with the label. */
+  text-underline-offset: 0.35em;
 }
 
 /* ==========================================================================
@@ -181,6 +214,7 @@
     The translucent panel. The backdrop filter is what makes the content
     scrolling underneath read as *underneath* rather than as a mistake.
     */
+    position: relative;
     background: color-mix(in oklab, var(--surface) 82%, transparent);
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
@@ -192,6 +226,11 @@
   It is a mask, not a border: the line is strongest in the middle and
   fades out towards both ends, which keeps the bar from looking like a
   rectangle that someone drew a rule under.
+
+  Two lines are drawn rather than one. The upper one is the shadow the
+  bar casts onto the page, the lower one the edge of the bar itself. A
+  single hairline looked thin and unfinished — like a rule that had been
+  forgotten rather than one that had been drawn.
   */
   .app-header-bar::after {
     content: "";
@@ -199,22 +238,29 @@
     left: 0;
     right: 0;
     bottom: -1px;
-    height: 1px;
-    background: var(--border);
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent,
-      var(--border) 15%,
-      var(--border) 85%,
-      transparent
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent,
-      var(--border) 15%,
-      var(--border) 85%,
-      transparent
-    );
+    height: 2px;
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in oklab, var(--foreground) 12%, transparent) 12%,
+        color-mix(in oklab, var(--foreground) 12%, transparent) 88%,
+        transparent
+      ),
+      linear-gradient(
+        90deg,
+        transparent,
+        var(--border) 15%,
+        var(--border) 85%,
+        transparent
+      );
+    background-size:
+      100% 1px,
+      100% 1px;
+    background-position:
+      0 0,
+      0 1px;
+    background-repeat: no-repeat;
     pointer-events: none;
   }
 
@@ -222,8 +268,10 @@
   The brand.
 
   A slightly heavier weight and a soft glow behind the mark, so the corner
-  of the bar has something to hold on to. The glow is a radial gradient in
-  the accent colour, very transparent — it is felt, not seen.
+  of the bar has something to hold on to. The glow is a drop shadow in the
+  ink colour of the page, very transparent — it is felt, not seen. The mark
+  itself is monochrome, so the glow has to be monochrome too: a coloured
+  halo would tint the ink and put a brand colour back into the corner.
   */
   .app-header-brand {
     transition: opacity var(--app-transition) ease;
@@ -235,14 +283,14 @@
 
   .app-header-brand svg {
     filter: drop-shadow(
-      0 1px 4px color-mix(in oklab, var(--accent) 35%, transparent)
+      0 1px 4px color-mix(in oklab, var(--foreground) 22%, transparent)
     );
     transition: filter var(--app-transition) ease;
   }
 
   .app-header-brand:hover svg {
     filter: drop-shadow(
-      0 2px 8px color-mix(in oklab, var(--accent) 55%, transparent)
+      0 2px 8px color-mix(in oklab, var(--foreground) 38%, transparent)
     );
   }
 }
@@ -293,7 +341,25 @@
      * selectable while the widened hit area stays clickable.
      */
     z-index: 0;
-    transition: color 200ms ease;
+    /*
+     * The resting weight of a navigation label. The hovered label is one
+     * step heavier — see the hover rule below. The weight lives here rather
+     * than in a utility class on the element, because a utility would sit
+     * in a later cascade layer and win over the hover state.
+     *
+     * 600 rather than 500: the Chinese labels are four narrow glyphs, and
+     * at a medium weight they read as thin grey strokes next to the much
+     * heavier brand name. A semibold label holds its own against it.
+     */
+    font-weight: 600;
+    /*
+     * The label never changes colour. The only reactions are the weight of
+     * the type and the wave under it, so the transition carries those two
+     * properties rather than the colour.
+     */
+    transition:
+      font-weight 200ms ease,
+      text-decoration-color 200ms ease;
   }
 
   /*
@@ -320,12 +386,39 @@
   }
 
   /*
-   * The wave shows up on hover and focus. The current page keeps it at all
-   * times via the `active-nav` utility.
+   * The hover reaction.
+   *
+   * There is no box behind the label and no colour change: the item
+   * answers the pointer by getting *heavier* and by growing a wave under
+   * the glyphs. The wave is the browser's own `text-decoration`, so it sits
+   * underneath the text and never overlaps it.
    */
   #menu-items > li > a:hover,
   #menu-items > li > a:focus-visible {
-    @apply underline decoration-wavy decoration-2 underline-offset-8;
+    @apply underline decoration-wavy decoration-2;
+    /*
+     * The offset of the wave.
+     *
+     * It is measured in `em` rather than in pixels, so that the wave keeps
+     * the same distance from the text whatever the size of the label. On a
+     * phone the labels are smaller and sit closer together, and a fixed
+     * offset of 6px would push the wave down onto the line below.
+     */
+    text-underline-offset: 0.35em;
+    font-weight: 700;
+  }
+
+  /*
+   * The wave on the current page.
+   *
+   * The current page is drawn in the ink of the page, not in a brand colour:
+   * a bold label with a wave under it, exactly like a hovered item. The
+   * wave is drawn in the same colour as the label, so that the two read as
+   * one mark rather than as a coloured word with a grey line under it.
+   */
+  #menu-items > li > a.active-nav {
+    font-weight: 700;
+    text-decoration-color: currentColor;
   }
 
   /*
@@ -358,39 +451,20 @@
   }
 
   /*
-   * Mobile menu.
+   * The mobile menu.
    *
-   * The menu is toggled by adding `data-open="true"` to the list. The items
-   * fade and slide in one after another, which makes the expansion read as
-   * an intentional reveal instead of a sudden pop.
+   * There is no mobile menu any more: the navigation links are always on
+   * screen, on a phone as well as on a wide display. A visitor must be
+   * able to reach every section of the site without opening anything
+   * first — a hidden menu hides the site itself.
+   *
+   * The rules below are kept only for the icons of the bar, which swap
+   * and scale on hover.
    */
-  #menu-items[data-open="true"] > li {
-    animation: nav-item-in 260ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
-  }
-
-  #menu-items[data-open="true"] > li:nth-child(1) {
-    animation-delay: 0ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(2) {
-    animation-delay: 30ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(3) {
-    animation-delay: 60ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(4) {
-    animation-delay: 90ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(5) {
-    animation-delay: 120ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(6) {
-    animation-delay: 150ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(7) {
-    animation-delay: 180ms;
-  }
-  #menu-items[data-open="true"] > li:nth-child(8) {
-    animation-delay: 210ms;
+  #menu-btn svg {
+    transition:
+      transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 150ms ease;
   }
 
   @keyframes nav-item-in {
@@ -401,32 +475,6 @@
     to {
       opacity: 1;
       transform: translateY(0);
-    }
-  }
-
-  /*
-   * The menu button swaps between a burger and a cross icon. The icon that
-   * becomes visible rotates into place, so the change reads as a turn rather
-   * than a hard swap.
-   */
-  #menu-btn svg {
-    transition:
-      transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 150ms ease;
-  }
-
-  #menu-btn[aria-expanded="true"] #close-icon {
-    animation: menu-icon-in 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes menu-icon-in {
-    from {
-      transform: rotate(-90deg) scale(0.7);
-      opacity: 0;
-    }
-    to {
-      transform: rotate(0deg) scale(1);
-      opacity: 1;
     }
   }
 }
@@ -475,12 +523,16 @@
    * Every card on the site — posts, writing, projects — uses this one
    * treatment, so the radius, the border and the hover reaction are
    * identical everywhere.
+   *
+   * The cards do not move. A card that lifts under the pointer turns the
+   * whole list into a carousel of small jumps; a page of entries should
+   * be read, not pushed around. The hover state therefore changes the
+   * colour of the surface and nothing else.
    */
   .post-card {
     transition:
       border-color var(--app-transition) ease,
-      transform var(--app-transition) ease,
-      box-shadow var(--app-transition) ease;
+      background-color var(--app-transition) ease;
   }
 
   .post-card > p {
@@ -502,8 +554,6 @@
     .post-card:hover {
       border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
       background: var(--surface-raised);
-      transform: translateY(-2px);
-      box-shadow: var(--app-shadow-lift);
     }
   }
 
@@ -522,15 +572,12 @@
     box-shadow: var(--app-shadow);
     transition:
       border-color var(--app-transition) ease,
-      transform var(--app-transition) ease,
-      box-shadow var(--app-transition) ease;
+      background-color var(--app-transition) ease;
   }
 
   .app-card:hover {
     border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
     background: var(--surface-raised);
-    transform: translateY(-2px);
-    box-shadow: var(--app-shadow-lift);
   }
 
   /*
@@ -543,6 +590,24 @@
   .app-list-entry {
     padding-top: var(--app-space-6);
     padding-bottom: var(--app-space-6);
+  }
+
+  /*
+   * The writing list.
+   *
+   * The literary works are separated by a hairline rather than by the
+   * raised panel the other lists use: they are read one after the other,
+   * and a stack of cards would break them into separate objects.
+   *
+   * The rule is drawn on the *entry* rather than on the list, so that it
+   * stops at the last entry instead of running past it.
+   */
+  ul[data-list-layout="writing"] > li {
+    border-bottom: 1px solid var(--border);
+  }
+
+  ul[data-list-layout="writing"] > li:last-child {
+    border-bottom: 0;
   }
 
   /*
@@ -579,9 +644,7 @@
     padding: var(--app-space-4) var(--app-space-5);
     transition:
       border-color var(--app-transition) ease,
-      background-color var(--app-transition) ease,
-      box-shadow var(--app-transition) ease,
-      transform var(--app-transition) ease;
+      background-color var(--app-transition) ease;
   }
 
   /*
@@ -613,8 +676,6 @@
   ul[data-list-layout="vertical"] > li:hover > article {
     border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
     background: var(--surface-raised);
-    transform: translateY(-1px);
-    box-shadow: var(--app-shadow-lift);
   }
 
   /* The date above the title. */
@@ -643,6 +704,9 @@
    */
   ul[data-list-layout="notes"] {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-5);
   }
 
   ul[data-list-layout="notes"] > li {
@@ -650,9 +714,16 @@
     display: grid;
     grid-template-columns: 1fr;
     column-gap: var(--app-space-5);
+    row-gap: var(--app-space-2);
   }
 
-  /* The date column. */
+  /*
+   * The date column.
+   *
+   * On a phone the date sits above the entry. From `sm` upwards it moves
+   * into its own column on the left of the rule, where it becomes the axis
+   * of the timeline.
+   */
   ul[data-list-layout="notes"] .app-timeline-date {
     color: var(--muted-foreground);
     font-size: 0.8125rem;
@@ -660,51 +731,311 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* The panel that holds one entry. */
-  ul[data-list-layout="notes"] > li > article {
-    border: 1px solid var(--border);
-    border-radius: var(--app-radius);
-    background: var(--surface);
-    box-shadow: var(--app-shadow);
-    padding: var(--app-space-4) var(--app-space-5);
-    transition:
-      border-color var(--app-transition) ease,
-      background-color var(--app-transition) ease,
-      box-shadow var(--app-transition) ease;
+  ul[data-list-layout="notes"] .app-timeline-date time {
+    display: block;
   }
 
-  ul[data-list-layout="notes"] > li:hover > article {
-    border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
-    background: var(--surface-raised);
-    box-shadow: var(--app-shadow-lift);
+  /*
+   * The stacked date: the day on the first line, the moment of the day on
+   * the second.
+   *
+   * The two lines fill the width of the column and are right-aligned
+   * against the rule, so that the days line up in a column of their own
+   * and the eye can scan down the axis without reading any of them.
+   */
+  .app-timeline-stacked {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+    line-height: 1.4;
   }
 
   @media (min-width: 40rem) {
+    .app-timeline-stacked {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+  } /*
+   * The bubble that holds one entry.
+   *
+   * A note is a message, and a message has a shape: a rounded panel with a
+   * small tail on its left edge. The article is only the container that
+   * holds the bubble — it is transparent, so that the bubble reads as the
+   * actual object rather than as a frame around one.
+   *
+   * The bubble is a flat surface rather than the old lit-from-above
+   * gradient: the tail has to be filled with exactly the same colour as
+   * the bubble, and a gradient would leave the tail a different shade.
+   * The sense of depth comes from the hairline and the shadow instead.
+   *
+   * The bubble does not move when the pointer passes over it. A list of
+   * notes is read from top to bottom; a panel that jumped under the
+   * pointer would move the text out from under the reader.
+   */
+  ul[data-list-layout="notes"] > li > article {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    /*
+     * The padding on the left is the room the tail needs: the tail is
+     * drawn outside the bubble, and without the padding it would hang off
+     * the edge of the content column — and off the edge of the screen on
+     * a phone.
+     */
+    padding-left: 0.75rem;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  /*
+   * The column that holds the bubble.
+   *
+   * `min-width: 0` lets the long lines inside the bubble break instead of
+   * pushing the column wider than the page.
+   */
+  ul[data-list-layout="notes"] .app-note-column {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  ul[data-list-layout="notes"] .app-note-bubble {
+    position: relative;
+    /*
+     * The outline is a ring rather than a border. A border is drawn inside
+     * the element's box, and the tail's stroke runs past the corner the
+     * border would stop at — the two would not meet, and the bubble would
+     * look as though it had been cut out of a frame. A ring is drawn
+     * outside the box, so the bubble's outline and the tail's outline lie
+     * on the same line.
+     */
+    box-shadow:
+      0 0 0 1px var(--app-bubble-border, var(--border)),
+      var(--app-shadow),
+      inset 0 1px 0
+        color-mix(in oklab, var(--surface-raised) 90%, var(--foreground));
+    background: var(--app-bubble-bg, var(--app-bubble-fill));
+    /*
+     * Every corner is rounded — the top-left one included. The tail is
+     * built out of the bubble's own top-left corner (see below), so a
+     * square corner here would break the curve where the two meet.
+     *
+     * The radius is the bubble's own, not the site's standard one: it has
+     * to match the 1rem curve of the tail's wedge, or the two outlines
+     * would meet in a step instead of running into each other.
+     */
+    border-radius: var(--app-radius-bubble);
+    padding: var(--app-space-4) var(--app-space-5);
+    transition:
+      box-shadow var(--app-transition) ease,
+      background-color var(--app-transition) ease;
+  }
+
+  /*
+   * The tail.
+   *
+   * The shape Apple Messages draws: a wedge whose top-right corner is
+   * rounded off, with a second piece of the page background laid over
+   * its left half to carve the crescent out of it. What is left is the
+   * tail — a crescent whose tip points up and to the left, into the empty
+   * space where the speaker would be.
+   *
+   * The wedge is not glued to the side of the bubble: it is placed at the
+   * bubble's top-left corner, overlapping it, so that the crescent's
+   * upper edge runs into the bubble's own rounded corner and its lower
+   * edge runs into the bubble's left edge. The two outlines meet without
+   * a step, and the bubble reads as one shape rather than as a rectangle
+   * with a spike glued to its side.
+   *
+   * The crescent is a single shape rather than two overlapping boxes. The
+   * reference builds it by laying a page-coloured box over the wedge, but
+   * that paints over whatever stroke lies underneath it. An outline that
+   * runs beneath the cut is simply erased, which is why a tail built this
+   * way cannot carry a complete border: the cut takes the left half of
+   * the stroke with it, and the outer arc — which the reference never
+   * strokes, because it has no border — is left with none at all.
+   *
+   * So the crescent is drawn as one path instead: the wedge, minus the
+   * cut, filled in a single even-odd shape. Nothing is painted over
+   * anything, and the outline of the tail can be drawn on top of it in
+   * one unbroken stroke.
+   *
+   * The tail takes its colours from the same custom properties as the
+   * bubble, so the two stay in step when the pointer passes over the entry.
+   */
+  ul[data-list-layout="notes"] .app-note-bubble::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    /*
+     * The wedge sits at the bubble's top-left corner, overlapping it: it
+     * starts a little to the left of the bubble's edge and runs down over
+     * the corner, so that the crescent's lower edge runs into the bubble's
+     * left border and its upper edge runs into the bubble's top border.
+     *
+     * The three numbers are the wedge of the reference: 18 wide, 20 tall,
+     * its top-right corner rounded off with a 16px radius.
+     */
+    left: -0.5rem;
+    top: 0;
+    width: 1.125rem;
+    height: 1.25rem;
+    background: var(--app-bubble-bg, var(--app-bubble-fill));
+    /*
+     * The path is in the wedge's own box, whose origin is the wedge's
+     * top-left corner — 8px to the left of the bubble's edge.
+     *
+     *   M0 0         the wedge's top-left corner
+     *   L2 0         along the top edge to where the arc begins
+     *   A16 16       the outer arc, down to the wedge's right edge
+     *   L18 20       down the right edge
+     *   L8 20        back along the bottom edge to the cut
+     *   L8 10        up the cut's right edge
+     *   A10 10       the cut's own arc, closing the crescent
+     *
+     * `evenodd` is what makes the cut a hole rather than a second shape:
+     * both sub-paths are filled, and the region they share — the part of
+     * the wedge the cut covers — is left empty.
+     */
+    clip-path: path(
+      evenodd,
+      "M0 0L2 0A16 16 0 0 1 18 16L18 20L8 20L8 10A10 10 0 0 0 0 0.2Z"
+    );
+    transition: background-color var(--app-transition) ease;
+  }
+
+  /*
+   * The outline of the tail.
+   *
+   * One path, stroked in one piece, tracing the crescent from end to end:
+   * the wedge's outer arc, its top edge, its left edge, the cut's arc,
+   * and a short run down the bubble's left edge. At both ends it runs
+   * into the bubble's own ring, so the two continue into each other as
+   * one unbroken line rather than stopping beside each other.
+   *
+   * The path is drawn as a stroke inside a masked box rather than as a
+   * border, because a stroke can follow the arc exactly — a border can
+   * only ever be a rectangle.
+   */
+  ul[data-list-layout="notes"] .app-note-bubble::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    /*
+     * The box the path is drawn in. It starts a little to the left of and
+     * a little above the bubble's corner, so that the stroke has room to
+     * run around the outside of the bubble's top-left corner.
+     */
+    left: -0.6875rem;
+    top: -0.1875rem;
+    width: 2.125rem;
+    height: 1.625rem;
+    background: var(--app-bubble-border, var(--border));
+    /*
+     * The mask is the stroke itself: an SVG path, one pixel wide, in
+     * white on a transparent background. The box is filled with the
+     * border colour and the mask cuts everything away but the stroke.
+     *
+     * The path is in the box's own coordinates, whose origin is 11px to
+     * the left of and 3px above the bubble's top-left corner:
+     *
+     *   M16.174 7.548   where the tail's outer arc leaves the bubble
+     *   A16 16          the tail's outer arc, back up to its top
+     *   L5 3            along the wedge's top edge
+     *   L3 3            along the wedge's left edge
+     *   A10 10          the cut's arc, down to the bubble's left edge
+     *   L11 16          down the bubble's left edge, into its ring
+     */
+    -webkit-mask-image: var(--app-note-tail-outline);
+    mask-image: var(--app-note-tail-outline);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    transition: background-color var(--app-transition) ease;
+  }
+
+  ul[data-list-layout="notes"] > li:hover {
+    /*
+     * The hover tints the bubble rather than lifting it, and it tints the
+     * wedge of the tail along with it — both read the same custom
+     * property, so the tail can never drift a shade away from the bubble
+     * it belongs to.
+     */
+    --app-bubble-bg: color-mix(
+      in oklab,
+      var(--accent) 6%,
+      var(--app-bubble-fill)
+    );
+    --app-bubble-border: color-mix(in oklab, var(--accent) 40%, var(--border));
+  }
+  @media (min-width: 40rem) {
     ul[data-list-layout="notes"] > li {
-      grid-template-columns: 3.75rem 1fr;
+      /*
+       * The date column is as wide as the longest line it has to hold — the
+       * day, "2026.10.28" — and not one pixel more. A narrower column
+       * would push the text out of the column and across the rule.
+       */
+      grid-template-columns: 5.5rem 1fr;
+      row-gap: 0;
     }
 
+    /*
+     * The date sits in its own column, right-aligned against the rule so
+     * that the days line up in a column of their own and the eye can scan
+     * down the axis without reading any of them.
+     */
     ul[data-list-layout="notes"] .app-timeline-date {
       text-align: right;
+      padding-top: 0.0625rem;
     }
 
-    /* The rule that runs through all the nodes. */
+    /*
+     * The rule that runs through all the nodes.
+     *
+     * It sits in the middle of the gap between the date column and the
+     * panel, so that the dates and the panels are the same distance from
+     * it on either side. The rule fades out at both ends, so that it reads
+     * as a continuation of the axis rather than as a box drawn around the
+     * list.
+     */
     ul[data-list-layout="notes"]::before {
       content: "";
       position: absolute;
-      left: 4.375rem;
-      top: 0.75rem;
-      bottom: 0.75rem;
+      left: 6.0625rem;
+      top: 0.5rem;
+      bottom: 0.5rem;
       width: 1px;
-      background: var(--border);
+      background: linear-gradient(
+        180deg,
+        transparent,
+        var(--border) 6%,
+        var(--border) 94%,
+        transparent
+      );
     }
 
-    /* The dot that marks the entry on the rule. */
+    /*
+     * The dot that marks the entry on the rule.
+     *
+     * It is centred on the rule, and it sits level with the *tip of the
+     * bubble's tail* — the two belong together, so that the eye reads the
+     * tail as pointing at the node it marks rather than at the panel
+     * beside it.
+     *
+     * The tip is at the top of the bubble, and the bubble starts at the
+     * top of the entry, so the dot's centre has to be a half of its own
+     * height above the entry's top edge: `top` is negative by exactly
+     * half the dot's diameter.
+     */
     ul[data-list-layout="notes"] > li::before {
       content: "";
       position: absolute;
-      left: 4.1875rem;
-      top: 1.0625rem;
+      left: 5.875rem;
+      top: -0.1875rem;
       width: 0.375rem;
       height: 0.375rem;
       border-radius: 9999px;
@@ -712,14 +1043,12 @@
       background: var(--background);
       transition:
         border-color 200ms ease,
-        background-color 200ms ease,
-        transform 200ms ease;
+        background-color 200ms ease;
     }
 
     ul[data-list-layout="notes"] > li:hover::before {
       border-color: var(--accent);
       background: var(--accent);
-      transform: scale(1.35);
     }
   }
 
@@ -756,14 +1085,12 @@
     padding: var(--app-space-4) var(--app-space-5);
     transition:
       border-color var(--app-transition) ease,
-      background-color var(--app-transition) ease,
-      box-shadow var(--app-transition) ease;
+      background-color var(--app-transition) ease;
   }
 
   ul[data-list-layout="series"] > li:hover > article {
     border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
     background: var(--surface-raised);
-    box-shadow: var(--app-shadow-lift);
   }
 
   /*

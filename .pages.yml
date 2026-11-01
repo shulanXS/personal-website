@@ -1,230 +1,399 @@
 # Pages CMS configuration
 # Docs: https://pagescms.org/docs/configuration/
 #
-# NOTE: In this project the file name of a content file determines its URL
-# (the `slug` frontmatter field is not part of the Content Collections schema
-# and is therefore dropped). Every `filename` template below is deliberately
-# free of date prefixes so that editing a publish date never changes a link.
+# ---------------------------------------------------------------------------
+# How this project addresses its content
+# ---------------------------------------------------------------------------
+#
+# Astro's glob loader uses the `slug` frontmatter field as the entry id when
+# the field is present, and falls back to the file name otherwise. So:
+#
+#   * `slug` present  → the URL is `/posts/<slug>`
+#   * `slug` absent   → the URL is `/posts/<file name>`
+#
+# The `filename` templates below therefore contain no date prefix, and the
+# slug is the only field that may change a link. Editing a publish date never
+# changes a URL.
+#
+# Two conventions keep the editor and the build in agreement:
+#
+#   * The schema is strict — unknown keys are rejected. That is why the list
+#     fields use `list:` (not `of:`) and the select fields use
+#     `options.values` (not a bare `options:` array).
+#   * Dates are stored as `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`. Astro's YAML parser
+#     only turns that shape into a real `Date`; a naive `2026-10-28T09:30`
+#     stays a string and would fail the `z.date()` schema. The trailing `Z`
+#     keeps the value unambiguous — the site renders every timestamp in
+#     `Asia/Shanghai`, but the stored value is UTC.
+#
+# Every timestamp in the repository uses that exact shape, so the editor can
+# read and write every existing entry without losing information.
 
 media:
   - name: images
-    label: Images
+    label: 图片
     input: public/uploads
     output: /uploads
     rename: random
     extensions: [png, jpg, jpeg, webp, gif, avif]
-    categories: [image]
+
+components:
+  # -------------------------------------------------------------------------
+  # Shared field definitions.
+  #
+  # A component that describes a *single* field keeps the frontmatter flat —
+  # only `type: object` components nest the keys. Defining the date format
+  # once means the editor and the repository cannot drift apart.
+  # -------------------------------------------------------------------------
+  publishDate:
+    type: date
+    label: 发布日期
+    required: true
+    options:
+      time: true
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    description: 填写 UTC 时间，格式形如 2026-10-28T09:30:00.000Z。
+
+  updateDate:
+    type: date
+    label: 更新日期
+    required: false
+    options:
+      time: true
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    description: 留空表示尚未修改过。
+
+  tagList:
+    type: string
+    label: 标签
+    list: true
+    description: 回车确认一个标签。标签在所有集合之间共享。
+
+settings:
+  # Keep the keys that the schema does not describe.
+  #
+  # Without this, saving an entry rewrites the frontmatter from the editor
+  # form alone and drops every key the form does not cover.
+  content:
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: "content({name}): create {filename}"
+      update: "content({name}): update {filename}"
+      delete: "content({name}): delete {filename}"
+      rename: "content({name}): rename {oldFilename} -> {newFilename}"
 
 content:
-  # ---------------------------------------------------------------------
-  # Blog — reuses the existing posts collection.
-  # MDX files are intentionally NOT part of this collection: their body
-  # contains JSX components which the rich-text editor would destroy.
-  # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Blog — the `posts` collection.
+  #
+  # Only `.md` files are editable here: the collection's file extension comes
+  # from the `filename` template, so the MDX files — whose bodies contain JSX
+  # that the rich-text editor would destroy — stay out of reach.
+  # ---------------------------------------------------------------------------
   - name: posts
-    label: Blog
+    label: 技术文章
     type: collection
     path: src/content/posts
     filename:
       template: "{fields.slug}.md"
       field: create
+    operations:
+      # The URL is the `slug` field, not the file name. Renaming the file
+      # would only let the two drift apart.
+      rename: false
+    view:
+      fields: [title, pubDatetime, tags, draft]
+      primary: title
+      sort: [pubDatetime, title]
+      search: [title, description]
+      default:
+        sort: pubDatetime
+        order: desc
     fields:
       - name: title
         type: string
         required: true
-      - name: description
-        type: text
-        required: true
+        label: 标题
+        options:
+          minlength: 2
       - name: slug
         type: string
         required: true
         label: Slug
-        description: File name and URL segment. Keep it stable once published.
         pattern: "^[a-z0-9-]+$"
+        description: 决定文章链接（/posts/<slug>）。修改它会改变已有链接，请谨慎。
+      - name: description
+        type: text
+        required: true
+        label: 摘要
+        description: 列表页与 SEO 使用的摘要。
+      - name: pubDatetime
+        component: publishDate
+      - name: modDatetime
+        component: updateDate
       - name: author
         type: string
         required: false
-      - name: pubDatetime
-        type: date
-        required: true
-      - name: modDatetime
-        type: date
-        required: false
+        label: 作者
       - name: tags
-        type: list
-        required: false
-        of:
-          type: string
+        component: tagList
       - name: featured
         type: boolean
         required: false
         default: false
+        label: 首页推荐
       - name: draft
         type: boolean
         required: false
         default: false
+        label: 草稿
+        description: 草稿不会出现在列表、RSS 与搜索中。
       - name: ogImage
         type: image
         required: false
+        label: 分享图
+        options:
+          media: images
+      - name: canonicalURL
+        type: string
+        required: false
+        label: 规范链接
+        description: 转载或外链文章的原始地址。
+      - name: timezone
+        type: string
+        required: false
+        label: 时区
+        description: 留空则使用站点时区（Asia/Shanghai）。
+      - name: hideEditPost
+        type: boolean
+        required: false
+        default: false
+        label: 隐藏编辑链接
       - name: body
         type: rich-text
+        label: 正文
+        options:
+          media: images
 
-  # ---------------------------------------------------------------------
-  # Notes — short-form posts. The `id` field is a UUID v4 and doubles as
-  # the file name and the URL segment, so the link stays stable when the
-  # publish date changes.
-  # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Notes — short-form posts ("碎碎念").
+  #
+  # The `id` field is a UUID v4 and doubles as the file name, so the link
+  # stays stable when the publish date changes.
+  # ---------------------------------------------------------------------------
   - name: notes
-    label: Notes
+    label: 碎碎念
     type: collection
     path: src/content/notes
     filename: "{fields.id}.md"
+    operations:
+      # The file name *is* the id; renaming it would break the entry.
+      rename: false
+    view:
+      fields: [pubDatetime, title, tags, draft]
+      # A note may have no title, so the date identifies it in the list.
+      primary: pubDatetime
+      sort: [pubDatetime, title]
+      search: [title, content]
+      default:
+        sort: pubDatetime
+        order: desc
     fields:
       - name: id
         type: uuid
         required: true
         label: ID
+        options:
+          editable: false
       - name: title
         type: string
         required: false
+        label: 标题
+        description: 留空则由正文开头自动生成（仅用于搜索索引）。
       - name: content
         type: text
         required: false
-        label: Content
+        label: 内容
       - name: images
-        type: list
+        type: image
         required: false
-        label: Images
-        of:
-          type: image
+        label: 图片
+        options:
+          media: images
+          multiple:
+            max: 9
+          unique: true
+      - name: imageAlts
+        type: string
+        required: false
+        label: 图片说明
+        list: true
+        description: 与「图片」按顺序一一对应的替代文本。
       - name: pubDatetime
-        type: date
-        required: true
+        component: publishDate
       - name: modDatetime
-        type: date
-        required: false
+        component: updateDate
       - name: tags
-        type: list
-        required: false
-        of:
-          type: string
+        component: tagList
       - name: draft
         type: boolean
         required: false
         default: false
+        label: 草稿
 
-  # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Writing — novels, essays, short stories.
+  #
   # `series`, `chapterNumber` and `status` are reserved for chapters.
-  # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   - name: writing
-    label: Writing
+    label: 文学创作
     type: collection
     path: src/content/writing
     filename:
       template: "{fields.slug}.md"
       field: create
+    operations:
+      # The URL is the `slug` field, not the file name.
+      rename: false
+    view:
+      fields: [title, type, series, chapterNumber, pubDatetime, draft]
+      primary: title
+      sort: [series, chapterNumber, pubDatetime]
+      search: [title, description]
+      default:
+        sort: pubDatetime
+        order: desc
     fields:
       - name: title
         type: string
         required: true
+        label: 标题
       - name: slug
         type: string
         required: true
         label: Slug
         pattern: "^[a-z0-9-]+$"
+        description: 决定作品链接（/writing/<slug>）。修改它会改变已有链接，请谨慎。
       - name: type
         type: select
         required: false
         default: essay
+        label: 类型
         options:
-          - value: novel
-            label: Novel
-          - value: essay
-            label: Essay
-          - value: short
-            label: Short Story
+          values:
+            - name: novel
+              label: 小说
+            - name: essay
+              label: 散文
+            - name: short
+              label: 短篇
       - name: description
         type: text
         required: false
+        label: 简介
       - name: series
         type: string
         required: false
+        label: 系列
+        description: 同一系列的作品会共用章节导航。
       - name: chapterNumber
         type: number
         required: false
+        label: 章节序号
+        options:
+          min: 1
       - name: status
         type: select
         required: false
+        label: 状态
         options:
-          - value: ongoing
-            label: Ongoing
-          - value: completed
-            label: Completed
+          values:
+            - name: ongoing
+              label: 连载中
+            - name: completed
+              label: 已完结
       - name: cover
         type: image
         required: false
+        label: 封面
+        options:
+          media: images
       - name: pubDatetime
-        type: date
-        required: true
+        component: publishDate
       - name: modDatetime
-        type: date
-        required: false
+        component: updateDate
       - name: tags
-        type: list
-        required: false
-        of:
-          type: string
+        component: tagList
       - name: draft
         type: boolean
         required: false
         default: false
+        label: 草稿
       - name: body
         type: rich-text
+        label: 正文
+        options:
+          media: images
 
-  # ---------------------------------------------------------------------
-  # Projects — a plain data file, editable with a simple form.
-  # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Projects — a plain JSON file, editable with a simple form.
+  # ---------------------------------------------------------------------------
   - name: projects
-    label: Projects
+    label: 项目
     type: file
     path: src/data/projects.json
+    format: json
+    operations:
+      delete: false
     fields:
       - name: projects
-        type: list
-        required: false
-        of:
-          type: object
-          fields:
-            - name: name
-              type: string
-              required: true
-            - name: description
-              type: text
-              required: false
-            - name: techStack
-              type: list
-              required: false
-              of:
-                type: string
-            - name: tags
-              type: list
-              required: false
-              label: Tags
-              of:
-                type: string
-            - name: github
-              type: string
-              required: false
-            - name: demo
-              type: string
-              required: false
-            - name: screenshot
-              type: image
-              required: false
-            - name: featured
-              type: boolean
-              required: false
-            - name: order
-              type: number
-              required: false
+        type: object
+        label: 项目列表
+        list:
+          collapsible: true
+          summary: "{fields.name} ({index})"
+        fields:
+          - name: name
+            type: string
+            required: true
+            label: 名称
+          - name: description
+            type: text
+            required: false
+            label: 简介
+          - name: techStack
+            type: string
+            required: false
+            label: 技术栈
+            list: true
+          - name: tags
+            component: tagList
+          - name: github
+            type: string
+            required: false
+            label: GitHub
+            pattern: "^https?://.+"
+          - name: demo
+            type: string
+            required: false
+            label: 演示地址
+            pattern: "^https?://.+"
+          - name: screenshot
+            type: image
+            required: false
+            label: 截图
+            options:
+              media: images
+          - name: featured
+            type: boolean
+            required: false
+            default: false
+            label: 首页推荐
+          - name: order
+            type: number
+            required: false
+            label: 排序
+            description: 数字越小越靠前。

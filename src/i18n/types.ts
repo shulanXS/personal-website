@@ -1,11 +1,53 @@
 export interface UIStrings {
+  /**
+   * The identity of the site.
+   *
+   * The name, the author and the one-line description are part of the
+   * interface, not part of the configuration: they are shown in the header,
+   * in the footer, in the metadata of every page and in the social buttons.
+   * Switching the interface language therefore has to switch them too —
+   * with one deliberate exception: the name itself is never translated.
+   * "Wenjie Che" stays "Wenjie Che" in both interfaces, because a name is
+   * not a phrase: rendering it as "车文杰" in the Chinese interface would
+   * read as an alias rather than as the person it refers to.
+   */
+  site: {
+    /** The name of the site — also the name of its author. */
+    title: string;
+    /**
+     * The name of the person, written in the language of the interface.
+     *
+     * The site title is a brand and never changes; this one follows the
+     * interface language, so the Chinese interface shows 车文杰 and the
+     * English one shows Wenjie Che.
+     */
+    name: string;
+    /** The name of the author, as it appears in the copyright line. */
+    author: string;
+    /** The one-line description of the site. */
+    description: string;
+  };
   nav: {
     home: string;
     posts: string;
     notes: string;
     writing: string;
     projects: string;
+    about: string;
     search: string;
+  };
+  /**
+   * The accessible labels of the social buttons.
+   *
+   * The labels are part of the interface: a Chinese interface says
+   * "发送邮件" where the English one says "Send an email".
+   */
+  socials: {
+    github: string;
+    wechat: string;
+    mail: string;
+    /** The label of the mail button, with the name of the site in it. */
+    mailTo: string;
   };
   post: {
     publishedAt: string;
@@ -106,6 +148,10 @@ export interface UIStrings {
   footer: {
     copyright: string;
     allRightsReserved: string;
+    /** The heading of the navigation column in the footer. */
+    navTitle: string;
+    /** The heading of the column that lists the most recent writing. */
+    recentTitle: string;
     /** The label of the link that opens the content management backend. */
     manage: string;
     /** The accessible title of the CMS link. */
@@ -136,6 +182,44 @@ export interface UIStrings {
     searchTitle: string;
     searchDesc: string;
   };
+  /**
+   * The "About me" page.
+   *
+   * The page is a small biography in fixed sections: a heading, a lead
+   * paragraph, and then a list of titled sections. The structure is fixed
+   * here rather than in the page, so that the two languages always have
+   * the same sections in the same order.
+   */
+  about: {
+    /** The title of the page. */
+    title: string;
+    /** The one-line description under the title. */
+    desc: string;
+    /** The short identity line next to the avatar. */
+    identity: string;
+    /** The lead paragraph. */
+    lead: string;
+    /** The titled sections, in the order they are shown. */
+    sections: {
+      /** The heading of a section. */
+      title: string;
+      /** The paragraphs of a section. */
+      body: string[];
+    }[];
+    /** The heading above the list of things the site holds. */
+    hereTitle: string;
+    /** The items of the list of things the site holds. */
+    hereItems: {
+      /** The name of one thing the site holds. */
+      label: string;
+      /** What that thing is. */
+      desc: string;
+    }[];
+    /** The heading above the contact links. */
+    contactTitle: string;
+    /** The sentence above the contact links. */
+    contactDesc: string;
+  };
   a11y: {
     skipToContent: string;
     openMenu: string;
@@ -152,6 +236,8 @@ export interface UIStrings {
     breadcrumb: string;
     rssFeed: string;
     backToTop: string;
+    /** The accessible label of the navigation column in the footer. */
+    footerNav: string;
   };
   /**
    * Pagefind's own search UI strings.

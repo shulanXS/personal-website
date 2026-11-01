@@ -4,6 +4,7 @@ import { ClientRouter } from "astro:transitions";
 import { getRelativeLocaleUrl } from "astro:i18n";
 import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
 import { getAssetPath } from "@/utils/withBase";
+import { useTranslations } from "@/i18n";
 import config from "@/config";
 import "@/styles/global.css";
 
@@ -23,9 +24,11 @@ type Props = {
 
 const { site } = config;
 
+const t = useTranslations(site.uiLang);
+
 const {
-  title = site.title,
-  description = site.description,
+  title = t.site.title,
+  description = t.site.description,
   ogImage = resolveDefaultOgImagePath(config),
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
   width = "default",
@@ -99,12 +102,12 @@ const uiLang = site.uiLang;
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
-    <meta name="author" content={site.author} />
+    <meta name="author" content={t.site.author} />
     <link rel="sitemap" href={getAssetPath("sitemap-index.xml")} />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={site.title} />
+    <meta property="og:site_name" content={t.site.title} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
@@ -121,7 +124,7 @@ const uiLang = site.uiLang;
     <link
       rel="alternate"
       type="application/rss+xml"
-      title={site.title}
+      title={t.site.title}
       href={new URL(rssHref, Astro.site)}
     />
 

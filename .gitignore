@@ -31,3 +31,11 @@ public/pagefind
 
 # docker compose
 compose.override.yaml
+
+# scratch files
+# One-off previews and probes that are written while working on a design
+# question. They are useful for the session they are made in and noise
+# afterwards, so they are kept out of the repository by pattern.
+*-tmp.mjs
+outline-test.html
+design-proposals-*.html

@@ -12,6 +12,7 @@ const PAGES = [
   ["notes", "/notes/"],
   ["writing", "/writing/"], ["writing-detail", "/writing/chapter-one/"],
   ["projects", "/projects/"],
+  ["about", "/about/"],
   ["search", "/search/"], ["404", "/404/"],
 ];
 
@@ -21,7 +22,36 @@ const out = [];
 function srgb(c) { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }
 function lum([r, g, b]) { return 0.2126 * srgb(r) + 0.7152 * srgb(g) + 0.0722 * srgb(b); }
 function contrast(a, b) { const l1 = lum(a), l2 = lum(b); const hi = Math.max(l1,l2), lo = Math.min(l1,l2); return (hi + 0.05) / (lo + 0.05); }
-function parseRGB(s) { const m = s.match(/[\d.]+/g); return m ? m.slice(0, 3).map(Number) : null; }
+
+/*
+ * A colour is turned into sRGB by the *browser*, not by a parser here.
+ *
+ * The computed style of an element can be any of the colour spaces CSS
+ * supports — `oklab()`, `color-mix()`, `oklch()` — and a regular
+ * expression cannot tell an OKLab lightness of 0.92 from an sRGB value of
+ * 0.92. The browser already knows how to convert, so the conversion is
+ * left to it: the colour is painted onto a canvas and read back.
+ */
+const toSRGB = async (page, colors) => page.evaluate(list => {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return [];
+
+  return list.map(color => {
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillStyle = "#000";
+    ctx.fillStyle = color;
+    // A colour the browser cannot parse leaves the fill colour as black,
+    // which would silently turn every failure into a contrast of 1.
+    if (ctx.fillStyle === "#000000" && !/^#0{6}$|black|rgb\(0, 0, 0\)/.test(color)) {
+      return null;
+    }
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return { r, g, b, a: a / 255 };
+  });
+}, colors);
 
 for (const vp of [{ n: "desktop", width: 1440, height: 900 }, { n: "mobile", width: 390, height: 844 }]) {
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
@@ -72,6 +102,17 @@ for (const vp of [{ n: "desktop", width: 1440, height: 900 }, { n: "mobile", wid
         if (el.children.length) continue;
         const txt = el.textContent?.trim();
         if (!txt) continue;
+        /*
+         * Code is excluded.
+         *
+         * A syntax-highlighted token takes its colour from the highlighter,
+         * not from the stylesheet: a comment inside a YAML sample is painted
+         * in the highlighter's own comment colour, which is chosen to
+         * read well inside a code block and not to meet the contrast rules
+         * of body text. Reporting it as a contrast failure of the site
+         * would be reporting a problem that does not exist.
+         */
+        if (el.closest("pre, code")) continue;
         const cs = getComputedStyle(el);
         if (cs.visibility === "hidden" || cs.display === "none") continue;
         if (el.className?.toString?.().includes("sr-only")) continue;
@@ -84,7 +125,6 @@ for (const vp of [{ n: "desktop", width: 1440, height: 900 }, { n: "mobile", wid
         seen.add(key);
         res.contrast.push({ tag: el.tagName.toLowerCase(), cls: el.className?.toString?.().slice(0, 60), fg, bg, fs: cs.fontSize, fw: cs.fontWeight, txt: txt.slice(0, 28) });
       }
-
       const containers = [...document.querySelectorAll("main section, main article, main ul, header ul")];
       for (const c of containers) {
         const kids = [...c.children].filter(k => {
@@ -120,6 +160,15 @@ for (const vp of [{ n: "desktop", width: 1440, height: 900 }, { n: "mobile", wid
         if (b.width === 0) continue;
         const parent = el.parentElement;
         if (!parent) continue;
+        /*
+         * Visually hidden text is clipped on purpose.
+         *
+         * The `sr-only` utility shrinks its box to a single pixel and lets
+         * the text overflow it — that is how the text stays available to a
+         * screen reader without being seen. Reporting the overflow as a
+         * layout fault would report the mechanism of the technique.
+         */
+        if (parent.className?.toString?.().includes("sr-only")) continue;
         const pb = parent.getBoundingClientRect();
         if (pb.width > 0 && (b.right > pb.right + 2) && getComputedStyle(parent).overflowX === "hidden") {
           res.offscreen.push(`${el.tagName.toLowerCase()}.${el.className?.toString?.().slice(0,50)} overflows parent`);
@@ -129,14 +178,59 @@ for (const vp of [{ n: "desktop", width: 1440, height: 900 }, { n: "mobile", wid
     });
 
     const ws = r.widths;
-    if (ws.length >= 2) {
-      const uniq = [...new Set(ws.map(w => w.w))];
-      if (uniq.length > 1) out.push(`${vp.n}/${name}: CONTAINER WIDTH MISMATCH ${JSON.stringify(ws)}`);
+    /*
+     * The chrome and the body are allowed to be different widths.
+     *
+     * The header bar and the footer are drawn on the *chrome* column, which
+     * is the same on every page and does not follow the width of the page
+     * body. The body sits on its own column, whose width is chosen per
+     * page — a narrow reading column on an article, a wide one on the home
+     * page. What has to hold on every page is that the header and the
+     * footer agree with *each other*, and that the navigation is the same
+     * everywhere.
+     */
+    const chrome = ws.filter(w => w.sel === "header > div" || w.sel === "footer > div");
+    if (chrome.length >= 2) {
+      const uniq = [...new Set(chrome.map(w => `${w.l}-${w.r}`))];
+      if (uniq.length > 1) {
+        out.push(`${vp.n}/${name}: CHROME MISMATCH ${JSON.stringify(chrome)}`);
+      }
     }
+
+    /*
+     * The colours are converted to sRGB by the browser, so that the
+     * comparison is made between the two colours as they are actually
+     * painted on the screen.
+     *
+     * A translucent background is composited over the page behind it
+     * first: the header is a panel of 82% surface over the page, and the
+     * text on it is read against the *result* of that blend, not against
+     * the surface alone.
+     */
+    const colors = [...new Set(r.contrast.flatMap(c => [c.fg, c.bg]))];
+    const srgbMap = new Map();
+    (await toSRGB(page, colors)).forEach((c, i) => {
+      if (c) srgbMap.set(colors[i], c);
+    });
+
     for (const c of r.contrast) {
-      const fg = parseRGB(c.fg), bg = parseRGB(c.bg);
-      if (!fg || !bg) continue;
-      const cr = contrast(fg, bg);
+      const fgRaw = srgbMap.get(c.fg);
+      const bgRaw = srgbMap.get(c.bg);
+      if (!fgRaw || !bgRaw) continue;
+
+      // The page behind a translucent surface.
+      const pageBg = srgbMap.get("rgb(255,255,255)") ?? { r: 255, g: 255, b: 255, a: 1 };
+
+      const over = (fg, bg) => ({
+        r: fg.r * fg.a + bg.r * (1 - fg.a),
+        g: fg.g * fg.a + bg.g * (1 - fg.a),
+        b: fg.b * fg.a + bg.b * (1 - fg.a),
+      });
+
+      const bg = bgRaw.a < 1 ? over(bgRaw, pageBg) : bgRaw;
+      const fg = fgRaw.a < 1 ? over(fgRaw, bg) : fgRaw;
+
+      const cr = contrast([fg.r, fg.g, fg.b], [bg.r, bg.g, bg.b]);
       const size = parseFloat(c.fs);
       const large = size >= 24 || (size >= 18.66 && parseInt(c.fw) >= 700);
       const min = large ? 3 : 4.5;

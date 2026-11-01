@@ -14,6 +14,14 @@ import { runtimeTranslations } from "@/i18n";
 type LightboxOptions = {
   /** Container to search for images in. Defaults to `#article`. */
   containerId?: string;
+  /**
+   * A CSS selector for the container.
+   *
+   * The blog detail page has a single `#article` element to bind to, but a
+   * listing page has none: its images live in the entries of a list. The
+   * selector names the list instead.
+   */
+  containerSelector?: string;
 };
 
 function getString(key: string, locale: string): string {
@@ -36,8 +44,9 @@ function currentLocale(): string {
 }
 
 export function initLightbox(options: LightboxOptions = {}) {
-  const containerId = options.containerId ?? "article";
-  const container = document.getElementById(containerId);
+  const container = options.containerSelector
+    ? document.querySelector<HTMLElement>(options.containerSelector)
+    : document.getElementById(options.containerId ?? "article");
   if (!container) return;
   const article: HTMLElement = container;
 

@@ -1,13 +1,40 @@
 import type { UIStrings } from "../types";
 
 export default {
+  site: {
+    /*
+     * The name of the site is the same in every language: it is a name,
+     * not a phrase. "Wenjie Che" is how the author is known, and the
+     * Chinese interface shows it in Latin letters rather than translating
+     * it — a transliterated name reads as an alias, not as a name.
+     */
+    title: "Wenjie Che",
+    /*
+     * The name of the person, written in the language of the interface.
+     *
+     * Unlike the site title — which is a brand and stays in Latin letters
+     * everywhere — this one is the human name, so it is written the way
+     * the person writes it: 车文杰 in Chinese, Wenjie Che in English.
+     */
+    name: "车文杰",
+    author: "车文杰",
+    description:
+      "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与文学创作。",
+  },
   nav: {
     home: "首页",
     posts: "技术文章",
     notes: "碎碎念",
     writing: "文学创作",
     projects: "项目",
+    about: "关于我",
     search: "搜索",
+  },
+  socials: {
+    github: "GitHub",
+    wechat: "微信",
+    mail: "发送邮件",
+    mailTo: "发送邮件给车文杰",
   },
   post: {
     publishedAt: "发布于",
@@ -100,7 +127,11 @@ export default {
   },
   footer: {
     copyright: "版权所有",
-    allRightsReserved: "保留所有权利。",
+    allRightsReserved: "保留所有权利",
+    /** The heading of the navigation column in the footer. */
+    navTitle: "导航",
+    /** The heading of the column that lists the most recent writing. */
+    recentTitle: "最近更新",
     /** The label of the link that opens the content management backend. */
     manage: "管理内容",
     /** The accessible title of the CMS link. */
@@ -131,6 +162,56 @@ export default {
     searchTitle: "搜索",
     searchDesc: "搜索任意文章 ...",
   },
+  about: {
+    title: "关于我",
+    desc: "我是谁，我在做什么，以及这个站点为什么存在。",
+    identity: "硕士在读 · AI 应用方向",
+    lead: "你好，我是车文杰，一名正在攻读硕士学位的研究生，研究方向是 AI 的实际应用。我关心技术如何真正落到日常的生活里，也相信一项技术的价值，取决于它有没有被普通人用起来。",
+    sections: [
+      {
+        title: "在做什么",
+        body: [
+          "我的研究聚焦于把大模型能力接入真实的产品流程——不是停留在跑通 Demo，而是让它在具体业务里稳定、可解释、可用。",
+          "平时我会写技术文章，把踩过的坑和想通的事情整理出来；也写一些文学创作，那是另一条让我保持语言敏感度的路。",
+        ],
+      },
+      {
+        title: "这个站点",
+        body: [
+          "这是我的个人数字空间。技术文章写给同样在折腾技术的人看，碎碎念记录那些还没长成文章的念头，文学创作则是我工作之外的另一面。",
+          "我尽量让每一篇文章都值得读：与其追求更新频率，不如保证写下来的东西真的解决了某个问题。",
+        ],
+      },
+      {
+        title: "此刻",
+        body: [
+          "正在读的书、做的小项目、用的工具，我都会随手记在碎碎念里。如果你对其中某件事感兴趣，欢迎来信聊聊。",
+        ],
+      },
+    ],
+    hereTitle: "这里有些什么",
+    hereItems: [
+      {
+        label: "技术文章",
+        desc: "关于 AI 应用、Web 开发与工程实践的长文。",
+      },
+      {
+        label: "碎碎念",
+        desc: "随时记下的想法、阅读笔记与日常片段。",
+      },
+      {
+        label: "文学创作",
+        desc: "小说、散文与短篇故事。",
+      },
+      {
+        label: "项目",
+        desc: "做过、开源过或正在折腾的东西。",
+      },
+    ],
+    contactTitle: "联系我",
+    contactDesc:
+      "如果你对上面某段内容有想法，或者只是想打个招呼，都可以直接找我。",
+  },
   a11y: {
     skipToContent: "跳到主要内容",
     openMenu: "打开菜单",
@@ -146,6 +227,8 @@ export default {
     breadcrumb: "面包屑导航",
     rssFeed: "RSS 订阅",
     backToTop: "回到顶部",
+    /** The accessible label of the navigation column in the footer. */
+    footerNav: "页脚导航",
   },
   pagefind: {
     placeholder: "搜索",

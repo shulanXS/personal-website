@@ -39,7 +39,7 @@ const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
 const writingTags = tags.filter(tag => tag.counts.writing > 0);
 ---
 
-<Layout title={`${t.pages.writingTitle} | ${config.site.title}`} width="list">
+<Layout title={`${t.pages.writingTitle} | ${t.site.title}`} width="list">
   <Header />
 
   <Breadcrumb />
@@ -85,10 +85,7 @@ const writingTags = tags.filter(tag => tag.counts.writing > 0);
                           : t.writing.completed}
                       </span>
                     </h3>
-                    <ul
-                      class="border-border border-t"
-                      data-list-layout="series"
-                    >
+                    <ul data-list-layout="series">
                       {entry.chapters.map(chapter => (
                         <WritingCard work={chapter} />
                       ))}
@@ -106,7 +103,7 @@ const writingTags = tags.filter(tag => tag.counts.writing > 0);
                 >
                   {t.writing.standalone}
                 </h2>
-                <ul class="border-border border-t" data-list-layout="series">
+                <ul data-list-layout="series">
                   {standalone.map(work => (
                     <WritingCard work={work} />
                   ))}

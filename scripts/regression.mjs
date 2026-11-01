@@ -28,10 +28,10 @@ async function withPage(ctx, fn) {
     await page.goto(BASE + "/", { waitUntil: "networkidle" });
     await page.locator("#lang-btn").click();
     await page.waitForTimeout(500);
-    await page.locator("header nav a").first().click();
+    await page.locator("header #menu-items > li > a").first().click();
     await page.waitForTimeout(1300);
     const lang = await page.evaluate(() => document.documentElement.lang);
-    const txt = await page.locator("header nav a").first().innerText();
+    const txt = await page.locator("header #menu-items > li > a").first().innerText();
     check("语言切换在导航后保持", lang === "en" && /Blog/i.test(txt), `lang=${lang} txt=${txt}`);
   });
 
@@ -40,7 +40,7 @@ async function withPage(ctx, fn) {
     await page.goto(BASE + "/", { waitUntil: "networkidle" });
     await page.locator("#theme-btn").click();
     await page.waitForTimeout(300);
-    await page.locator("header nav a").first().click();
+    await page.locator("header #menu-items > li > a").first().click();
     await page.waitForTimeout(1300);
     const dark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
     check("主题切换在导航后保持", dark, `dark=${dark}`);
@@ -150,6 +150,76 @@ async function withPage(ctx, fn) {
     check("关键页面无 JS 报错", errs.length === 0, errs.join(" | "));
   }
 
+  // 10b. the cards do not move under the pointer
+  await withPage(ctx, async (page) => {
+    const moved = [];
+    for (const [name, path, sel] of [
+      ["首页碎碎念", "/", 'ul[data-list-layout="notes"] > li > article'],
+      ["技术文章", "/posts/", 'ul[data-list-layout="vertical"] > li > article'],
+      ["文学创作", "/writing/", 'ul[data-list-layout="series"] > li > article'],
+      ["项目", "/projects/", ".app-card"],
+    ]) {
+      await page.goto(BASE + path, { waitUntil: "networkidle" });
+      await page.waitForTimeout(300);
+      const card = page.locator(sel).first();
+      if ((await card.count()) === 0) continue;
+      await card.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(200);
+      const before = await card.boundingBox();
+      await card.hover();
+      await page.waitForTimeout(400);
+      const after = await card.boundingBox();
+      const shadow = await card.evaluate(
+        el => getComputedStyle(el).boxShadow
+      );
+      if (!before || !after) continue;
+      if (Math.abs(before.y - after.y) > 0.5) {
+        moved.push(`${name} 位移 ${before.y}->${after.y}`);
+      }
+      if (shadow && !/none/.test(shadow) && /0px 0px 0px/.test(shadow)) {
+        moved.push(`${name} 阴影 ${shadow}`);
+      }
+    }
+    check("卡片悬停无位移与抬升阴影", moved.length === 0, moved.join(", "));
+  });
+
+  // 10c. the navigation answers the pointer with weight and a wave, not a colour
+  await withPage(ctx, async (page) => {
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(300);
+    const link = page.locator("#menu-items > li > a").first();
+    const before = await link.evaluate(el => {
+      const cs = getComputedStyle(el);
+      return {
+        color: cs.color,
+        weight: cs.fontWeight,
+        deco: cs.textDecorationStyle,
+        bg: getComputedStyle(el, "::before").backgroundColor,
+      };
+    });
+    await link.hover();
+    await page.waitForTimeout(400);
+    const after = await link.evaluate(el => {
+      const cs = getComputedStyle(el);
+      return {
+        color: cs.color,
+        weight: cs.fontWeight,
+        deco: cs.textDecorationStyle,
+        bg: getComputedStyle(el, "::before").backgroundColor,
+      };
+    });
+
+    const problems = [];
+    if (Number(after.weight) <= Number(before.weight)) {
+      problems.push(`weight ${before.weight}->${after.weight} 未加粗`);
+    }
+    if (after.deco !== "wavy") problems.push(`decoration=${after.deco}`);
+    if (before.color !== after.color) problems.push(`color ${before.color}->${after.color}`);
+    if (after.bg !== "rgba(0, 0, 0, 0)") problems.push(`hover 底色=${after.bg}`);
+
+    check("导航悬停仅加粗加波浪线", problems.length === 0, problems.join(", "));
+  });
+
   await ctx.close();
 }
 
@@ -157,12 +227,10 @@ async function withPage(ctx, fn) {
 {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 
-  // 11. mobile menu opens, items do not overlap, and the label updates
+  // 11. the navigation is always visible and its items do not overlap
   await withPage(ctx, async (page) => {
     await page.goto(BASE + "/", { waitUntil: "networkidle" });
     await page.waitForTimeout(300);
-    await page.locator("#menu-btn").click();
-    await page.waitForTimeout(400);
     const items = await page.evaluate(() => [...document.querySelectorAll("#menu-items > li")].map(li => {
       const b = li.getBoundingClientRect();
       return { x: b.left, y: b.top, w: b.width, h: b.height };
@@ -172,14 +240,49 @@ async function withPage(ctx, fn) {
       const a = items[i], b = items[j];
       if (a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h) overlap = true;
     }
-    const expanded = await page.locator("#menu-btn").getAttribute("aria-expanded");
-    check("移动端菜单展开且无重叠", expanded === "true" && !overlap, `expanded=${expanded} overlap=${overlap}`);
+    // Every navigation link has to be on screen without any interaction.
+    const links = await page.evaluate(() => {
+      const vw = document.documentElement.clientWidth;
+      return [...document.querySelectorAll("#menu-items > li > a")].map(a => {
+        const b = a.getBoundingClientRect();
+        const label = a.textContent?.trim() ?? "";
+        return { label, visible: b.width > 0 && b.height > 0 && b.right <= vw + 2 && b.left >= -2 };
+      });
+    });
+    const hidden = links.filter(l => !l.visible).map(l => l.label);
+    check("移动端导航完整可见且无重叠", !overlap && hidden.length === 0 && links.length === 5,
+      `links=${links.length} overlap=${overlap} hidden=${hidden.join(",")}`);
+  });
+
+  // 11b. the navigation is complete on every page, at every narrow width
+  await withPage(ctx, async (page) => {
+    const bad = [];
+    for (const w of [320, 360, 390, 430]) {
+      await page.setViewportSize({ width: w, height: 844 });
+      for (const p of ["/", "/notes/", "/about/"]) {
+        await page.goto(BASE + p, { waitUntil: "networkidle" });
+        await page.waitForTimeout(200);
+        const r = await page.evaluate(() => {
+          const vw = document.documentElement.clientWidth;
+          const links = [...document.querySelectorAll("#menu-items > li > a")];
+          const hidden = links.filter(a => {
+            const b = a.getBoundingClientRect();
+            return b.width === 0 || b.height === 0 || b.right > vw + 2 || b.left < -2;
+          }).length;
+          return { total: links.length, hidden };
+        });
+        if (r.total !== 5 || r.hidden !== 0) {
+          bad.push(`${w}px ${p} total=${r.total} hidden=${r.hidden}`);
+        }
+      }
+    }
+    check("窄屏各页面导航按钮完整显示", bad.length === 0, bad.join(", "));
   });
 
   // 12. no horizontal overflow on any page
   await withPage(ctx, async (page) => {
     const bad = [];
-    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/chapter-one/", "/projects/", "/search/", "/404/"]) {
+    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/chapter-one/", "/projects/", "/about/", "/search/", "/404/"]) {
       await page.goto(BASE + p, { waitUntil: "networkidle" });
       await page.waitForTimeout(300);
       const o = await page.evaluate(() => ({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth }));
@@ -188,21 +291,58 @@ async function withPage(ctx, fn) {
     check("移动端无横向溢出", bad.length === 0, bad.join(", "));
   });
 
-  // 13. container widths align (content box, ignoring padding)
+  // 13. the chrome is identical on every page, and the bar spans the viewport
   await withPage(ctx, async (page) => {
-    await page.goto(BASE + "/", { waitUntil: "networkidle" });
-    await page.waitForTimeout(300);
-    const boxes = await page.evaluate(() => {
-      const cb = el => { const b = el.getBoundingClientRect(); const cs = getComputedStyle(el);
-        return Math.round(b.width - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0)); };
-      const res = {};
-      for (const [k, s] of Object.entries({ header: "header > div", main: "main", footer: "footer > div" })) {
-        const el = document.querySelector(s); if (el) res[k] = cb(el);
+    const perPage = {};
+    for (const p of ["/", "/posts/", "/projects/", "/notes/", "/writing/"]) {
+      await page.goto(BASE + p, { waitUntil: "networkidle" });
+      await page.waitForTimeout(250);
+      perPage[p] = await page.evaluate(() => {
+        const bar = document.querySelector("header");
+        const row = document.querySelector("header > div");
+        const foot = document.querySelector("footer > div");
+        const b = bar?.getBoundingClientRect();
+        const r = row?.getBoundingClientRect();
+        const cs = row ? getComputedStyle(row) : null;
+        const pad = cs ? (parseFloat(cs.paddingLeft) || 0) : 0;
+        return {
+          barWidth: b ? Math.round(b.width) : 0,
+          rowWidth: r ? Math.round(r.width - 2 * pad) : 0,
+          rowLeft: r ? Math.round(r.left + pad) : 0,
+          footLeft: foot
+            ? Math.round(
+                foot.getBoundingClientRect().left +
+                  (parseFloat(getComputedStyle(foot).paddingLeft) || 0)
+              )
+            : 0,
+          viewport: document.documentElement.clientWidth,
+        };
+      });
+    }
+
+    const problems = [];
+
+    // The bar itself has to span the whole viewport on every page.
+    for (const [p, v] of Object.entries(perPage)) {
+      if (v.barWidth !== v.viewport) {
+        problems.push(`${p} bar=${v.barWidth}!=${v.viewport}`);
       }
-      return res;
-    });
-    const uniq = [...new Set(Object.values(boxes))];
-    check("Header/Main/Footer 内容宽度一致", uniq.length === 1, JSON.stringify(boxes));
+    }
+
+    // The navigation row has to be exactly the same width on every page.
+    const rowWidths = [...new Set(Object.values(perPage).map(v => v.rowWidth))];
+    if (rowWidths.length !== 1) {
+      problems.push(`nav row widths differ: ${JSON.stringify(rowWidths)}`);
+    }
+
+    // The header and the footer have to begin on the same vertical line.
+    for (const [p, v] of Object.entries(perPage)) {
+      if (Math.abs(v.rowLeft - v.footLeft) > 1) {
+        problems.push(`${p} header=${v.rowLeft} footer=${v.footLeft}`);
+      }
+    }
+
+    check("导航栏全站一致且满屏", problems.length === 0, problems.join(", "));
   });
 
   await ctx.close();

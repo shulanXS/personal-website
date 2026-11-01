@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <!--
+    The site mark: a geometric monogram of the author's name (CWJ).
+
+    Three strokes share one circle:
+
+    1. An open ring whose gap faces right. It reads as the letter C, and the
+       gap is what lets the other two strokes breathe.
+    2. A W, nested in the left half of the ring, its peaks and valleys kept
+       on one rhythm so the mark stays legible down to 24px.
+    3. A J, standing in the opening of the ring, dropping down and hooking
+       back to the left. Its top and bottom are flush with the top and the
+       bottom of the W, so the two letters read as one line of type.
+
+    The colour comes from the inherited text colour: the svg carries no
+    `stroke` of its own, and `currentColor` resolves against the *text*
+    colour of the element it sits in. That is what keeps the mark
+    monochrome: it takes the ink of the page, not a brand colour.
+  -->
+  <g
+    stroke-width="2.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  >
+    <!-- The C: an open ring, open towards the right. -->
+    <path d="M37.02 13.07A17 17 0 1 0 37.02 34.93" />
+
+    <!-- The W, nested in the left half of the ring. -->
+    <path d="M12.6 18.4 15.6 29.8 18.8 19.8 22 29.8 25 18.4" />
+
+    <!-- The J, standing in the opening of the ring, flush with the W. -->
+    <path d="M33.6 18.4v7.4c0 2.6-2.1 4-5.3 4" />
+  </g>
+</svg>

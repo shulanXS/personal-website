@@ -19,7 +19,7 @@ const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
 const projectTags = tags.filter(tag => tag.counts.projects > 0);
 ---
 
-<Layout title={`${t.pages.projectsTitle} | ${config.site.title}`} width="wide">
+<Layout title={`${t.pages.projectsTitle} | ${t.site.title}`} width="wide">
   <Header />
 
   <Breadcrumb />
@@ -39,7 +39,7 @@ const projectTags = tags.filter(tag => tag.counts.projects > 0);
             {t.pages.projectsEmpty}
           </p>
         ) : (
-          <ul class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {projects.map(project => (
               <ProjectCard project={project} headingLevel="h2" />
             ))}

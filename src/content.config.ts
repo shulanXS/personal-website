@@ -7,6 +7,30 @@ export const BLOG_PATH = "src/content/posts";
 export const NOTES_PATH = "src/content/notes";
 export const WRITING_PATH = "src/content/writing";
 
+/**
+ * An image field that accepts both kinds of paths.
+ *
+ * Astro's `image()` resolves a path against the content folder and optimizes
+ * it — which is what a repository asset such as `../../assets/images/x.png`
+ * needs. It cannot resolve a path inside `public/`: such a file is served
+ * as-is and has no build-time metadata, so `image()` fails with
+ * "Could not find requested image".
+ *
+ * Pages CMS stores uploaded media under `public/uploads` and writes the
+ * public path (`/uploads/abc.png`) into the frontmatter, so a public path has
+ * to be accepted. A leading slash is what distinguishes the two: a repository
+ * asset is always a relative path, a public file is always absolute.
+ *
+ * The branches are tried in order:
+ *
+ *   1. an absolute path — a file in `public/`, kept as-is;
+ *   2. `image()` — a repository asset, resolved and optimized;
+ *   3. a plain string — a remote URL, or any path Astro cannot resolve,
+ *      which is then used verbatim.
+ */
+const contentImage = <T extends z.ZodType>(image: () => T) =>
+  z.union([z.string().startsWith("/"), image(), z.string()]);
+
 const posts = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${BLOG_PATH}` }),
   schema: ({ image }) =>
@@ -24,7 +48,7 @@ const posts = defineCollection({
        * being filed under a made-up "others" bucket.
        */
       tags: z.array(z.string()).default([]),
-      ogImage: image().or(z.string()).optional(),
+      ogImage: contentImage(image).optional(),
       description: z.string(),
       canonicalURL: z.string().optional(),
       hideEditPost: z.boolean().optional(),
@@ -91,7 +115,7 @@ const writing = defineCollection({
       series: z.string().optional(),
       chapterNumber: z.number().optional(),
       status: z.enum(["ongoing", "completed"]).optional(),
-      cover: image().or(z.string()).optional(),
+      cover: contentImage(image).optional(),
       pubDatetime: z.date(),
       modDatetime: z.date().optional().nullable(),
       draft: z.boolean().optional(),
