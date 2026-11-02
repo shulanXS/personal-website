@@ -122,152 +122,16 @@ function applyCollectionFilter(slug: string): void {
   }
 
   syncActiveChips(slug);
-}
-
-/**
- * The other pages of the current collection.
- *
- * A paginated listing only renders one page of entries, so a tag whose
- * matches all live on page 3 would show an empty page. To avoid that, the
- * sibling pages are fetched in the background and merged into the listing
- * when a filter is active.
- */
-function siblingPageUrls(): string[] {
-  const container = document.querySelector<HTMLElement>("[data-list-pages]");
-  if (!container) return [];
-
-  const raw = container.dataset.listPages ?? "";
-  return raw
-    .split(",")
-    .map(url => url.trim())
-    .filter(Boolean);
-}
-
-/**
- * Fetches a sibling page and extracts its tagged entries.
- */
-async function fetchTaggedItems(
-  url: string
-): Promise<{ tags: string; title: string; url: string; date: string }[]> {
-  const response = await fetch(url);
-  if (!response.ok) return [];
-
-  const html = await response.text();
-  const doc = new DOMParser().parseFromString(html, "text/html");
-
-  return [...doc.querySelectorAll<HTMLElement>("[data-tagged-item]")].map(
-    item => ({
-      tags: item.dataset.tags ?? "",
-      title:
-        item.querySelector("h2, h3")?.textContent?.trim() ??
-        item.textContent?.trim().slice(0, 40) ??
-        "",
-      url: item.querySelector("a")?.getAttribute("href") ?? "",
-      date: item.querySelector("[data-date]")?.textContent?.trim() ?? "",
-    })
+  /*
+   * The listing may have parts that are grouped — a heading with a list
+   * under it — and a group whose entries have all been filtered away is
+   * left describing nothing. The groups are hidden by the page itself,
+   * which knows how they are put together; it is told that the filter has
+   * run.
+   */
+  document.dispatchEvent(
+    new CustomEvent("tags:filtered", { detail: { slug } })
   );
-}
-
-/**
- * Renders the entries of a sibling page into the current listing.
- */
-function appendSiblingItems(
-  items: { tags: string; title: string; url: string; date: string }[]
-): void {
-  const list = document.querySelector<HTMLElement>("ul[data-list-layout]");
-  if (!list) return;
-
-  for (const item of items) {
-    if (list.querySelector(`a[href="${item.url}"]`)) continue;
-
-    /*
-    The appended entry has to look exactly like the entries that are already
-    on the page, or the last page of a filtered listing would break the
-    rhythm of the list. The markup therefore mirrors the vertical layout:
-    an `<article>` wrapper holding the date and the link.
-    */
-    const li = document.createElement("li");
-    li.setAttribute("data-tagged-item", "");
-    li.setAttribute("data-tags", item.tags);
-
-    const article = document.createElement("article");
-    article.className = "flex flex-col gap-2";
-
-    if (item.date) {
-      const meta = document.createElement("div");
-      meta.className = "app-vertical-date";
-      meta.textContent = item.date;
-      article.appendChild(meta);
-    }
-
-    const link = document.createElement("a");
-    link.href = item.url;
-    link.className =
-      "text-accent inline-block text-xl font-semibold decoration-dashed underline-offset-4 hover:underline";
-    link.textContent = item.title;
-    article.appendChild(link);
-
-    li.appendChild(article);
-    list.appendChild(li);
-    li.setAttribute("data-appended", "true");
-  }
-}
-
-/**
- * Removes the entries that were merged in from the sibling pages.
- *
- * They are only needed while a filter is active. Once the filter is
- * cleared, the listing goes back to exactly the entries it was built with,
- * so that the pagination at the bottom stays truthful.
- */
-function removeAppendedItems(): void {
-  for (const item of document.querySelectorAll<HTMLElement>(
-    "[data-appended]"
-  )) {
-    item.remove();
-  }
-}
-
-/**
- * Loads the sibling pages of a paginated listing and re-applies the filter.
- *
- * The extra entries are appended to the listing and then hidden or shown
- * according to the active tag, so that the reader sees every entry of the
- * collection carrying the tag — not only the ones that happened to be on
- * this page.
- */
-let siblingsLoaded = false;
-
-async function loadSiblingsAndFilter(slug: string): Promise<void> {
-  if (!slug) {
-    // The filter was cleared — the listing returns to its original state.
-    removeAppendedItems();
-    applyCollectionFilter("");
-    return;
-  }
-
-  if (siblingsLoaded) {
-    applyCollectionFilter(slug);
-    return;
-  }
-
-  siblingsLoaded = true;
-
-  const urls = siblingPageUrls();
-  if (urls.length === 0) {
-    applyCollectionFilter(slug);
-    return;
-  }
-
-  try {
-    const pages = await Promise.all(urls.map(fetchTaggedItems));
-    for (const items of pages) appendSiblingItems(items);
-  } catch {
-    // The sibling pages could not be fetched — the current page still
-    // filters correctly, which is the important part.
-  }
-
-  applyCollectionFilter(slug);
 }
 
 /**
@@ -392,7 +256,7 @@ function applyFromUrl(): void {
     renderSearchResults(slug);
     syncActiveChips(slug);
   } else {
-    void loadSiblingsAndFilter(slug);
+    applyCollectionFilter(slug);
   }
 }
 
@@ -423,13 +287,39 @@ function handleChipClick(event: Event): void {
     renderSearchResults(next);
     syncActiveChips(next);
   } else {
-    void loadSiblingsAndFilter(next);
+    applyCollectionFilter(next);
+  }
+}
+
+/**
+ * Handles a click on the button that clears the filter.
+ *
+ * The button is the way back out of an empty result: a reader whose
+ * filter matched nothing is otherwise left with a message and no way to
+ * undo the filter. Clicking it clears the tag and shows everything
+ * again.
+ */
+function handleEmptyResetClick(event: Event): void {
+  const target = event.target as HTMLElement | null;
+  if (!target?.closest<HTMLElement>("[data-tag-empty-reset]")) return;
+
+  event.preventDefault();
+
+  syncUrl("");
+
+  const scope = document.querySelector<HTMLElement>("[data-tag-scope]");
+  if (scope?.dataset.tagScope === "search") {
+    renderSearchResults("");
+    syncActiveChips("");
+  } else {
+    applyCollectionFilter("");
   }
 }
 
 // The listener lives on `document`, so it keeps working across View
 // Transitions without being re-registered.
 document.addEventListener("click", handleChipClick);
+document.addEventListener("click", handleEmptyResetClick);
 
 document.addEventListener("astro:page-load", applyFromUrl);
 document.addEventListener("astro:after-swap", applyFromUrl);

@@ -29,15 +29,50 @@ interface SiteConfig {
 }
 
 interface PostsConfig {
-  /** Posts per page on paginated listing pages */
-  perPage?: number;
-  /** Posts shown on the index/home page */
+  /**
+   * Posts shown on the index/home page.
+   */
   perIndex?: number;
   /**
    * Scheduled posts within this window (ms) of their pubDatetime
    * are shown as published. Defaults to 15 minutes.
    */
   scheduledPostMargin?: number;
+}
+
+interface HomeConfig {
+  /**
+   * How many entries the activity timeline on the home page shows.
+   *
+   * The timeline merges every kind of content into one list, so this
+   * number is the length of that list — not a number of items per kind.
+   * Defaults to 12.
+   */
+  activityLimit?: number;
+  /**
+   * How many notes the "最近动态" section of the wide layout shows.
+   *
+   * Defaults to 3.
+   */
+  recentNotes?: number;
+  /**
+   * How many articles the "最近文章" section of the wide layout shows.
+   *
+   * Defaults to 3.
+   */
+  recentPosts?: number;
+  /**
+   * How many works the "最近创作" section of the wide layout shows.
+   *
+   * Defaults to 3.
+   */
+  recentWriting?: number;
+  /**
+   * How many projects the "最近项目" section of the wide layout shows.
+   *
+   * Defaults to 2.
+   */
+  recentProjects?: number;
 }
 
 interface FeaturesConfig {
@@ -103,17 +138,12 @@ interface ShareLink {
   name: string;
   /** Base share URL. The post URL will be appended as a query param. */
   url: string;
-  /**
-   * Accessible label for the icon link (aria-label, title attribute).
-   * Auto-generated if omitted: "Share this post on Facebook", "Share this post via WhatsApp", etc.
-   * Override when the default wording doesn't fit.
-   */
-  linkTitle?: string;
 }
 
 interface AstroPaperConfig {
   site: SiteConfig;
   posts?: PostsConfig;
+  home?: HomeConfig;
   features?: FeaturesConfig;
   /**
    * The content management backend.
@@ -155,6 +185,7 @@ type ResolvedSiteConfig = Required<
 export interface ResolvedAstroPaperConfig {
   site: ResolvedSiteConfig;
   posts: Required<PostsConfig>;
+  home: Required<HomeConfig>;
   features: Required<FeaturesConfig>;
   cms: Required<CmsConfig>;
   socials: SocialLink[];

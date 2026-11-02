@@ -1,10 +1,11 @@
 /**
- * A focused measurement of the notes timeline.
+ * A focused measurement of the notes wall.
  *
  * The layout audit reports problems in general terms. This script measures
- * the one thing that matters about the timeline — whether the date, the
- * rule and the entry stay out of each other's way — and prints the numbers
- * so the geometry can be judged rather than guessed at.
+ * the three things that matter about the wall — that the date stays in its
+ * own margin, that the prose and the foot of an entry end on the same
+ * line, and that the index and the groups agree with each other — and
+ * prints the numbers so the geometry can be judged rather than guessed at.
  */
 import { chromium } from "playwright";
 
@@ -28,91 +29,99 @@ for (const vp of [
 
   for (const [name, path] of PAGES) {
     await page.goto(BASE + path, { waitUntil: "networkidle" });
-    await page.waitForTimeout(250);
+    await page.waitForTimeout(350);
 
     const r = await page.evaluate(() => {
-      const list = document.querySelector('ul[data-list-layout="notes"]');
-      if (!list) return null;
+      const round = n => Math.round(n);
 
-      const listBox = list.getBoundingClientRect();
-      const listCS = getComputedStyle(list);
+      /*
+       * The wall exists on the notes listing. The home page has a
+       * section of recent notes that uses the same components, but no
+       * month groups and no index.
+       */
+      const wall = document.querySelector(".app-notes-wall");
+      const groups = [...document.querySelectorAll(".app-notes-group")];
+      const index = document.querySelector(".app-notes-index");
 
-      // The rule drawn by the list's ::before.
-      const ruleCS = getComputedStyle(list, "::before");
-      const ruleLeft =
-        ruleCS.content !== "none" && ruleCS.width !== "auto"
-          ? listBox.left + parseFloat(ruleCS.left)
-          : null;
+      const box = el => {
+        if (!el) return null;
+        const b = el.getBoundingClientRect();
+        return { l: round(b.left), r: round(b.right), w: round(b.width) };
+      };
 
-      const items = [...list.querySelectorAll(":scope > li")].slice(0, 3);
+      const entries = [...document.querySelectorAll(".app-note-entry")].slice(0, 3);
 
       return {
-        isColumn: listCS.display,
-        gap: listCS.rowGap,
-        ruleLeft,
-        items: items.map(li => {
-          const box = li.getBoundingClientRect();
-          const date = li.querySelector(".app-timeline-date");
-          const article = li.querySelector(":scope > article");
-          const dBox = date?.getBoundingClientRect();
-          const aBox = article?.getBoundingClientRect();
+        hasWall: !!wall,
+        wall: box(wall),
+        index: index ? { ...box(index), display: getComputedStyle(index).display } : null,
+        groups: groups.length,
+        indexItems: document.querySelectorAll("[data-notes-index-item]").length,
+        entries: entries.map(entry => {
+          const when = entry.querySelector(".app-note-entry-when");
+          const body = entry.querySelector(".app-note-entry-body");
+          const prose = entry.querySelector(".app-note-entry-prose");
+          const foot = entry.querySelector(".app-note-entry-foot");
 
-          // The node dot drawn by the li's ::before.
-          const dotCS = getComputedStyle(li, "::before");
-          const dot =
-            dotCS.content !== "none" && dotCS.width !== "auto"
-              ? {
-                  left: box.left + parseFloat(dotCS.left),
-                  right:
-                    box.left +
-                    parseFloat(dotCS.left) +
-                    parseFloat(dotCS.width),
-                  top: box.top + parseFloat(dotCS.top),
-                }
-              : null;
+          const wBox = box(when);
+          const bBox = box(body);
+          const pBox = box(prose);
+          const fBox = box(foot);
 
-          // The two lines of the stacked date.
-          const times = [...(date?.querySelectorAll("time") ?? [])].map(t => {
-            const tb = t.getBoundingClientRect();
-            return { text: t.textContent?.trim(), l: tb.left, r: tb.right };
-          });
+          /*
+           * On a narrow screen the date sits *above* the entry rather
+           * than beside it, so the two boxes overlap in the horizontal
+           * direction and the gap between them says nothing. The
+           * layout is told apart by the columns of the entry itself.
+           */
+          const stacked = getComputedStyle(entry).gridTemplateColumns
+            .split(" ")
+            .length < 2;
 
           return {
-            date: dBox ? { l: dBox.left, r: dBox.right, w: dBox.width } : null,
-            article: aBox
-              ? { l: aBox.left, r: aBox.right, w: aBox.width }
-              : null,
-            dot,
-            times,
-            // How far the date reaches past the column it should stay in.
-            dateOverflows:
-              dBox && ruleLeft !== null
-                ? Math.round(Math.max(0, dBox.right - ruleLeft))
-                : null,
+            when: wBox,
+            body: bBox,
+            prose: pBox,
+            foot: fBox,
+            stacked,
+            /*
+             * The gap between the margin and the text. It has to be
+             * positive: a date that overlaps the writing is the one fault
+             * this layout must not have.
+             */
+            gap: !stacked && wBox && bBox ? round(bBox.l - wBox.r) : null,
+            /*
+             * The prose and the foot have to end on the same line, so
+             * that the note reads as one column rather than as two of
+             * different widths.
+             */
+            measureSkew: pBox && fBox ? round(fBox.r - pBox.r) : null,
+            day: entry.querySelector(".app-note-entry-day")?.textContent?.trim(),
+            weekday: entry.querySelector(".app-note-entry-weekday")?.textContent?.trim(),
+            time: entry.querySelector(".app-note-entry-time")?.textContent?.trim(),
           };
         }),
       };
     });
 
-    if (!r) {
-      console.log(`${vp.n}/${name}: no notes timeline`);
+    if (!r.hasWall && r.entries.length === 0) {
+      console.log(`${vp.n}/${name}: no notes`);
       continue;
     }
 
     console.log(`\n=== ${vp.n}/${name} (${path}) ===`);
     console.log(
-      `list display=${r.isColumn} gap=${r.gap} ruleLeft=${r.ruleLeft}`
+      `wall=[${r.wall ? r.wall.l + ".." + r.wall.r : "?"}]` +
+        ` index=[${r.index ? r.index.l + ".." + r.index.r : "-"}]${r.index ? " display=" + r.index.display : ""}` +
+        ` groups=${r.groups} indexItems=${r.indexItems}`
     );
-    for (const [i, it] of r.items.entries()) {
-      const times = it.times
-        .map(t => `"${t.text}"[${Math.round(t.l)}..${Math.round(t.r)}]`)
-        .join(" ");
+    for (const [i, e] of r.entries.entries()) {
       console.log(
-        `  [${i}] date=[${it.date ? Math.round(it.date.l) + ".." + Math.round(it.date.r) : "?"}]` +
-          ` article=[${it.article ? Math.round(it.article.l) + ".." + Math.round(it.article.r) : "?"}]` +
-          ` dot=[${it.dot ? Math.round(it.dot.left) + ".." + Math.round(it.dot.right) : "none"}]` +
-          ` times=${times}` +
-          ` dateOverflowsRule=${it.dateOverflows}`
+        `  [${i}] when=[${e.when ? e.when.l + ".." + e.when.r : "?"}]` +
+          ` body=[${e.body ? e.body.l + ".." + e.body.r : "?"}]` +
+          (e.stacked ? " stacked" : ` gap=${e.gap}`) +
+          ` measureSkew=${e.measureSkew}` +
+          ` "${e.day} ${e.weekday} ${e.time}"`
       );
     }
   }

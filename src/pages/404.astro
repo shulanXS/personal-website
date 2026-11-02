@@ -11,7 +11,7 @@ const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(config.site.uiLang);
 ---
 
-<Layout title={`${t.notFound.title} | ${t.site.title}`}>
+<Layout title={`${t.notFound.title} | ${t.site.title}`} titleKey="notFound.title">
   <Header />
 
   <main

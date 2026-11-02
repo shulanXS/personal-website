@@ -25,6 +25,14 @@ type Props = {
   count?: number;
   /** Marks the chip as the currently active filter. */
   active?: boolean;
+  /**
+   * Set the label flush with the left edge of the row it sits in.
+   *
+   * The chip keeps its hash, but the hash is taken out of the flow and
+   * hung in a slot of its own, so that the *label* — the thing the eye
+   * actually reads — starts on the same line as the text above it.
+   */
+  flush?: boolean;
 };
 
 const {
@@ -34,6 +42,7 @@ const {
   size = "sm",
   count,
   active = false,
+  flush = false,
 } = Astro.props;
 
 const locale = Astro.currentLocale ?? config.site.lang;
@@ -42,6 +51,24 @@ const sizeClasses = {
   sm: "text-xs gap-0.5 px-2 py-0.5",
   md: "text-sm gap-1 px-2.5 py-1",
   lg: "text-base gap-1 px-3 py-1.5",
+};
+
+/*
+ * The horizontal padding of a *flush* chip is not the ordinary one.
+ *
+ * The chip gives the label no left padding, so that the hash — the
+ * leftmost mark of the chip — starts exactly where the text above it
+ * starts. The hash's own drawing carries a little air inside its box,
+ * and that air is taken back separately (see `.app-tag-flush-hash`).
+ *
+ * The padding is written as a utility class of its own (`pl-0` and not
+ * `px-2`), because a rule in a stylesheet would lose against the
+ * utilities by layer order.
+ */
+const flushSizeClasses = {
+  sm: "text-xs gap-0.5 py-0.5 pl-0 pr-2",
+  md: "text-sm gap-1 py-1 pl-0 pr-2.5",
+  lg: "text-base gap-1 py-1.5 pl-0 pr-3",
 };
 
 const iconClasses = {
@@ -55,7 +82,9 @@ const iconClasses = {
  * reaction and no pointer. It is styled like the muted metadata around it so
  * that it reads as part of the text rather than as a button.
  */
-const staticClasses = `inline-flex items-center text-muted-foreground select-none ${sizeClasses[size]}`;
+const staticClasses = flush
+  ? `inline-flex items-center text-muted-foreground select-none ${flushSizeClasses[size]} app-tag-flush`
+  : `inline-flex items-center text-muted-foreground select-none ${sizeClasses[size]}`;
 
 const base =
   "inline-flex items-center rounded-full border transition-colors duration-200 select-none";
@@ -69,7 +98,13 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
 {
   mode === "static" ? (
     <span class={staticClasses} data-tag-static={slug} title={`#${name}`}>
-      <IconHash class:list={["opacity-60", iconClasses[size]]} />
+      <IconHash
+        class:list={[
+          "opacity-60",
+          iconClasses[size],
+          flush && "app-tag-flush-hash",
+        ]}
+      />
       <span>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">

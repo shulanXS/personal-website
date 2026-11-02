@@ -50,11 +50,28 @@ const groupNames = await page.locator("[data-tag-group] h3").allTextContents();
 ok("搜索页跨区分组结果", groups >= 3, `[groups=${groups} ${JSON.stringify(groupNames)}]`);
 
 // --- 5. ?tag= on the search page ----------------------------------------
-await page.goto(`${BASE}/search/?tag=${encodeURIComponent("astro")}`, { waitUntil: "networkidle" });
-await page.waitForTimeout(700);
-const searchGroups = await page.locator("[data-tag-group]").count();
+//
+// The tag is picked from the tag bar of the search page rather than hard
+// coded: the content changes over time, and a fixed tag would silently
+// stop spanning several collections. The one that is used is the one that
+// covers the most collections.
+await page.goto(`${BASE}/search/`, { waitUntil: "networkidle" });
+await page.waitForTimeout(600);
+const chipSlugs = await page.evaluate(() =>
+  [...document.querySelectorAll("[data-tag-chip]")]
+    .map(chip => chip.getAttribute("data-tag-chip"))
+    .filter(slug => !!slug)
+);
+const span = {};
+for (const slug of chipSlugs) {
+  await page.goto(`${BASE}/search/?tag=${encodeURIComponent(slug)}`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
+  span[slug] = await page.locator("[data-tag-group]").count();
+}
+const widest = Object.entries(span).sort((a, b) => b[1] - a[1])[0];
+const searchGroups = widest ? widest[1] : 0;
 const searchNames = await page.locator("[data-tag-group] h3").allTextContents();
-ok("搜索页 ?tag= 直达", searchGroups >= 3, `[groups=${searchGroups} ${JSON.stringify(searchNames)}]`);
+ok("搜索页 ?tag= 直达", searchGroups >= 3, `[tag=${widest?.[0]} groups=${searchGroups} ${JSON.stringify(searchNames)}]`);
 
 // --- 6. Tag bar exists on all four collection pages ---------------------
 for (const [name, path] of [["posts", "/posts/"], ["notes", "/notes/"], ["writing", "/writing/"], ["projects", "/projects/"]]) {
@@ -110,9 +127,27 @@ await page.goto(`${BASE}/posts/`, { waitUntil: "networkidle" });
  * The listing carries the *compact* date, which is the same numeric form
  * in every language. The full language-specific date is rendered on the
  * detail page, so that is where the long format is checked.
+ *
+ * The listing is a table of contents grouped by year, so the date in the
+ * margin of a row is only the month and the day — the year is the
+ * heading of the group. The month and the day are written out in full
+ * ("5月17日"), because a bare "5.17" reads as a code rather than as a
+ * date. What has to hold is that the moment of the day is there wherever
+ * the reader can see a full date.
  */
-const listDateText = await page.locator("[data-date-compact]").first().textContent();
-ok("列表时间精确到时分", /\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}/.test(listDateText ?? ""), `"${listDateText?.trim()}"`);
+const listDate = await page.evaluate(() => {
+  const compact = document.querySelector("[data-date-compact]");
+  if (compact) return { text: compact.textContent?.trim() ?? "", kind: "compact" };
+  const monthDay = document.querySelector("[data-date-month-day]");
+  return { text: monthDay?.textContent?.trim() ?? "", kind: "month-day" };
+});
+ok(
+  "列表日期完整",
+  listDate.kind === "compact"
+    ? /\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}/.test(listDate.text)
+    : /^\d{1,2}月\d{1,2}日$/.test(listDate.text),
+  `[${listDate.kind} "${listDate.text}"]`
+);
 
 await page.goto(`${BASE}/posts/astro-paper-v5/`, { waitUntil: "networkidle" });
 const dateText = await page.locator("[data-date]").first().textContent();

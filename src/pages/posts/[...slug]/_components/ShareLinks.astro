@@ -1,10 +1,17 @@
 ---
 import LinkButton from "@/components/LinkButton.astro";
-import { tplStr, useTranslations } from "@/i18n";
+import { formatTemplate, useTranslations } from "@/i18n";
+import { flatRuntimeTranslations } from "@/i18n";
 import config from "@/config";
 
 const { shareLinks } = config;
 const t = useTranslations(config.site.uiLang);
+
+/*
+ * The flattened dictionary of the language the page is rendered in. The
+ * same composition runs again in the browser when the language changes.
+ */
+const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
 
 const icons = import.meta.glob<{
   default: (_props: Record<string, unknown>) => unknown;
@@ -12,19 +19,33 @@ const icons = import.meta.glob<{
 
 const pageUrl = Astro.url;
 
-const platformLabel = (name: string) =>
-  name.charAt(0).toUpperCase() + name.slice(1);
-
 const items = await Promise.all(
-  shareLinks.map(async ({ name, url, linkTitle }) => {
+  shareLinks.map(async ({ name, url }) => {
     const mod = await icons[`/src/assets/icons/socials/${name}.svg`]?.();
     const Icon = mod?.default;
+
+    /*
+     * The label comes from the dictionary, keyed by the platform.
+     *
+     * A platform is labelled with a whole sentence rather than with its
+     * own name, because the name itself differs between the languages —
+     * 微信 in Chinese, WeChat in English — and a name passed in as a
+     * parameter would freeze whichever one the page was rendered with.
+     */
+    const key =
+      name === "mail"
+        ? "post.sharePostViaEmail"
+        : "post.sharePlatforms." + name;
+
     const title =
-      linkTitle ??
-      (name === "mail"
+      name === "mail"
         ? t.post.sharePostViaEmail
-        : tplStr(t.post.sharePostOn, { platform: platformLabel(name) }));
-    return { url, title, Icon };
+        : (t.post.sharePlatforms[name] ??
+          formatTemplate(t.post.sharePostOn, dict, [
+            name.charAt(0).toUpperCase() + name.slice(1),
+          ]));
+
+    return { url, title, Icon, key };
   })
 );
 ---
@@ -36,7 +57,7 @@ const items = await Promise.all(
         {t.post.sharePostIntro}
       </span>
       <div class="text-center">
-        {items.map(({ url, title, Icon }) =>
+        {items.map(({ url, title, Icon, key }) =>
           Icon ? (
             <LinkButton
               href={`${url}${pageUrl}`}
@@ -44,9 +65,12 @@ const items = await Promise.all(
               title={title}
               target="_blank"
               rel="noopener noreferrer"
+              data-i18n={key}
             >
               <Icon class="inline-block size-6 scale-125 fill-current stroke-none opacity-90 sm:scale-110" />
-              <span class="sr-only">{title}</span>
+              <span class="sr-only" data-i18n={key}>
+                {title}
+              </span>
             </LinkButton>
           ) : null
         )}

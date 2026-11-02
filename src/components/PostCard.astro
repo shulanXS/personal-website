@@ -7,23 +7,37 @@ import Datetime from "./Datetime.astro";
 import TagChip from "./TagChip.astro";
 
 /**
- * A technical article in the vertical list.
+ * A technical article in a list.
  *
- * Every article is one self-contained block, and the blocks are stacked
- * vertically down the page. Inside a block the elements also run top to
- * bottom — the date, then the title, then the summary, then the tags — so
- * the eye travels straight down the column instead of zig-zagging between
- * a left-hand date gutter and a right-hand body.
+ * There are three shapes of the same entry, and they are not
+ * interchangeable.
  *
- * The date sits above the title rather than beside it, which is what keeps
- * the block readable as a single unit: the title is the first thing the
- * eye lands on, and the timestamp is the quiet line above it.
+ * The *catalog* shape is the one on the articles page: the entry is a row
+ * of a table of contents. The date sits in a narrow column on the left —
+ * and because the list is grouped by year, that column carries only the
+ * month and the day. The title comes first on the right, then the summary,
+ * then the tags.
+ *
+ * The *listing* shape is the one that used to be on the articles page: the
+ * date sits above the title, then the summary, then the tags. It is read
+ * top to bottom like a paragraph — the eye lands on the quiet line first
+ * and works down to the title, which is the reverse of how a reference
+ * list is read.
+ *
+ * The *compact* shape is the one on the home page: the title comes first,
+ * then the date, then the tags. A home page section is a reference to the
+ * articles rather than an introduction to them, and a reference is read the
+ * way a dictionary is read — the word you are looking for first, the
+ * details afterwards. It is also a narrow column, and a summary of two
+ * lines would crowd out the two things that are actually worth showing.
  */
 type Props = {
   post: CollectionEntry<"posts">;
+  /** Which shape of the entry to render. */
+  variant?: "catalog" | "listing" | "compact";
 };
 
-const { post } = Astro.props;
+const { post, variant = "listing" } = Astro.props;
 const { data, id, filePath } = post;
 
 const href = getPostUrl(id, filePath, Astro.currentLocale);
@@ -32,46 +46,134 @@ const tagSlugs = tags.map(tagSlug);
 ---
 
 <li data-tagged-item data-tags={tagSlugs.join(",")}>
-  <article class="flex flex-col gap-2.5">
-    <div class="app-vertical-date">
-      <Datetime
-        pubDatetime={data.pubDatetime}
-        modDatetime={data.modDatetime ?? null}
-        bare
-        compact
-      />
-    </div>
+  {
+    variant === "compact" ? (
+      <article class="flex flex-col gap-1.5">
+        <a
+          href={href}
+          class="text-accent inline-block text-lg leading-snug font-semibold decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+        >
+          <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
+        </a>
 
-    <a
-      href={href}
-      class="text-accent inline-block text-xl leading-snug font-semibold decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
-    >
-      <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
-    </a>
+        <div class="app-vertical-date">
+          <Datetime
+            pubDatetime={data.pubDatetime}
+            modDatetime={data.modDatetime ?? null}
+            bare
+            compact
+          />
+        </div>
 
-    {
-      data.description && (
-        <p class="text-muted-foreground text-[0.9375rem] leading-relaxed">
-          {data.description}
-        </p>
-      )
-    }
+        {tags.length > 0 && (
+          <ul class="mt-0.5 flex flex-wrap gap-1.5">
+            {tags.map(tag => (
+              <li>
+                <TagChip
+                  slug={tagSlug(tag)}
+                  name={tagDisplayName(tag)}
+                  mode="static"
+                  size="sm"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </article>
+    ) : variant === "catalog" ? (
+      /*
+      A row of the table of contents.
 
-    {
-      tags.length > 0 && (
-        <ul class="mt-0.5 flex flex-wrap gap-1.5">
-          {tags.map(tag => (
-            <li>
-              <TagChip
-                slug={tagSlug(tag)}
-                name={tagDisplayName(tag)}
-                mode="static"
-                size="sm"
-              />
-            </li>
-          ))}
-        </ul>
-      )
-    }
-  </article>
+      The date sits in a column of its own on the left. Because the list is
+      grouped by year and the year is the heading of the group, the column
+      carries only the month and the day — and that is what makes it work:
+      a column of short numbers is a column the eye can scan straight
+      down, so the dates read as a timeline rather than as a list of
+      interruptions.
+
+      There is no reading time here. The length of an article is the
+      author's business, and it is the one number on the row that does not
+      help the reader decide whether to click.
+      */
+      <article class="app-post-row">
+        <div class="app-post-row-date">
+          {/*
+          Only the publication date. The row is filed under the year it
+          was published in, so writing the date it was last touched would
+          put a month from another year next to a heading that does not
+          match it.
+          */}
+          <Datetime pubDatetime={data.pubDatetime} bare monthDay />
+        </div>
+
+        <div class="app-post-row-body">
+          <a
+            href={href}
+            class="text-accent app-post-row-title inline-block decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+          >
+            <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
+          </a>
+
+          {data.description && (
+            <p class="app-post-row-desc">{data.description}</p>
+          )}
+
+          {tags.length > 0 && (
+            <ul class="app-post-row-tags">
+              {tags.map(tag => (
+                <li>
+                  <TagChip
+                    slug={tagSlug(tag)}
+                    name={tagDisplayName(tag)}
+                    mode="static"
+                    size="sm"
+                    flush
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </article>
+    ) : (
+      <article class="flex flex-col gap-2.5">
+        <div class="app-vertical-date">
+          <Datetime
+            pubDatetime={data.pubDatetime}
+            modDatetime={data.modDatetime ?? null}
+            bare
+            compact
+          />
+        </div>
+
+        <a
+          href={href}
+          class="text-accent inline-block text-xl leading-snug font-semibold decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+        >
+          <h2 transition:name={toTransitionName(id)}>{data.title}</h2>
+        </a>
+
+        {data.description && (
+          <p class="text-muted-foreground text-[0.9375rem] leading-relaxed">
+            {data.description}
+          </p>
+        )}
+
+        {tags.length > 0 && (
+          <ul class="mt-0.5 flex flex-wrap gap-1.5">
+            {tags.map(tag => (
+              <li>
+                <TagChip
+                  slug={tagSlug(tag)}
+                  name={tagDisplayName(tag)}
+                  mode="static"
+                  size="sm"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </article>
+    )
+  }
 </li>

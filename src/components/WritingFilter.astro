@@ -1,0 +1,178 @@
+---
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+/**
+ * One option of the first level: a kind of work.
+ */
+type TypeOption = {
+  /** The value of the `type` field of the works. */
+  value: string;
+  /** The label of the kind, in the interface language. */
+  label: string;
+  /** How many works carry it. */
+  count: number;
+};
+
+/**
+ * One option of the second level: a single work or a series.
+ */
+type WorkOption = {
+  /** The name of the work, which is what the filter matches on. */
+  value: string;
+  /** The label of the work. */
+  label: string;
+  /** The kind of the work, so that the level narrows with the first one. */
+  type: string;
+  /** How many chapters the work has. */
+  count: number;
+};
+
+type Props = {
+  /** The kinds of work that occur, with the kinds that do not occur left out. */
+  types: TypeOption[];
+  /** The works and the series. */
+  works: WorkOption[];
+  /**
+   * The tags that are neither a kind nor a work — the free-form ones.
+   */
+  tags: { slug: string; name: string; count: number }[];
+};
+const { types, works, tags } = Astro.props;
+
+const t = useTranslations(config.site.uiLang);
+---
+
+{
+  /*
+  The filter of the writing page.
+
+  The writing collection is not a bag of tagged items like the rest of the
+  site: a piece of writing is a novel, an essay or a short story, and it
+  belongs to a series or it stands on its own. So the filter is built the
+  way the collection actually is — in levels — rather than as one flat row
+  of tags.
+
+  The three levels are:
+
+    1. the kind of the work — 小说 / 散文 / 短篇;
+    2. the work itself — a series by name, or a stand-alone piece;
+    3. the free-form tags — the ones that cut across kinds ("玄幻",
+       "读后感").
+
+  The levels narrow each other: choosing a kind narrows the works below it
+  to that kind, and choosing a work narrows the tags to the ones that
+  work carries. The reader is never asked to pick a combination that does
+  not exist.
+*/
+}
+<div class="app-writing-filter" data-writing-filter>
+  <div class="app-writing-filter-level">
+    <span class="app-writing-filter-label" data-i18n="writing.byType">
+      {t.writing.byType}
+    </span>
+    <div class="app-writing-filter-options">
+      <button
+        type="button"
+        class="app-writing-filter-option"
+        data-writing-facet="type"
+        data-writing-value=""
+        aria-pressed="true"
+      >
+        {t.writing.all}
+      </button>
+      {
+        types.map(option => (
+          <button
+            type="button"
+            class="app-writing-filter-option"
+            data-writing-facet="type"
+            data-writing-value={option.value}
+            aria-pressed="false"
+          >
+            {option.label}
+            <span class="app-writing-filter-count">{option.count}</span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    works.length > 0 && (
+      <div class="app-writing-filter-level">
+        <span class="app-writing-filter-label" data-i18n="writing.byWork">
+          {t.writing.byWork}
+        </span>
+        <div class="app-writing-filter-options">
+          <button
+            type="button"
+            class="app-writing-filter-option"
+            data-writing-facet="work"
+            data-writing-value=""
+            aria-pressed="true"
+          >
+            {t.writing.allWorks}
+          </button>
+          {works.map(work => (
+            <button
+              type="button"
+              class="app-writing-filter-option"
+              data-writing-facet="work"
+              data-writing-value={work.value}
+              data-writing-work-type={work.type}
+              aria-pressed="false"
+            >
+              {work.label}
+              {work.count > 1 && (
+                <span class="app-writing-filter-count">{work.count}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    tags.length > 0 && (
+      <div class="app-writing-filter-level">
+        <span class="app-writing-filter-label" data-i18n="tags.title">
+          {t.tags.title}
+        </span>
+        {/*
+          The free-form tags keep the ordinary chip behaviour, so that the
+          same tag means the same thing here as it does on the search page.
+        */}
+        <div
+          class="app-writing-filter-options"
+          data-tag-bar
+          data-tag-mode="filter"
+        >
+          <button
+            type="button"
+            class="app-writing-filter-option"
+            data-tag-chip=""
+            data-tag-mode="filter"
+            aria-pressed="true"
+          >
+            {t.tags.all}
+          </button>
+          {tags.map(tag => (
+            <button
+              type="button"
+              class="app-writing-filter-option"
+              data-tag-chip={tag.slug}
+              data-tag-mode="filter"
+              aria-pressed="false"
+              title={`#${tag.name}`}
+            >
+              {tag.name}
+              <span class="app-writing-filter-count">{tag.count}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+</div>

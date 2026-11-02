@@ -5,29 +5,48 @@
 # How this project addresses its content
 # ---------------------------------------------------------------------------
 #
-# Astro's glob loader uses the `slug` frontmatter field as the entry id when
-# the field is present, and falls back to the file name otherwise. So:
+# Every collection has its own rule for "where does this end up on the
+# site", and the editor has to follow the same rule or the link it shows
+# will not be the link the site serves.
 #
-#   * `slug` present  → the URL is `/posts/<slug>`
-#   * `slug` absent   → the URL is `/posts/<file name>`
-#
-# The `filename` templates below therefore contain no date prefix, and the
-# slug is the only field that may change a link. Editing a publish date never
-# changes a URL.
+#   * Articles (`posts`) — Astro's glob loader takes the `slug` frontmatter
+#     field as the entry id when the field is present, and falls back to the
+#     file name otherwise. So the URL is `/posts/<slug>`, or
+#     `/posts/<file name>` for an article that has no slug. Three of the
+#     articles in the repository are in that second group.
+#   * Notes (`notes`) — the file name *is* the id: a UUID. A note has no
+#     page of its own; it is expanded in place on the listing.
+#   * Literary works (`writing`) — the URL is always the `slug` field, so
+#     the slug is required and the file name only follows it.
+#   * Projects (`projects`) — a plain JSON file, not a collection.
 #
 # Two conventions keep the editor and the build in agreement:
 #
 #   * The schema is strict — unknown keys are rejected. That is why the list
 #     fields use `list:` (not `of:`) and the select fields use
-#     `options.values` (not a bare `options:` array).
-#   * Dates are stored as `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`. Astro's YAML parser
-#     only turns that shape into a real `Date`; a naive `2026-10-28T09:30`
-#     stays a string and would fail the `z.date()` schema. The trailing `Z`
-#     keeps the value unambiguous — the site renders every timestamp in
-#     `Asia/Shanghai`, but the stored value is UTC.
+#     `options.values` (not a bare `options:` array). The summary of a
+#     collapsible list lives *inside* `list.collapsible`, not beside it.
+#   * Dates are stored with a UTC offset. Astro's YAML parser turns
+#     `2026-10-28T09:30:00.000Z` and `2026-10-28T09:30:00.000+08:00` into
+#     a real `Date` alike, but a naive `2026-10-28T09:30` stays a string
+#     and would fail the `z.date()` schema. The offset is written out
+#     rather than assumed: the editor reads a wall-clock moment and writes
+#     it back with the offset of the machine it was typed on, so the stored
+#     instant stays the same no matter where the edit was made. The site
+#     renders every timestamp in `Asia/Shanghai`.
 #
-# Every timestamp in the repository uses that exact shape, so the editor can
-# read and write every existing entry without losing information.
+# One more convention, about images:
+#
+#   * An image in `public/uploads` is written into the frontmatter as an
+#     absolute public path (`/uploads/abc.png`). The site serves it as-is.
+#   * An image in `src/assets` is written as a path relative to the content
+#     file (`../../assets/covers/abc.png`). Astro resolves it, optimizes it
+#     and measures it — which is what makes it usable as the cover of a
+#     series. The two kinds cannot be mixed in one field: the media picker
+#     only knows about the public folder, and a public path cannot be
+#     optimized by Astro. So the fields that hold repository assets are
+#     plain text fields, and the fields that hold uploaded images use the
+#     media picker.
 
 media:
   - name: images
@@ -51,16 +70,23 @@ components:
     required: true
     options:
       time: true
-      format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-    description: 填写 UTC 时间，格式形如 2026-10-28T09:30:00.000Z。
+      # The offset is written out (`+08:00`), not assumed (`Z`). A literal
+      # `Z` would label the local wall clock as UTC and silently shift every
+      # timestamp by the difference between the two.
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+    description: 填写本机时间，保存时会带上时区偏移（如 2026-10-28T09:30:00.000+08:00）。
 
   updateDate:
     type: date
     label: 更新日期
     required: false
+    # An optional date that starts empty. Without this the editor would
+    # fill it with the current moment on every open, and the file would
+    # claim to have been revised the moment it was opened.
+    default: ""
     options:
       time: true
-      format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     description: 留空表示尚未修改过。
 
   tagList:
@@ -88,9 +114,9 @@ content:
   # ---------------------------------------------------------------------------
   # Blog — the `posts` collection.
   #
-  # Only `.md` files are editable here: the collection's file extension comes
-  # from the `filename` template, so the MDX files — whose bodies contain JSX
-  # that the rich-text editor would destroy — stay out of reach.
+  # Only `.md` files are editable here: the extension of the collection
+  # comes from the `filename` template, so the MDX files — whose bodies
+  # contain JSX that the rich-text editor would destroy — stay out of reach.
   # ---------------------------------------------------------------------------
   - name: posts
     label: 技术文章
@@ -103,6 +129,19 @@ content:
       # The URL is the `slug` field, not the file name. Renaming the file
       # would only let the two drift apart.
       rename: false
+    exclude:
+      # These articles carry raw HTML in their body — a `<figure>`, a
+      # `<video>`, an HTML comment. The rich-text editor is a Markdown
+      # editor: it does not know those tags, so it escapes them into
+      # visible text on the first save, and the article would show a wall
+      # of `‹video autoplay=“loop”›` instead of the video. They are left
+      # to be edited in the repository.
+      - astro-paper-2.md
+      - astro-paper-3.md
+      - astro-paper-4.md
+      - tailwind-typography.md
+      - how-to-add-latex-equations-in-blog-posts.md
+      - setting-dates-via-git-hooks.md
     view:
       fields: [title, pubDatetime, tags, draft]
       primary: title
@@ -120,10 +159,17 @@ content:
           minlength: 2
       - name: slug
         type: string
-        required: true
+        required: false
         label: Slug
-        pattern: "^[a-z0-9-]+$"
-        description: 决定文章链接（/posts/<slug>）。修改它会改变已有链接，请谨慎。
+        # The pattern also accepts the empty string.
+        #
+        # An optional field with a strict pattern is a trap: the editor
+        # holds an empty string for a field that has no value, and the
+        # validation rejects an empty string — so the form could not be
+        # saved at all. Three of the articles have no slug (their link
+        # comes from the file name), and they have to stay editable.
+        pattern: "^$|^[a-z0-9-]+$"
+        description: 决定文章链接（/posts/<slug>）。留空时链接取文件名。修改它会改变已有链接，请谨慎。新建文章时必填。
       - name: description
         type: text
         required: true
@@ -144,6 +190,7 @@ content:
         required: false
         default: false
         label: 首页推荐
+        description: 保留字段，站点当前未按此筛选。
       - name: draft
         type: boolean
         required: false
@@ -151,11 +198,10 @@ content:
         label: 草稿
         description: 草稿不会出现在列表、RSS 与搜索中。
       - name: ogImage
-        type: image
+        type: string
         required: false
         label: 分享图
-        options:
-          media: images
+        description: 图片路径。public 下的图片用绝对路径（/uploads/abc.png），仓库内的图片用相对本文的路径（../../assets/images/abc.png）。
       - name: canonicalURL
         type: string
         required: false
@@ -207,6 +253,10 @@ content:
         label: ID
         options:
           editable: false
+          # The file name is the id. A regenerated id would no longer match
+          # the file, and the note would lose its anchor.
+          generate: false
+        description: 文件名即 ID，创建后不可更改。
       - name: title
         type: string
         required: false
@@ -237,6 +287,10 @@ content:
         component: updateDate
       - name: tags
         component: tagList
+      - name: canonicalURL
+        type: string
+        required: false
+        label: 规范链接
       - name: draft
         type: boolean
         required: false
@@ -298,7 +352,7 @@ content:
         type: string
         required: false
         label: 系列
-        description: 同一系列的作品会共用章节导航。
+        description: 同一系列的作品会共用章节导航。封面挂在系列的第一章上。
       - name: chapterNumber
         type: number
         required: false
@@ -316,17 +370,20 @@ content:
             - name: completed
               label: 已完结
       - name: cover
-        type: image
+        type: string
         required: false
         label: 封面
-        options:
-          media: images
+        description: 仓库内的图片，填相对于本文的路径（如 ../../assets/covers/xue-luo-jiang-chuan.png）。由 npm run covers:build 生成。
       - name: pubDatetime
         component: publishDate
       - name: modDatetime
         component: updateDate
       - name: tags
         component: tagList
+      - name: canonicalURL
+        type: string
+        required: false
+        label: 规范链接
       - name: draft
         type: boolean
         required: false
@@ -353,8 +410,9 @@ content:
         type: object
         label: 项目列表
         list:
-          collapsible: true
-          summary: "{fields.name} ({index})"
+          collapsible:
+            collapsed: false
+            summary: "{fields.name} ({index})"
         fields:
           - name: name
             type: string
@@ -392,6 +450,12 @@ content:
             required: false
             default: false
             label: 首页推荐
+            description: 保留字段，首页当前按时间排序，不读取该字段。
+          - name: pubDatetime
+            component: publishDate
+            # A project without a date is dated to the epoch and falls to
+            # the bottom of the timeline, so the date is not required.
+            required: false
           - name: order
             type: number
             required: false

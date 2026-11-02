@@ -35,7 +35,7 @@ const t = useTranslations(config.site.uiLang);
 const tagIndex = await getTagIndex(locale);
 ---
 
-<Layout title={`${t.pages.searchTitle} | ${t.site.title}`}>
+<Layout title={`${t.pages.searchTitle} | ${t.site.title}`} titleKey="pages.searchTitle">
   <Header />
 
   <Breadcrumb />

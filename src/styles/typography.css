@@ -31,10 +31,14 @@
       text-wrap: balance;
     }
 
-    h3 {
-      @apply italic;
-    }
-
+    /*
+     * The colour of the prose.
+     *
+     * The italic that used to be applied to every `h3` is gone: a
+     * slanted CJK face is a faked oblique, and on Chinese text it reads
+     * as a rendering mistake rather than as emphasis. The headings are
+     * distinguished by their weight and their spacing instead.
+     */
     p,
     strong,
     ol,
@@ -145,19 +149,79 @@
    *
    * This is a sibling of `.app-prose` rather than a nested modifier, because
    * the class is applied to the same element that carries `.app-prose`.
+   *
+   * The Chinese serif is a *webfont* (see `reading-font.css`), so the
+   * reading pages carry a heavier font stack than the rest of the site.
+   * The line height is generous — a Chinese serif has finer strokes than
+   * the sans face and needs the air to stay legible — and the tracking is
+   * trimmed, because full-width glyphs already carry generous side
+   * bearing and a little extra spacing makes the column look loose.
    */
   .app-prose-serif {
-    font-family: var(--font-serif);
+    font-family: var(--font-reading-serif);
     line-height: 2;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
+    font-size: 1.0625rem;
   }
 
   .app-prose-serif h1,
   .app-prose-serif h2,
   .app-prose-serif h3,
   .app-prose-serif h4 {
-    font-family: var(--font-serif);
-    letter-spacing: 0.04em;
+    font-family: var(--font-reading-serif);
+    letter-spacing: 0.03em;
+    font-weight: 600;
+  }
+
+  /*
+   * The opening of a chapter.
+   *
+   * It is set exactly like the rest of the text. An indented or
+   * enlarged first paragraph was tried and dropped: a Chinese reader
+   * sees the change of size as a change of *voice* rather than as the
+   * start of a book, and the chapter then reads as if its first line
+   * were a quotation from somewhere else.
+   */
+
+  /*
+   * The letter and the poem.
+   *
+   * Both are set in the writing's own voice rather than in the voice of
+   * the narration, so they are indented on both sides and set slightly
+   * smaller — a block that is narrower than the column around it reads
+   * as a quotation rather than as a continuation of the story.
+   */
+  .app-prose-serif blockquote {
+    border-inline-start: 2px solid var(--border);
+    margin-inline: 0;
+    padding-inline-start: 1.25em;
+    font-size: 0.9375rem;
+    line-height: 1.95;
+    opacity: 1;
+    color: color-mix(in oklab, var(--foreground) 88%, var(--background));
+  }
+
+  .app-prose-serif blockquote p {
+    margin-bottom: var(--app-space-3);
+  }
+
+  .app-prose-serif blockquote p:last-child {
+    margin-bottom: 0;
+  }
+
+  /*
+   * Emphasis inside a chapter.
+   *
+   * `font-style: italic` is undone on purpose. A Chinese serif has no
+   * italic cut, so the browser fakes one by slanting the glyphs — and a
+   * slanted Chinese character does not look like emphasis, it looks like
+   * the font failed to load. The emphasis is shown as a colour change
+   * instead, which works in Chinese the way italics do not.
+   */
+  .app-prose-serif em,
+  .app-prose-serif i {
+    font-style: normal;
+    color: color-mix(in oklab, var(--accent) 72%, var(--foreground));
   }
 
   /* ===== Code Blocks & Syntax Highlighting ===== */

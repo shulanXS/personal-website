@@ -4,10 +4,13 @@ import Header from "@/components/Header.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
-import WritingCard from "@/components/WritingCard.astro";
-import TagBar from "@/components/TagBar.astro";
+import WritingFilter from "@/components/WritingFilter.astro";
+import WritingContents from "@/components/WritingContents.astro";
+import TagEmpty from "@/components/TagEmpty.astro";
 import { getPublishedWriting } from "@/utils/content";
+import { buildWritingFacets, groupWriting } from "@/utils/writingMeta";
 import { getTagIndex } from "@/utils/tagIndex";
+import { tagDisplayName } from "@/utils/tagIndex";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -15,31 +18,59 @@ const t = useTranslations(config.site.uiLang);
 
 const works = await getPublishedWriting();
 
-// Group works by series so that chapters stay together and ordered.
-const standalone = works.filter(work => !work.data.series);
-const seriesMap = new Map<string, typeof works>();
-for (const work of works) {
-  const series = work.data.series;
-  if (!series) continue;
-  const list = seriesMap.get(series) ?? [];
-  list.push(work);
-  seriesMap.set(series, list);
-}
+/*
+ * The works are grouped into series first and standalone works second, so
+ * that a novel is read as one thing with chapters rather than as a list of
+ * chapters that happen to share a tag.
+ */
+const { series, standalone } = groupWriting(works);
 
-const series = [...seriesMap.entries()]
-  .map(([name, chapters]) => ({
-    name,
-    chapters: chapters.sort(
-      (a, b) => (a.data.chapterNumber ?? 0) - (b.data.chapterNumber ?? 0)
-    ),
-  }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+/*
+ * The filter of the page.
+ *
+ * The kinds and the works come from the shape of the collection itself;
+ * the tags that cut across kinds come from the tag index. A tag that
+ * repeats the name of a series is left out — the second level of the
+ * filter already offers it.
+ */
+const facets = buildWritingFacets(
+  { series, standalone },
+  {
+    novel: t.writing.novel,
+    essay: t.writing.essay,
+    short: t.writing.short,
+  }
+);
+
+const workNames = new Set(facets.works.map(work => work.value));
+
+/*
+ * The names of the kinds of work, in the interface language.
+ *
+ * A tag that repeats a kind ("小说") is left out of the tag level: the
+ * first level of the filter already says it, and offering it twice would
+ * say the same thing in two places.
+ */
+const typeNames = new Set(facets.types.map(type => type.label));
 
 const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
-const writingTags = tags.filter(tag => tag.counts.writing > 0);
+
+const freeTags = tags
+  .filter(tag => tag.counts.writing > 0)
+  .filter(tag => !workNames.has(tag.name))
+  .filter(tag => !typeNames.has(tag.name))
+  .map(tag => ({
+    slug: tag.slug,
+    name: tagDisplayName(tag.name),
+    count: tag.counts.writing,
+  }));
 ---
 
-<Layout title={`${t.pages.writingTitle} | ${t.site.title}`} width="list">
+<Layout
+  title={`${t.pages.writingTitle} | ${t.site.title}`}
+  titleKey="pages.writingTitle"
+  width="wide"
+>
   <Header />
 
   <Breadcrumb />
@@ -51,8 +82,6 @@ const writingTags = tags.filter(tag => tag.counts.writing > 0);
     descKey="pages.writingDesc"
   >
     <div data-tag-scope="collection" data-pagefind-ignore>
-      <TagBar tags={writingTags} source="writing" />
-
       {
         works.length === 0 ? (
           <p class="text-muted-foreground" data-i18n="pages.writingEmpty">
@@ -60,69 +89,23 @@ const writingTags = tags.filter(tag => tag.counts.writing > 0);
           </p>
         ) : (
           <>
-            {series.length > 0 && (
-              <section class="mt-8 mb-10">
-                <h2
-                  class="text-xl font-semibold tracking-wide"
-                  data-i18n="writing.series"
-                >
-                  {t.writing.series}
-                </h2>
-                {series.map(entry => (
-                  <div class="mt-4">
-                    <h3 class="text-muted-foreground flex items-center gap-2 text-sm font-semibold">
-                      {entry.name}
-                      <span
-                        class="border-border rounded border px-2 py-0.5 text-xs font-normal"
-                        data-i18n={
-                          entry.chapters[0]?.data.status === "ongoing"
-                            ? "writing.ongoing"
-                            : "writing.completed"
-                        }
-                      >
-                        {entry.chapters[0]?.data.status === "ongoing"
-                          ? t.writing.ongoing
-                          : t.writing.completed}
-                      </span>
-                    </h3>
-                    <ul data-list-layout="series">
-                      {entry.chapters.map(chapter => (
-                        <WritingCard work={chapter} />
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </section>
-            )}
-
-            {standalone.length > 0 && (
-              <section class="mt-8">
-                <h2
-                  class="text-xl font-semibold tracking-wide"
-                  data-i18n="writing.standalone"
-                >
-                  {t.writing.standalone}
-                </h2>
-                <ul data-list-layout="series">
-                  {standalone.map(work => (
-                    <WritingCard work={work} />
-                  ))}
-                </ul>
-              </section>
-            )}
+            <WritingFilter
+              types={facets.types}
+              works={facets.works}
+              tags={freeTags}
+            />
+            <WritingContents series={series} standalone={standalone} />
           </>
         )
       }
 
-      <p
-        class="text-muted-foreground mt-8 hidden"
-        data-tag-empty
-        data-i18n="tags.empty"
-      >
-        {t.tags.empty}
-      </p>
+      <TagEmpty />
     </div>
   </Main>
 
   <Footer />
 </Layout>
+
+<script>
+  import "@/scripts/writingFilter";
+</script>

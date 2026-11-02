@@ -1,0 +1,108 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
+import { renderMarkdown, noteFallbackTitle } from "@/utils/markdown";
+import TagChip from "./TagChip.astro";
+
+type Props = {
+  note: CollectionEntry<"notes">;
+};
+
+const { note } = Astro.props;
+const { data, id } = note;
+
+/*
+ * The body of a note is Markdown, even though it is stored in a frontmatter
+ * field rather than in the body of the file. It is rendered through the
+ * same pipeline as the articles, so that a note may contain lists, quotes,
+ * emphasis and code — and look like it.
+ */
+const html = await renderMarkdown(data.content);
+
+/*
+ * A note without a title still needs a heading, because Pagefind turns every
+ * heading into its own search result ("sub result"). The first words of the
+ * note serve as that heading — visually hidden, so the list still reads as
+ * a clean timeline.
+ *
+ * The text is sanitized because Pagefind parses `key:value` pairs — a colon
+ * inside the value would be read as the start of the next pair.
+ */
+const indexTitle = (
+  data.title ?? (noteFallbackTitle(data.content) || "note")
+).replace(/[\r\n:;]+/g, " ");
+
+const tags = data.tags ?? [];
+---
+
+<article class="app-note-inline min-w-0">
+  {
+    /*
+      The heading gives every note its own search result. For a note that
+      has a title it is the visible title; for an untitled note it is a
+      hidden fallback so that the entry is still findable and still shows up
+      as a sub result under the listing.
+
+      The `id` matters: Pagefind turns a heading with an id into a sub
+      result that links straight to this note.
+    */
+  }
+  {
+    data.title ? (
+      <h2 id={`note-${id}`} class="text-lg font-semibold">
+        {data.title}
+      </h2>
+    ) : (
+      <h2 id={`note-${id}`} class="sr-only">
+        {indexTitle}
+      </h2>
+    )
+  }
+  {
+    data.content && (
+      /*
+          The rendered Markdown sits inside a prose block, so that the
+          lists, quotes and code inside a note pick up the typography of
+          the articles.
+        */
+      <div class="app-prose app-note-body" data-note-body set:html={html} />
+    )
+  }
+  {
+    data.images && data.images.length > 0 && (
+      <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {data.images.map((src, index) => {
+          const alt = data.imageAlts?.[index] ?? "";
+          return (
+            <li>
+              <img
+                src={src}
+                alt={alt}
+                loading="lazy"
+                width={400}
+                height={300}
+                class="border-border h-full w-full rounded border object-cover"
+              />
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+  {
+    tags.length > 0 && (
+      <ul class="mt-1 flex flex-wrap gap-2" data-pagefind-ignore>
+        {tags.map(tag => (
+          <li>
+            <TagChip
+              slug={tagSlug(tag)}
+              name={tagDisplayName(tag)}
+              mode="static"
+              size="sm"
+            />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>

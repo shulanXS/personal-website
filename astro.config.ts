@@ -91,6 +91,30 @@ export default defineConfig({
       styles: ["normal", "italic"],
       formats: ["woff", "ttf"],
     },
+    {
+      /*
+        The serif face of the literary pages.
+
+        A Chinese serif is a webfont rather than a system font: no
+        platform ships a good one by default (macOS has Songti, Windows
+        has SimSun, Linux usually has nothing), and the difference
+        between "a serif" and "a *good* Chinese serif" is the whole
+        reason the reading pages are set apart from the rest of the site.
+
+        The font is a complete CJK face — around 15 MB — so it is
+        subset down to the characters this site actually renders. The
+        `glyphs` option does exactly that: the provider asks Google for
+        a font file that contains only these code points, and the
+        browser downloads that file instead of the whole typeface.
+      */
+      name: "Noto Serif SC",
+      cssVariable: "--font-serif-web",
+      provider: fontProviders.google(),
+      fallbacks: ["serif"],
+      weights: [400, 600],
+      styles: ["normal"],
+      formats: ["woff2"],
+    },
   ],
   env: {
     schema: {

@@ -4,10 +4,13 @@ import Header from "@/components/Header.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
-import NoteCard from "@/components/NoteCard.astro";
+import NoteEntry from "@/components/NoteEntry.astro";
 import TagBar from "@/components/TagBar.astro";
+import TagEmpty from "@/components/TagEmpty.astro";
 import { getPublishedNotes } from "@/utils/content";
+import { groupNotesByMonth } from "@/utils/noteMonths";
 import { getTagIndex } from "@/utils/tagIndex";
+import { formatMonthHeading, formatMonthLabel } from "@/utils/formatDate";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -17,9 +20,21 @@ const notes = await getPublishedNotes();
 
 const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
 const noteTags = tags.filter(tag => tag.counts.notes > 0);
+
+/*
+ * The notes are grouped by the month they were written in.
+ *
+ * The month index beside the wall is built from the same groups, so the
+ * two can never disagree about which months there are.
+ */
+const groups = groupNotesByMonth(notes, config.site.timezone);
 ---
 
-<Layout title={`${t.pages.notesTitle} | ${t.site.title}`} width="list">
+<Layout
+  title={`${t.pages.notesTitle} | ${t.site.title}`}
+  titleKey="pages.notesTitle"
+  width="list"
+>
   <Header />
 
   <Breadcrumb />
@@ -51,28 +66,119 @@ const noteTags = tags.filter(tag => tag.counts.notes > 0);
             {t.pages.notesEmpty}
           </p>
         ) : (
-          <ul
-            class="mt-6"
-            data-list-layout="notes"
+          <div
+            class="app-notes-wall"
             data-pagefind-body
             data-pagefind-meta="type:notes"
           >
-            {notes.map(note => (
-              <NoteCard note={note} />
-            ))}
-          </ul>
+            {/*
+              The month index.
+
+              It is an index rather than a control panel: it lists the
+              months the notes span, each with the number of notes it
+              holds, and each link jumps to the month below. The counts
+              follow the active tag filter — a month whose notes are all
+              filtered away is hidden with them, so that the index never
+              points at an empty section.
+            */}
+            <nav
+              class="app-notes-index"
+              data-pagefind-ignore
+              aria-label={t.notes.byMonth}
+            >
+              <p class="app-notes-index-heading" data-i18n="notes.byMonth">
+                {t.notes.byMonth}
+              </p>
+              <ul class="app-notes-index-list">
+                {groups.map((group, index) => (
+                  <li data-notes-index-item data-notes-month={group.key}>
+                    <a
+                      class="app-notes-index-link"
+                      href={`#notes-${group.key}`}
+                      aria-current={index === 0 ? "true" : undefined}
+                      data-notes-index-link
+                    >
+                      <span
+                        data-date-month-label={new Date(
+                          group.notes[0].data.pubDatetime
+                        ).toISOString()}
+                      >
+                        {formatMonthLabel(
+                          group.notes[0].data.pubDatetime,
+                          config.site.timezone
+                        )}
+                      </span>
+                      <span
+                        class="app-notes-index-count"
+                        data-notes-count
+                        data-notes-count-key="notes.monthCountShort"
+                      >
+                        {group.notes.length}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/*
+              The wall itself: the notes, grouped by month.
+            */}
+            <div class="app-notes-groups">
+              {groups.map((group, index) => (
+                <section
+                  class="app-notes-group"
+                  id={`notes-${group.key}`}
+                  data-notes-group={group.key}
+                  data-notes-first={index === 0 ? "" : undefined}
+                >
+                  <div class="app-notes-month">
+                    <h2 class="app-notes-month-title">
+                      <time
+                        datetime={new Date(
+                          group.notes[0].data.pubDatetime
+                        ).toISOString()}
+                        data-date-month-heading={new Date(
+                          group.notes[0].data.pubDatetime
+                        ).toISOString()}
+                      >
+                        {formatMonthHeading(
+                          group.notes[0].data.pubDatetime,
+                          config.site.uiLang,
+                          config.site.timezone
+                        )}
+                      </time>
+                    </h2>
+                    <span
+                      class="app-notes-month-count"
+                      data-notes-count
+                      data-notes-count-key="notes.monthCount"
+                    >
+                      {t.notes.monthCount.replace(
+                        "{{0}}",
+                        String(group.notes.length)
+                      )}
+                    </span>
+                    <span class="app-notes-month-rule" />
+                  </div>
+
+                  {group.notes.map(note => (
+                    <NoteEntry note={note} />
+                  ))}
+                </section>
+              ))}
+            </div>
+          </div>
         )
       }
 
-      <p
-        class="text-muted-foreground mt-8 hidden"
-        data-tag-empty
-        data-i18n="tags.empty"
-      >
-        {t.tags.empty}
-      </p>
+      <TagEmpty />
     </div>
   </Main>
 
   <Footer />
 </Layout>
+
+<script>
+  import "@/scripts/notesWall";
+</script>

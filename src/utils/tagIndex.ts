@@ -3,8 +3,9 @@ import {
   getPublishedPosts,
   getPublishedWriting,
 } from "./content";
-import { getProjects } from "./getProjects";
+import { getProjects, getProjectDate } from "./getProjects";
 import { getNotesUrl, getPostUrl, getWritingUrl } from "./getPostPaths";
+import { noteFallbackTitle, stripMarkdown } from "./markdown";
 import { slugifyStr } from "./slugify";
 import config from "@/config";
 
@@ -189,11 +190,16 @@ export async function getTagIndex(
 
   for (const entry of notes) {
     const tags = entry.data.tags ?? [];
+    /*
+     * The title and the summary of a note are plain text: a note is
+     * written in Markdown, and the Markdown syntax has no place in a search
+     * result.
+     */
     items.push({
-      title: entry.data.title ?? entry.data.content.slice(0, 40),
+      title: entry.data.title ?? noteFallbackTitle(entry.data.content),
       url: getNotesUrl(locale),
       date: (entry.data.modDatetime ?? entry.data.pubDatetime).toISOString(),
-      description: entry.data.content.slice(0, 160),
+      description: stripMarkdown(entry.data.content).slice(0, 160),
       tags,
       tagSlugs: tags.map(tagSlug),
       source: "notes",
@@ -222,7 +228,7 @@ export async function getTagIndex(
       // Projects have no detail page of their own — the project grid is the
       // only place they live.
       url: "",
-      date: "",
+      date: getProjectDate(project).toISOString(),
       description: project.description,
       tags,
       tagSlugs: tags.map(tagSlug),

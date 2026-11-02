@@ -1,0 +1,349 @@
+---
+import { Image } from "astro:assets";
+import Datetime from "./Datetime.astro";
+import TagChip from "./TagChip.astro";
+import {
+  chapterDescription,
+  chapterName,
+  type WritingGroup,
+} from "@/utils/writingMeta";
+import { getWritingUrl } from "@/utils/getPostPaths";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
+import { formatCharacterCount } from "@/utils/formatCount";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+type Props = {
+  series: WritingGroup[];
+  standalone: WritingGroup[];
+};
+
+const { series, standalone } = Astro.props;
+
+const t = useTranslations(config.site.uiLang);
+const locale = Astro.currentLocale ?? config.site.lang;
+
+/*
+ * The label of the kind of a work.
+ *
+ * The kind is a fact about the work, not about the page, so it is written
+ * in the interface language rather than in the language of the work.
+ */
+const TYPE_LABEL_KEYS: Record<WritingGroup["type"], string> = {
+  novel: "writing.novel",
+  essay: "writing.essay",
+  short: "writing.short",
+};
+
+const TYPE_LABELS: Record<WritingGroup["type"], string> = {
+  novel: t.writing.novel,
+  essay: t.writing.essay,
+  short: t.writing.short,
+};
+
+/**
+ * Fills a template of the interface dictionary with a single value.
+ *
+ * The chapter count is the same fact in both languages and in both
+ * layouts, so it is written once here rather than twice in the markup.
+ */
+function template(key: string, value: string | number): string {
+  return t.writing[key as keyof typeof t.writing].replace(
+    "{{0}}",
+    String(value)
+  );
+}
+
+/**
+ * The name of a chapter, without the prefix that numbers it.
+ *
+ * The prefix — "第一天", "第三章" — is a way of naming the chapter's place,
+ * and the column of the listing already says which chapter this is. Showing
+ * it twice would say the same thing in two notations. A chapter whose title
+ * is nothing but a prefix takes its name from its summary instead.
+ */
+function chapterTitle(work: {
+  data: { title: string; description?: string };
+}): string {
+  return chapterName(work.data.title, work.data.description);
+}
+
+/**
+ * The summary of a chapter, without the prefix that numbers it.
+ */
+function chapterSummary(work: {
+  data: { title: string; description?: string };
+}): string | undefined {
+  return chapterDescription(work.data.title, work.data.description);
+}
+
+/**
+ * The cover of a series, if one was made for it.
+ *
+ * The picture is made by `scripts/build-covers.mjs` and attached to the
+ * first chapter of the series in its frontmatter, so a series that gets a
+ * new cover needs no change here. The cover carries no text: the name of
+ * the work is on the card beside it, and the picture is left to be a
+ * picture.
+ */
+function coverOf(group: WritingGroup): ImageMetadata | undefined {
+  const cover = group.cover;
+  if (!cover || typeof cover === "string") return undefined;
+  return cover;
+}
+---
+
+{
+  /*
+  The layout of the writing page.
+
+  Each series is a row of its own: the table of contents on the left, the
+  card of the series on the right. The card sits level with the name of the
+  series — the head of the series and the card are the top of the same row
+  — and it stays in view while the reader works through the chapters.
+
+  The card belongs to the series, not to the work: a novel is a thing that
+  has a cover, a stand-alone essay is a sheet of paper. So the card is
+  drawn per series, and a stand-alone essay has none.
+*/
+}
+<div class="app-writing-layout">
+  {
+    series.map(group => (
+      <section
+        class="app-writing-group"
+        data-writing-group
+        data-writing-type={group.type}
+        data-writing-work={group.name ?? ""}
+      >
+        <div class="app-writing-group-main">
+          <div class="app-writing-group-head">
+            <h2 class="app-writing-group-name">{group.name}</h2>
+            {group.status && (
+              <span
+                class="app-writing-status"
+                data-i18n={
+                  group.status === "ongoing"
+                    ? "writing.ongoing"
+                    : "writing.completed"
+                }
+              >
+                {group.status === "ongoing"
+                  ? t.writing.ongoing
+                  : t.writing.completed}
+              </span>
+            )}
+            <span class="app-writing-group-meta">
+              {group.works.length > 1 && (
+                <span
+                  data-i18n="writing.chapters"
+                  data-i18n-args={String(group.works.length)}
+                >
+                  {template("chapters", group.works.length)}
+                </span>
+              )}
+              {group.characters > 0 && (
+                <span data-writing-characters-about={group.characters}>
+                  约{" "}
+                  {formatCharacterCount(group.characters, config.site.uiLang)}
+                </span>
+              )}
+            </span>
+          </div>
+
+          <ol class="app-writing-toc">
+            {group.works.map((work, index) => (
+              <li
+                class="app-writing-row"
+                data-tagged-item
+                data-tags={work.data.tags.join(",")}
+                data-writing-type={group.type}
+                data-writing-work={group.name ?? ""}
+              >
+                {/*
+                  The whole row is the link.
+
+                  The anchor wraps the row rather than sitting inside it,
+                  so that a tap anywhere on the row opens the chapter —
+                  which is what a finger expects on a phone, where there
+                  is no pointer to aim with.
+                */}
+                <a
+                  class="app-writing-row-link"
+                  href={getWritingUrl(work.data.slug, locale)}
+                >
+                  {/*
+                    The label of the row is the number of the chapter — the
+                    place it occupies in the series, not the order in which
+                    the chapters were written.
+                  */}
+                  <span
+                    class="app-writing-row-label"
+                    data-i18n="writing.chapter"
+                    data-i18n-args={String(index + 1)}
+                  >
+                    {template("chapter", index + 1)}
+                  </span>
+                  <span class="app-writing-row-body">
+                    <span class="app-writing-row-title">
+                      {chapterTitle(work)}
+                    </span>
+                    {chapterSummary(work) && (
+                      <span class="app-writing-row-desc">
+                        {chapterSummary(work)}
+                      </span>
+                    )}
+                  </span>
+                  <span class="app-writing-row-date">
+                    <Datetime
+                      pubDatetime={work.data.pubDatetime}
+                      modDatetime={work.data.modDatetime}
+                      bare
+                      day
+                    />
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {/*
+          The card of the series.
+
+          Only a novel gets one. A series that is not a novel — and a
+          stand-alone work, which has no series at all — is a sheet of
+          paper rather than a book, and a picture of a book beside it
+          would say something untrue.
+        */}
+        {group.type === "novel" && (
+          <aside class="app-writing-aside">
+            <div
+              class="app-writing-card"
+              data-tagged-item
+              data-tags={group.tags.join(",")}
+              data-writing-type={group.type}
+              data-writing-work={group.name ?? ""}
+            >
+              {coverOf(group) ? (
+                <div class="app-writing-cover">
+                  <Image
+                    src={coverOf(group)!}
+                    alt={group.name ?? ""}
+                    widths={[272, 544]}
+                    sizes="272px"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ) : (
+                <div class="app-writing-cover app-writing-cover-plain">
+                  <span>{group.name}</span>
+                </div>
+              )}
+
+              <h3 class="app-writing-card-title">{group.name}</h3>
+
+              {/*
+                The tags of the work.
+
+                They are on the card of the work rather than on every
+                chapter: a novel whose seven chapters all carry the tag
+                "雪落江川" would say the same thing seven times.
+              */}
+              {group.tags.length > 0 && (
+                <ul class="app-writing-card-tags">
+                  {group.tags.map(tag => (
+                    <li>
+                      <TagChip
+                        slug={tagSlug(tag)}
+                        name={tagDisplayName(tag)}
+                        mode="static"
+                        size="sm"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </aside>
+        )}
+      </section>
+    ))
+  }
+
+  {
+    standalone.length > 0 && (
+      <section
+        class="app-writing-group app-writing-group-wide"
+        data-writing-group
+      >
+        <div class="app-writing-group-main">
+          <div class="app-writing-group-head">
+            <h2 class="app-writing-group-name">{t.writing.standalone}</h2>
+          </div>
+          <ol class="app-writing-toc">
+            {standalone.map(group =>
+              group.works.map(work => (
+                <li
+                  class="app-writing-row"
+                  data-tagged-item
+                  data-tags={work.data.tags.join(",")}
+                  data-writing-type={group.type}
+                  data-writing-work={work.data.title}
+                >
+                  <a
+                    class="app-writing-row-link"
+                    href={getWritingUrl(work.data.slug, locale)}
+                  >
+                    <span
+                      class="app-writing-row-label"
+                      data-i18n={TYPE_LABEL_KEYS[group.type]}
+                    >
+                      {TYPE_LABELS[group.type]}
+                    </span>
+                    <span class="app-writing-row-body">
+                      <span class="app-writing-row-title">
+                        {work.data.title}
+                      </span>
+                      {work.data.description && (
+                        <span class="app-writing-row-desc">
+                          {work.data.description}
+                        </span>
+                      )}
+                    </span>
+                    <span class="app-writing-row-date">
+                      <Datetime
+                        pubDatetime={work.data.pubDatetime}
+                        modDatetime={work.data.modDatetime}
+                        bare
+                        day
+                      />
+                    </span>
+                  </a>
+                </li>
+              ))
+            )}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+</div>
+
+<script>
+  import {
+    hideEmptyWritingGroups,
+    refreshWritingMeta,
+  } from "@/scripts/writingMeta";
+
+  document.addEventListener("astro:page-load", () => refreshWritingMeta());
+
+  // The counts and the periods are formatted for the active language, so
+  // they have to be rebuilt when the language changes.
+  document.addEventListener("ui:langchange", () => refreshWritingMeta());
+
+  // The tag filter hides the entries that do not carry the tag; a group
+  // whose entries have all been hidden has to go with them.
+  document.addEventListener("tags:filtered", () => hideEmptyWritingGroups());
+</script>

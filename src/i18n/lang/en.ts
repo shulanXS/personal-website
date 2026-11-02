@@ -33,8 +33,17 @@ export default {
     publishedAt: "Published at",
     updatedAt: "Updated",
     sharePostIntro: "Share this post:",
-    sharePostOn: "Share this post on {{platform}}",
+    sharePostOn: "Share this post on {{0}}",
     sharePostViaEmail: "Share this post via email",
+    sharePlatforms: {
+      wechat: "Share this post on WeChat",
+      weibo: "Share this post on Weibo",
+      whatsapp: "Share this post on WhatsApp",
+      facebook: "Share this post on Facebook",
+      x: "Share this post on X",
+      telegram: "Share this post on Telegram",
+      pinterest: "Share this post on Pinterest",
+    },
     tagLabel: "Tags",
     backToTop: "Back to top",
     goBack: "Go back",
@@ -51,6 +60,16 @@ export default {
     prev: "Prev",
     next: "Next",
     page: "Page",
+  },
+  posts: {
+    /**
+     * The number of articles in a year, e.g. "7 posts".
+     *
+     * It is written on the heading of the year group, and it follows the
+     * tag filter: the figure is the number of articles the reader will
+     * actually see, not the number the year holds in total.
+     */
+    yearCount: "{{0}} posts",
   },
   home: {
     /**
@@ -77,23 +96,63 @@ export default {
     keywords: "Applied AI · Tech Notes · Creative Writing",
     /** The label of the RSS feed link in the hero. */
     rss: "Subscribe via RSS",
-    featured: "Featured",
-    featuredProjects: "Featured Projects",
-    recentPosts: "Recent Posts",
+    /** The heading of the activity timeline on the home page. */
+    activity: "Recent Activity",
+    /** The sentence under the heading of the activity timeline. */
+    activityDesc:
+      "Everything that has happened on this site — notes, articles, writing and projects — in the order it happened.",
+    /** Shown when the timeline has nothing to show. */
+    activityEmpty: "Nothing has been published yet.",
+    /** The heading of the notes section on the wide layout. */
     recentNotes: "Recent Notes",
+    /** The heading of the projects section on the wide layout. */
+    featuredProjects: "Recent Projects",
+    /** The heading of the posts section on the wide layout. */
+    recentPosts: "Recent Posts",
+    /** The heading of the writing section on the wide layout. */
     recentWriting: "Recent Writing",
     allPosts: "All Posts",
     allNotes: "All Notes",
     allWriting: "All Writing",
     allProjects: "All Projects",
   },
+  /**
+   * The labels of the activity timeline.
+   */
+  activity: {
+    /** A note — a short, personal entry. */
+    note: "Note",
+    /** A technical article. */
+    post: "Post",
+    /** A piece of literary work. */
+    writing: "Writing",
+    /** A project. */
+    project: "Project",
+  },
   notes: {
     expand: "Expand",
     collapse: "Collapse",
+    /** The heading of the month index beside the notes. */
+    byMonth: "By month",
+    /** The number of notes of a month, e.g. "3 notes". */
+    monthCount: "{{0}} notes",
+    /** The number of notes of a month, in the singular. */
+    monthCountOne: "{{0}} note",
+    /** The number of notes of a month in the index — just the figure. */
+    monthCountShort: "{{0}}",
   },
   tags: {
     all: "All",
     empty: "Nothing here under this tag yet.",
+    /**
+     * The button that clears the filter when nothing matched.
+     *
+     * It is the way back: without it, a reader whose filter came out
+     * empty is left with a sentence and no way to undo the filter.
+     */
+    emptyReset: "Clear the filter",
+    /** The label of the level of the writing filter that holds the tags. */
+    title: "By tag",
   },
   search: {
     tagsTitle: "Browse by tag",
@@ -110,10 +169,31 @@ export default {
     standalone: "Standalone Works",
     ongoing: "Ongoing",
     completed: "Completed",
-    chapter: "Chapter",
-    chapterLabel: "Chapter",
     tableOfContents: "Table of Contents",
     chapterNavigation: "Chapter navigation",
+    chapter: "Chapter {{0}}",
+    /**
+     * The number of chapters of a series, e.g. "7 chapters in total".
+     *
+     * The phrase says "in total" because the count is the whole of the
+     * series and not just the part that is finished: a series that is
+     * still being written has chapters too, and how many of them there
+     * are says more than whether it is over.
+     */
+    chapters: "{{0}} chapters in total",
+    characters: "about {{0}} characters",
+    type: "Type",
+    chapterCount: "Chapters",
+    length: "Length",
+    period: "Period",
+    /** The label of the first level of the writing filter. */
+    byType: "By type",
+    /** The label of the second level of the writing filter. */
+    byWork: "By work",
+    /** The option that clears one level of the writing filter. */
+    allWorks: "All works",
+    /** The floating button that returns from a chapter to the list. */
+    backToList: "Back",
   },
   projects: {
     github: "GitHub",
@@ -131,6 +211,7 @@ export default {
     /** The accessible title of the CMS link. */
     manageTitle: "Manage the content of this site in Pages CMS",
   },
+  documentTitle: "{{0}} | {{1}}",
   pages: {
     tagTitle: "Tag",
     tagDesc: "All the articles with the tag",
@@ -140,6 +221,7 @@ export default {
 
     postsTitle: "Blog",
     postsDesc: "All the articles I've posted.",
+    postsEmpty: "No articles yet.",
 
     notesTitle: "Notes",
     notesDesc: "Short thoughts, daily records and quick notes.",
@@ -227,7 +309,6 @@ export default {
     noResults: "No results found",
     goToPreviousPage: "Go to previous page",
     goToNextPage: "Go to next page",
-    paginationNavigation: "Pagination Navigation",
     breadcrumb: "breadcrumb",
     rssFeed: "RSS Feed",
     backToTop: "Back to top",

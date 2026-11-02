@@ -5,6 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import PostCard from "@/components/PostCard.astro";
 import TagBar from "@/components/TagBar.astro";
+import TagEmpty from "@/components/TagEmpty.astro";
 import Footer from "@/components/Footer.astro";
 import { getPublishedPosts } from "@/utils/content";
 import { groupPostsByYear } from "@/utils/postYears";
@@ -94,13 +95,7 @@ const postTags = tags.filter(tag => tag.counts.posts > 0);
         )
       }
 
-      <p
-        class="text-muted-foreground mt-8 hidden"
-        data-tag-empty
-        data-i18n="tags.empty"
-      >
-        {t.tags.empty}
-      </p>
+      <TagEmpty />
     </div>
   </Main>
 

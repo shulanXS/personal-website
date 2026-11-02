@@ -1,0 +1,190 @@
+---
+import type { ActivityEntry } from "@/utils/activity";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+import Datetime from "./Datetime.astro";
+import TagChip from "./TagChip.astro";
+import NoteInline from "./NoteInline.astro";
+import IconNote from "@/assets/icons/IconNote.svg";
+import IconPost from "@/assets/icons/IconPost.svg";
+import IconWriting from "@/assets/icons/IconWriting.svg";
+import IconProject from "@/assets/icons/IconProject.svg";
+
+type Props = {
+  entry: ActivityEntry;
+};
+
+const { entry } = Astro.props;
+
+const t = useTranslations(config.site.uiLang);
+
+/*
+ * The label of the kind of the entry.
+ *
+ * It is what tells a reader what kind of thing they are looking at when
+ * the timeline holds all four kinds at once: a note and an article are
+ * both "a thing that happened", and without a label the timeline would
+ * read as one undifferentiated list.
+ */
+const KIND_LABEL: Record<ActivityEntry["kind"], string> = {
+  note: t.activity.note,
+  post: t.activity.post,
+  writing: t.activity.writing,
+  project: t.activity.project,
+};
+
+const KIND_I18N: Record<ActivityEntry["kind"], string> = {
+  note: "activity.note",
+  post: "activity.post",
+  writing: "activity.writing",
+  project: "activity.project",
+};
+
+/*
+ * The icon of the kind of the entry.
+ *
+ * The four kinds are told apart by their *shape* rather than by their
+ * colour: the whole site is built from one warm palette and one accent,
+ * and a fourth colour on the timeline would pull it away from the rest of
+ * the page. An icon is a different kind of distinction entirely — it
+ * reads as a category marker, not as a decoration.
+ */
+const KIND_ICON = {
+  note: IconNote,
+  post: IconPost,
+  writing: IconWriting,
+  project: IconProject,
+} as const;
+
+const KindIcon = KIND_ICON[entry.kind];
+
+const project = entry.project;
+---
+
+<li
+  data-tagged-item
+  data-tags={entry.tagSlugs.join(",")}
+  data-activity-kind={entry.kind}
+>
+  {
+    /*
+    The date lives in a narrow column on the left, so the moment a thing
+    happened is readable at a glance without reading the entry itself.
+
+    That column only exists from `sm` upwards. Below it the date is
+    rendered *inside* the entry instead.
+  */
+  }
+  <div class="app-timeline-date hidden sm:block" data-pagefind-ignore>
+    <Datetime pubDatetime={entry.date} bare stacked />
+  </div>
+
+  <div class="app-activity-entry">
+    {
+      /*
+      The header of the entry: the kind of the thing, and its title.
+
+      The icon and the label come first and the title second, so that the
+      line of titles down the page stays aligned — every entry begins at
+      the same x, and the eye can run down the titles alone.
+    */
+    }
+    <div class="app-activity-head">
+      <span class="app-activity-kind" data-i18n={KIND_I18N[entry.kind]}>
+        <KindIcon class="app-activity-kind-icon" />
+        {KIND_LABEL[entry.kind]}
+      </span>
+
+      {
+        /*
+        The date, for the narrow screens where there is no column for it.
+        It sits in the header, so that the entry keeps its own clean shape.
+        */
+      }
+      <div class="app-timeline-date sm:hidden" data-pagefind-ignore>
+        <Datetime pubDatetime={entry.date} bare stacked />
+      </div>
+    </div>
+
+    {
+      /*
+      A note is shown in full: it is a short piece of writing, and the
+      timeline is exactly the place where reading it makes sense.
+
+      It is drawn without a frame — no bubble, no card. The timeline is a
+      column of entries separated by hairlines, and a note that sits in
+      that column as plain text is a note that belongs to it.
+    */
+    }
+    {
+      entry.kind === "note" && entry.note && (
+        <NoteInline note={entry.note} />
+      )
+    }
+
+    {
+      /*
+      Everything else is summarised. An article, a chapter and a project
+      all have a page of their own, and the timeline links to it rather
+      than reproducing it.
+    */
+    }
+    {
+      entry.kind !== "note" && (
+        <div class="app-activity-body">
+          <h2 class="app-activity-title">
+            <a
+              href={entry.url}
+              class="app-activity-link"
+              {...(entry.kind === "project" && project?.github
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              {entry.title}
+            </a>
+          </h2>
+
+          {entry.description && (
+            <p class="app-activity-summary">{entry.description}</p>
+          )}
+
+          {/*
+            A project carries two sets of labels: the technologies it is
+            built with, and the site-wide tags that link it to the rest of
+            the content. Only the tags are shown here — a second row of
+            technology names would say the same thing twice, and the tags
+            are the ones that work across the site.
+          */}
+          {entry.tags.length > 0 && (
+            <ul class="app-activity-tags" data-pagefind-ignore>
+              {entry.tags.map(tag => (
+                <li>
+                  <TagChip
+                    slug={tagSlug(tag)}
+                    name={tagDisplayName(tag)}
+                    mode="static"
+                    size="sm"
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )
+    }
+  </div>
+</li>
+
+<script>
+  /*
+    The notes on the activity timeline are drawn without a bubble, but they
+    still carry pictures, and a picture that cannot be opened is a picture
+    that has been shrunk to nothing.
+
+    The module that binds the lightbox also owns the clamp of a long note,
+    which the timeline does not use — the notes there are shown in full —
+    so importing it here costs nothing and keeps the pictures working.
+  */
+  import "@/scripts/noteClamp";
+</script>

@@ -48,9 +48,27 @@ export default defineAstroPaperConfig({
     dir: "ltr",
   },
   posts: {
-    perPage: 4,
     perIndex: 4,
     scheduledPostMargin: 15 * 60 * 1000,
+  },
+  home: {
+    /**
+     * The length of the activity timeline on the home page.
+     *
+     * The timeline merges every kind of content into one list, so this is
+     * the length of the whole list rather than a number of items per kind.
+     */
+    activityLimit: 12,
+    /**
+     * The length of each section of the wide layout.
+     *
+     * The wide layout keeps the four kinds in four sections, so each one
+     * has a length of its own.
+     */
+    recentNotes: 3,
+    recentPosts: 3,
+    recentWriting: 3,
+    recentProjects: 2,
   },
   features: {
     lightAndDarkMode: true,
@@ -84,34 +102,46 @@ export default defineAstroPaperConfig({
    * a way to see the code, and a way to talk — say everything a visitor
    * needs to know.
    *
-   * Every URL below is a PLACEHOLDER — replace it with the real account
-   * before publishing. The icon is picked from `src/assets/icons/socials/`
-   * by `name`; an entry whose icon is missing is silently skipped, so the
-   * name has to match the file name exactly.
+   * The icon is picked from `src/assets/icons/socials/` by `name`; an
+   * entry whose icon is missing is silently skipped, so the name has to
+   * match the file name exactly.
    *
-   * `linkTitle` is the accessible label of the icon link. Without it the
-   * title falls back to an English placeholder ("车文杰 on Github"), which
-   * does not fit a Chinese interface.
+   * The label of a button is *not* given here: it is part of the
+   * interface and lives in the dictionary (`socials.*`), so that it
+   * follows the language switch. A `linkTitle` here would be a label
+   * frozen in one language forever.
+   *
+   * An entry with a `copy` value and no `url` becomes a button that
+   * copies the value — which is what a WeChat ID needs, since it is a
+   * string and not an address.
    */
   socials: [
     // --- Code & development -------------------------------------------
-    { name: "github", url: "https://github.com/shulanXS", linkTitle: "GitHub" },
+    { name: "github", url: "https://github.com/shulanXS" },
 
     // --- Chinese platforms --------------------------------------------
     // A WeChat ID cannot be linked to, so the button copies it instead.
-    { name: "wechat", copy: "shulan203", linkTitle: "微信" },
+    { name: "wechat", copy: "shulan203" },
 
     // --- Contact -------------------------------------------------------
-    { name: "mail", url: "mailto:chewenjiedaily@gmail.com", linkTitle: "发送邮件" },
+    { name: "mail", url: "mailto:chewenjiedaily@gmail.com" },
   ],
+  /*
+   * The share buttons on a post.
+   *
+   * No `linkTitle` is given: the label of a share button is part of the
+   * interface, so it lives in the dictionary (`post.sharePlatforms`) and
+   * follows the language switch. A label hardcoded here would stay in the
+   * language of the config forever.
+   */
   shareLinks: [
-    { name: "wechat", url: "https://service.weixin.qq.com/share?url=", linkTitle: "分享到微信" },
-    { name: "weibo", url: "https://service.weibo.com/share/share.php?url=", linkTitle: "分享到微博" },
-    { name: "whatsapp", url: "https://wa.me/?text=", linkTitle: "分享到 WhatsApp" },
-    { name: "facebook", url: "https://www.facebook.com/sharer.php?u=", linkTitle: "分享到 Facebook" },
-    { name: "x",        url: "https://x.com/intent/post?url=", linkTitle: "分享到 X" },
-    { name: "telegram", url: "https://t.me/share/url?url=", linkTitle: "分享到 Telegram" },
-    { name: "pinterest", url: "https://pinterest.com/pin/create/button/?url=", linkTitle: "分享到 Pinterest" },
-    { name: "mail",     url: "mailto:?subject=See%20this%20post&body=", linkTitle: "通过邮件分享" },
+    { name: "wechat", url: "https://service.weixin.qq.com/share?url=" },
+    { name: "weibo", url: "https://service.weibo.com/share/share.php?url=" },
+    { name: "whatsapp", url: "https://wa.me/?text=" },
+    { name: "facebook", url: "https://www.facebook.com/sharer.php?u=" },
+    { name: "x",        url: "https://x.com/intent/post?url=" },
+    { name: "telegram", url: "https://t.me/share/url?url=" },
+    { name: "pinterest", url: "https://pinterest.com/pin/create/button/?url=" },
+    { name: "mail",     url: "mailto:?subject=See%20this%20post&body=" },
   ],
 });

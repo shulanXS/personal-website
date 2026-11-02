@@ -7,6 +7,7 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import Footer from "@/components/Footer.astro";
 import Datetime from "@/components/Datetime.astro";
 import TagChip from "@/components/TagChip.astro";
+import WritingBackButton from "@/components/WritingBackButton.astro";
 import { getPublishedWriting } from "@/utils/content";
 import { getWritingUrl } from "@/utils/getPostPaths";
 import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
@@ -74,39 +75,46 @@ const tags = data.tags ?? [];
     data-pagefind-body
     data-pagefind-meta="type:writing"
   >
-    <h1 class="text-2xl font-semibold sm:text-3xl">{data.title}</h1>
+    {/*
+      The header of a chapter.
+
+      The series name sits *above* the title rather than inside it: the
+      title of a chapter is only meaningful inside its series, so the
+      two are two lines of one header, not one line of text. Reading
+      "雪落江川 · 第二天：微小的步伐" as a single string makes the eye
+      hunt for where the work ends and the chapter begins.
+
+      The chapter number is deliberately absent. The title already says
+      "第二天", and a "第 2" underneath it says the same fact a second
+      time, in a form that is also wrong the moment a chapter is
+      re-numbered. The status badge was dropped for the same reason:
+      it is a fact about the whole series, and it is already stated once
+      in the series heading on the list page.
+    */}
     {
       data.series && (
-        <p class="text-muted-foreground mt-1 text-sm">
-          {data.series}
-          {data.chapterNumber !== undefined && (
-            <span data-i18n="writing.chapterLabel">
-              {t.writing.chapterLabel}
-            </span>
-          )}
-          {data.chapterNumber !== undefined && ` ${data.chapterNumber}`}
-          {data.status && (
-            <span
-              class="border-border ml-2 rounded border px-2 py-0.5 text-xs"
-              data-i18n={
-                data.status === "ongoing"
-                  ? "writing.ongoing"
-                  : "writing.completed"
-              }
-            >
-              {data.status === "ongoing"
-                ? t.writing.ongoing
-                : t.writing.completed}
-            </span>
-          )}
-        </p>
+        <p class="app-writing-series mb-1 text-sm">{data.series}</p>
       )
     }
+    <h1 class="app-writing-title text-2xl font-semibold sm:text-3xl">
+      {data.title}
+    </h1>
     <div class="mt-2 mb-6">
       <Datetime pubDatetime={data.pubDatetime} modDatetime={data.modDatetime} />
     </div>
 
-    {data.description && <p class="mb-6 italic">{data.description}</p>}
+    {/*
+      The one-line summary of the chapter.
+
+      It is set in the serif face, like the chapter itself, and it is not
+      italic: the text is Chinese, and a slanted CJK face is a faked
+      oblique that looks like a mistake rather than like emphasis. It is
+      separated from the body by a rule instead, so that it reads as a
+      standfirst rather than as a paragraph of the story.
+    */}
+    {data.description && (
+      <p class="app-writing-standfirst">{data.description}</p>
+    )}
 
     <article id="article" class="app-prose app-prose-serif max-w-app-reading">
       <Content />
@@ -137,7 +145,20 @@ const tags = data.tags ?? [];
           data-i18n="writing.tableOfContents"
           data-i18n-attr="aria-label"
         >
-          <h2 class="text-lg font-semibold">{t.writing.tableOfContents}</h2>
+          <h2
+            class="text-lg font-semibold"
+            data-i18n="writing.tableOfContents"
+          >
+            {t.writing.tableOfContents}
+          </h2>
+          {/*
+            The table of contents lists the chapters by their own titles.
+
+            The chapter number was removed here too: the titles of this
+            series already begin with "第一天", "第二天" and so on, so a
+            leading "2." only repeated what the title says, in a
+            different notation.
+          */}
           <ol class="mt-3 flex flex-col gap-2">
             {seriesSiblings.map(sibling => (
               <li>
@@ -148,9 +169,6 @@ const tags = data.tags ?? [];
                     { "text-accent font-medium": sibling.id === work.id },
                   ]}
                 >
-                  {sibling.data.chapterNumber !== undefined
-                    ? `${sibling.data.chapterNumber}. `
-                    : ""}
                   {sibling.data.title}
                 </a>
               </li>
@@ -190,6 +208,15 @@ const tags = data.tags ?? [];
       )
     }
   </main>
+
+  {/*
+    The floating button that returns to the list of works.
+
+    It lives outside the main column, because it is anchored to the
+    viewport rather than to the text: it stays in the same corner of the
+    screen while the chapter scrolls underneath it.
+  */}
+  <WritingBackButton />
 
   <Footer />
 </Layout>

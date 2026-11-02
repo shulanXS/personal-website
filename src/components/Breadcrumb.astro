@@ -43,14 +43,16 @@ const navLabelKeys: Record<string, string> = {
   search: "nav.search",
 };
 
-// if breadcrumb is Home > Posts > [page] <etc>
-// replace Posts with localized "Posts (page number)"
+/*
+ * The posts listing is not paginated any more — every article is on the
+ * one page — so its crumb carries no page number.
+ *
+ * The article pages sit *under* the listing, and their crumb stops at the
+ * listing as well: the slug of an article is not something a reader needs
+ * to see in a trail of links.
+ */
 if (breadcrumbList[0] === "posts") {
-  breadcrumbList.splice(
-    0,
-    2,
-    `${t.nav.posts} (${t.pagination.page.toLowerCase()} ${breadcrumbList[1] || 1})`
-  );
+  breadcrumbList.splice(1);
 }
 
 // The standalone tag pages are gone — the tags now live on the search
@@ -73,16 +75,19 @@ if (breadcrumbList[0] === "posts") {
       <span aria-hidden="true" class="opacity-80">&raquo;</span>
     </li>
     {
-      breadcrumbList.map((breadcrumb, index) =>
-        index + 1 === breadcrumbList.length ? (
+      breadcrumbList.map((breadcrumb, index) => {
+        const i18nKey = navLabelKeys[breadcrumb];
+        const label = navLabels[breadcrumb] ?? decodeSegment(breadcrumb);
+
+        return index + 1 === breadcrumbList.length ? (
           <li>
             <span
               class:list={["capitalize opacity-75", { lowercase: index > 0 }]}
               aria-current="page"
-              data-i18n={navLabelKeys[breadcrumb]}
+              data-i18n={i18nKey}
             >
               {/* make the last part lowercase in Home > Tags > some-tag */}
-              {navLabels[breadcrumb] ?? decodeSegment(breadcrumb)}
+              {label}
             </span>
           </li>
         ) : (
@@ -90,16 +95,16 @@ if (breadcrumbList[0] === "posts") {
             <a
               href={pathUrl(locale, breadcrumb)}
               class="capitalize opacity-70"
-              data-i18n={navLabelKeys[breadcrumb]}
+              data-i18n={i18nKey}
             >
-              {navLabels[breadcrumb] ?? decodeSegment(breadcrumb)}
+              {label}
             </a>
             <span aria-hidden="true" class="opacity-70">
               &raquo;
             </span>
           </li>
-        )
-      )
+        );
+      })
     }
   </ul>
 </nav>

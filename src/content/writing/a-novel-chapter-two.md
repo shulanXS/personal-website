@@ -1,5 +1,5 @@
 ---
-title: "夜航船 · 第二章"
+title: "第二章"
 slug: chapter-two
 type: novel
 series: 夜航船

@@ -1,4 +1,5 @@
 import { flatRuntimeTranslations, defaultLocale } from "@/i18n";
+import { formatTemplate } from "@/i18n/format";
 import { refreshDates } from "@/scripts/dateFormat";
 
 const STORAGE_KEY = "uiLang";
@@ -48,7 +49,7 @@ export function applyLang(locale: string): void {
   for (const element of document.querySelectorAll<HTMLElement>("[data-i18n]")) {
     const key = element.dataset.i18n;
     if (!key) continue;
-    const value = dict[key];
+    const value = resolveValue(dict, key, element);
     if (value === undefined) continue;
 
     const attrs = element.dataset.i18nAttr;
@@ -60,6 +61,27 @@ export function applyLang(locale: string): void {
   }
 
   document.documentElement.lang = locale;
+}
+
+/**
+ * Resolves a dictionary entry, filling in the placeholders of a template.
+ *
+ * The placeholders are filled by `formatTemplate`, which knows the two
+ * conventions: a dotted path names another entry of the dictionary, a
+ * numeric one is a value the element supplies in `data-i18n-args`.
+ */
+function resolveValue(
+  dict: Record<string, string>,
+  key: string,
+  element?: HTMLElement
+): string | undefined {
+  const template = dict[key];
+  if (template === undefined) return undefined;
+
+  const args = element?.dataset.i18nArgs;
+  const values = args ? args.split(",").map(v => v.trim()) : [];
+
+  return formatTemplate(template, dict, values);
 }
 
 /**
@@ -225,7 +247,7 @@ document.addEventListener("astro:before-swap", event => {
   )) {
     const key = element.dataset.i18n;
     if (!key) continue;
-    const value = dict[key];
+    const value = resolveValue(dict, key, element);
     if (value === undefined) continue;
 
     const attrs = element.dataset.i18nAttr;

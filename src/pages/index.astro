@@ -7,33 +7,50 @@ import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import PostCard from "@/components/PostCard.astro";
-import NoteCard from "@/components/NoteCard.astro";
+import NoteEntry from "@/components/NoteEntry.astro";
 import WritingCard from "@/components/WritingCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
+import ActivityEntry from "@/components/ActivityEntry.astro";
 import {
   getPublishedNotes,
   getPublishedPosts,
   getPublishedWriting,
 } from "@/utils/content";
-import { getPostUrl } from "@/utils/getPostPaths";
+import { getProjectsByDate } from "@/utils/getProjects";
 import { routeUrl } from "@/utils/routes";
-import { getFeaturedProjects } from "@/utils/getProjects";
-import { formatDate } from "@/utils/formatDate";
+import { getRecentActivity } from "@/utils/activity";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
-const { socials, posts: postsConfig } = config;
+const { socials } = config;
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(config.site.uiLang);
 
-const posts = await getPublishedPosts();
+/*
+ * The wide layout.
+ *
+ * The home page has two faces. On a wide screen it keeps the four kinds of
+ * content in four sections, each one showing the latest of its kind.
+ *
+ * On a narrow screen it becomes a single column, and a single column of
+ * four separate sections is four things to scroll through. There the four
+ * kinds are merged into one timeline instead, so that the whole of what
+ * the site holds is read as one sequence of things that happened.
+ *
+ * Every list below is ordered by the moment its entries happened. A new
+ * note, article, chapter or project therefore moves straight to the top
+ * of its own section, with nothing arranged by hand.
+ */
 const notes = await getPublishedNotes();
+const posts = await getPublishedPosts();
 const writing = await getPublishedWriting();
-const projects = getFeaturedProjects();
+const projects = getProjectsByDate();
 
-const featuredPosts = posts.filter(({ data }) => data.featured);
-const recentPosts = posts.filter(({ data }) => !data.featured);
+/*
+ * The timeline of the narrow layout.
+ */
+const activity = await getRecentActivity(locale, config.home.activityLimit);
 
 const homePath = routeUrl(locale, "home");
 ---
@@ -126,7 +143,7 @@ const homePath = routeUrl(locale, "home");
           rather than outside it: a negative margin would push it past the
           edge of the viewport on a narrow screen, and the page would
           scroll sideways.
-          */
+        */
         }
         <div class="relative hidden shrink-0 p-6 md:block lg:p-10">
           <div
@@ -143,8 +160,54 @@ const homePath = routeUrl(locale, "home");
       </div>
     </section>
 
-    <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
-      <div class="lg:col-span-2">
+    <!--
+      The wide layout.
+
+      The home page keeps the four kinds of content in four sections, each
+      one showing the latest of its kind. Every section is ordered by the
+      moment its entries happened, so a new note, a new article, a new
+      chapter or a new project moves straight to the top of its own
+      section — nothing here is arranged by hand.
+
+      The four sections are *not* four equal blocks of a grid. The page is
+      one continuous flow of text, and the sections are laid out along it
+      in two columns that are independent of each other: the notes and
+      the articles on the top row, the projects and the literary works on
+      the bottom one.
+
+      The two columns are independent rather than being the two halves of
+      one grid, and that is the whole point. A grid makes its rows as tall
+      as their tallest cell, so a section of three long notes would leave
+      a hole under the articles beside it — a hole big enough to read as
+      a mistake. Two columns, each of which simply stacks its own two
+      sections, have no holes: the projects begin where the notes end, and
+      the literary works begin where the articles end.
+
+      The two columns are not of equal width either, and they are not
+      equal because the two kinds of thing they hold want different
+      amounts of room. The left column holds the notes and the projects:
+      a note is a paragraph of text, and a project is a card with a
+      picture of itself in it. Both want width. The right column holds
+      the articles and the literary works, and both of those are lists of
+      *references* — a title, a day, a set of tags — which say everything
+      they have to say in a narrow column. A third of the page would do
+      for them, and giving them more would only stretch them out.
+
+      Each section carries a "see everything" link of its own, so that a
+      section reads as a window onto a collection rather than as the whole
+      of it. The four big buttons at the foot of the page are the other
+      way in, and the two sets would say the same thing twice.
+
+      It is hidden on a narrow screen, where the timeline below takes its
+      place.
+    -->
+    <div
+      class="hidden lg:grid lg:grid-cols-[1.75fr_1fr] lg:items-start lg:gap-x-14"
+    >
+      <!--
+      The left column: the notes, and the projects below them.
+      -->
+      <div class="min-w-0">
         {
           /*
           The notes come first: they are the most personal and the most
@@ -155,53 +218,73 @@ const homePath = routeUrl(locale, "home");
         {
           notes.length > 0 && (
             <section id="recent-notes" class="pt-12 pb-6">
-              <h2
-                class="text-2xl font-semibold tracking-wide"
-                data-i18n="home.recentNotes"
-              >
-                {t.home.recentNotes}
-              </h2>
-              <ul class="mt-4" data-list-layout="notes">
-                {notes.slice(0, postsConfig.perIndex).map(note => (
-                  <NoteCard note={note} />
+              <div class="app-section-head">
+                <h2
+                  class="text-xl font-semibold tracking-wide"
+                  data-i18n="home.recentNotes"
+                >
+                  {t.home.recentNotes}
+                </h2>
+                <a
+                  href={routeUrl(locale, "notes")}
+                  class="app-section-more"
+                  data-i18n="home.allNotes"
+                >
+                  {t.home.allNotes}
+                  <IconArrowRight class="inline-block rtl:-rotate-180" />
+                </a>
+              </div>
+              <ul class="mt-5" data-list-layout="notes" data-notes-wall>
+                {notes.slice(0, config.home.recentNotes).map(note => (
+                  <li>
+                    <NoteEntry note={note} />
+                  </li>
                 ))}
               </ul>
             </section>
           )
         }
 
-        <!-- Featured projects -->
+        <!-- Recent projects -->
         {
           projects.length > 0 && (
-            <section id="featured-projects" class="pt-12 pb-6">
-              <h2
-                class="text-2xl font-semibold tracking-wide"
-                data-i18n="home.featuredProjects"
-              >
-                {t.home.featuredProjects}
-              </h2>
-              <ul class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {projects.map(project => (
-                  <ProjectCard project={project} />
-                ))}
-              </ul>
-            </section>
-          )
-        }
+            <section id="recent-projects" class="pt-12 pb-6">
+              <div class="app-section-head">
+                <h2
+                  class="text-xl font-semibold tracking-wide"
+                  data-i18n="home.featuredProjects"
+                >
+                  {t.home.featuredProjects}
+                </h2>
+                <a
+                  href={routeUrl(locale, "projects")}
+                  class="app-section-more"
+                  data-i18n="home.allProjects"
+                >
+                  {t.home.allProjects}
+                  <IconArrowRight class="inline-block rtl:-rotate-180" />
+                </a>
+              </div>
+              {/*
+              Two projects side by side, at the size they are on the
+              project page.
 
-        <!-- Recent posts -->
-        {
-          recentPosts.length > 0 && (
-            <section id="recent-posts" class="pt-12 pb-6">
-              <h2
-                class="text-2xl font-semibold tracking-wide"
-                data-i18n="home.recentPosts"
-              >
-                {t.home.recentPosts}
-              </h2>
-              <ul data-list-layout="vertical">
-                {recentPosts.slice(0, postsConfig.perIndex).map(post => (
-                  <PostCard post={post} />
+              A project is an object: it has a picture of itself, a name
+              and a description, and the picture is what tells two
+              projects apart at a glance. The left column is wide enough
+              to carry that picture properly, so the cards here are the
+              same cards as on the project page — the picture across the
+              top, the name and the description under it — rather than a
+              shrunken version of them.
+
+              The picture is the one thing that is scaled down: a card
+              this wide would not need a picture six hundred pixels wide,
+              and a smaller one keeps the pair of them from turning the
+              section into a wall of images.
+              */}
+              <ul class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {projects.slice(0, config.home.recentProjects).map(project => (
+                  <ProjectCard project={project} variant="compact" />
                 ))}
               </ul>
             </section>
@@ -209,43 +292,40 @@ const homePath = routeUrl(locale, "home");
         }
       </div>
 
-      <aside class="lg:col-span-1">
-        <!-- Featured posts -->
+      <!--
+      The right column: the articles, and the literary works below them.
+      -->
+      <div class="min-w-0">
+        <!-- Recent posts -->
         {
-          featuredPosts.length > 0 && (
-            <section id="featured" class="pt-12 pb-6">
-              <h2
-                class="text-2xl font-semibold tracking-wide"
-                data-i18n="home.featured"
-              >
-                {t.home.featured}
-              </h2>
-              <ul>
-                {featuredPosts.map(data => (
-                  <li class="border-border border-b py-4 last:border-b-0">
-                    <a
-                      href={getPostUrl(data.id, data.filePath, locale)}
-                      class="text-accent font-medium decoration-dashed underline-offset-4 hover:underline"
-                    >
-                      {data.data.title}
-                    </a>
-                    <p class="text-muted-foreground text-sm">
-                      <time
-                        datetime={new Date(
-                          data.data.modDatetime ?? data.data.pubDatetime
-                        ).toISOString()}
-                        data-date={new Date(
-                          data.data.modDatetime ?? data.data.pubDatetime
-                        ).toISOString()}
-                      >
-                        {formatDate(
-                          data.data.modDatetime ?? data.data.pubDatetime,
-                          config.site.uiLang,
-                          config.site.timezone
-                        )}
-                      </time>
-                    </p>
-                  </li>
+          posts.length > 0 && (
+            <section id="recent-posts" class="pt-12 pb-6">
+              <div class="app-section-head">
+                <h2
+                  class="text-xl font-semibold tracking-wide"
+                  data-i18n="home.recentPosts"
+                >
+                  {t.home.recentPosts}
+                </h2>
+                <a
+                  href={routeUrl(locale, "posts")}
+                  class="app-section-more"
+                  data-i18n="home.allPosts"
+                >
+                  {t.home.allPosts}
+                  <IconArrowRight class="inline-block rtl:-rotate-180" />
+                </a>
+              </div>
+              {/*
+              The articles are a plain list of references: a title, the day
+              it was written and the tags it carries. There is no rule above
+              the list and none between its entries — a hairline here would
+              draw a box around the section and make it read as a widget
+              rather than as part of the page.
+              */}
+              <ul class="mt-5" data-list-layout="vertical">
+                {posts.slice(0, config.home.recentPosts).map(post => (
+                  <PostCard post={post} variant="compact" />
                 ))}
               </ul>
             </section>
@@ -256,22 +336,82 @@ const homePath = routeUrl(locale, "home");
         {
           writing.length > 0 && (
             <section id="recent-writing" class="pt-12 pb-6">
-              <h2
-                class="text-2xl font-semibold tracking-wide"
-                data-i18n="home.recentWriting"
-              >
-                {t.home.recentWriting}
-              </h2>
-              <ul class="border-border border-t" data-list-layout="writing">
-                {writing.slice(0, postsConfig.perIndex).map(work => (
-                  <WritingCard work={work} />
+              <div class="app-section-head">
+                <h2
+                  class="text-xl font-semibold tracking-wide"
+                  data-i18n="home.recentWriting"
+                >
+                  {t.home.recentWriting}
+                </h2>
+                <a
+                  href={routeUrl(locale, "writing")}
+                  class="app-section-more"
+                  data-i18n="home.allWriting"
+                >
+                  {t.home.allWriting}
+                  <IconArrowRight class="inline-block rtl:-rotate-180" />
+                </a>
+              </div>
+              {/*
+              The works are a list of titles. There is no summary beside
+              them: a chapter's own line about itself is on its page, and
+              the section is a reference to the works rather than an
+              introduction to them.
+              */}
+              <ul class="mt-5" data-list-layout="writing">
+                {writing.slice(0, config.home.recentWriting).map(work => (
+                  <WritingCard work={work} variant="compact" />
                 ))}
-              </ul>{" "}
+              </ul>
             </section>
           )
         }
-      </aside>
+      </div>
     </div>
+
+    <!--
+      The narrow layout.
+
+      Everything the site holds is merged into one list here and ordered by
+      the moment it happened, so that the home page reads as a running
+      account of the site rather than as four separate sections.
+
+      It is shown on a narrow screen only; the wide layout above takes
+      over from `lg` upwards.
+    -->
+    <section id="activity" class="pt-12 pb-6 lg:hidden">
+      <div class="max-w-app-flow mx-auto">
+        <h2
+          class="text-2xl font-semibold tracking-wide"
+          data-i18n="home.activity"
+        >
+          {t.home.activity}
+        </h2>
+        <p
+          class="text-muted-foreground mt-2 text-sm"
+          data-i18n="home.activityDesc"
+        >
+          {t.home.activityDesc}
+        </p>
+
+        {
+          activity.length > 0 ? (
+            <ul class="mt-6" data-list-layout="activity">
+              {activity.map(entry => (
+                <ActivityEntry entry={entry} />
+              ))}
+            </ul>
+          ) : (
+            <p
+              class="text-muted-foreground mt-6"
+              data-i18n="home.activityEmpty"
+            >
+              {t.home.activityEmpty}
+            </p>
+          )
+        }
+      </div>
+    </section>
 
     <div class="my-8 flex flex-wrap justify-center gap-4 text-center">
       <LinkButton href={routeUrl(locale, "notes")}>

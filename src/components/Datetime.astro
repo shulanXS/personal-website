@@ -8,6 +8,8 @@ import { useTranslations } from "@/i18n";
 import {
   formatDate,
   formatCompactDate,
+  formatDayDate,
+  formatMonthDayDate,
   formatStackedDate,
 } from "@/utils/formatDate";
 dayjs.extend(utc);
@@ -47,6 +49,23 @@ type Props = {
    * language switch can rewrite them independently.
    */
   stacked?: boolean;
+  /**
+   * Show the day only, without the moment of the day.
+   *
+   * A listing says *when* a work appeared; the hour it was written is
+   * only interesting to someone who has already opened it. The listing
+   * pages use this, and the detail pages keep the full timestamp.
+   */
+  day?: boolean;
+  /**
+   * Show the month and the day, without the year.
+   *
+   * The articles listing is grouped by year and the year is written once,
+   * as the heading of the group. Writing it again on every entry would
+   * repeat the same fact eleven times over — and the repetition is what
+   * makes the date column wide.
+   */
+  monthDay?: boolean;
 };
 
 const {
@@ -58,6 +77,8 @@ const {
   bare = false,
   compact = false,
   stacked = false,
+  day = false,
+  monthDay = false,
 } = Astro.props;
 
 const t = useTranslations(config.site.uiLang);
@@ -88,17 +109,29 @@ const stackedDate = stacked
 
 const date = stacked
   ? ""
-  : compact
-    ? formatCompactDate(
+  : day
+    ? formatDayDate(
         stamp,
         config.site.uiLang,
         postTimezone ?? config.site.timezone
       )
-    : formatDate(
-        stamp,
-        config.site.uiLang,
-        postTimezone ?? config.site.timezone
-      );
+    : monthDay
+      ? formatMonthDayDate(
+          stamp,
+          config.site.uiLang,
+          postTimezone ?? config.site.timezone
+        )
+      : compact
+        ? formatCompactDate(
+            stamp,
+            config.site.uiLang,
+            postTimezone ?? config.site.timezone
+          )
+        : formatDate(
+            stamp,
+            config.site.uiLang,
+            postTimezone ?? config.site.timezone
+          );
 ---
 
 <div
@@ -172,8 +205,12 @@ const date = stacked
       <time
         class:list={["text-sm", { "sm:text-base": size === "lg" }]}
         datetime={datetime.toISOString()}
-        data-date={compact ? undefined : datetime.toISOString()}
+        data-date={
+          compact || day || monthDay ? undefined : datetime.toISOString()
+        }
         data-date-compact={compact ? datetime.toISOString() : undefined}
+        data-date-day={day ? datetime.toISOString() : undefined}
+        data-date-month-day={monthDay ? datetime.toISOString() : undefined}
       >
         {date}
       </time>

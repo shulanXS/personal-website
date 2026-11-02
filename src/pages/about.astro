@@ -45,7 +45,11 @@ const contactDetails = config.socials.map(({ name, url, copy }) => {
 const copyHint = t.about.contactCopyHint;
 ---
 
-<Layout title={`${t.about.title} | ${t.site.title}`} width="flow">
+<Layout
+    title={`${t.about.title} | ${t.site.title}`}
+    titleKey="about.title"
+    width="flow"
+  >
   <Header />
 
   <Breadcrumb />
@@ -122,11 +126,27 @@ const copyHint = t.about.contactCopyHint;
     }
     <div class="mt-10">
       {
-        t.about.sections.map(section => (
+        /*
+        The sections are indexed rather than keyed by name, so the key of
+        each one is its position: `about.sections.0.title`. The index is
+        part of the key, which means the runtime switcher can rebuild
+        every heading and paragraph of the biography in the other language.
+        */
+        t.about.sections.map((section, sectionIndex) => (
           <section class="border-border border-t pt-6 pb-2 first:border-t-0 first:pt-0">
-            <h2 class="text-lg font-semibold tracking-wide">{section.title}</h2>
-            {section.body.map(paragraph => (
-              <p class="text-foreground mt-3 leading-relaxed">{paragraph}</p>
+            <h2
+              class="text-lg font-semibold tracking-wide"
+              data-i18n={`about.sections.${sectionIndex}.title`}
+            >
+              {section.title}
+            </h2>
+            {section.body.map((paragraph, paragraphIndex) => (
+              <p
+                class="text-foreground mt-3 leading-relaxed"
+                data-i18n={`about.sections.${sectionIndex}.body.${paragraphIndex}`}
+              >
+                {paragraph}
+              </p>
             ))}
           </section>
         ))
@@ -152,14 +172,22 @@ const copyHint = t.about.contactCopyHint;
 
       <ul class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {
-          t.about.hereItems.map(item => (
+          t.about.hereItems.map((item, itemIndex) => (
             <li class="border-border bg-surface rounded-[var(--app-radius)] border p-4">
               <a
                 href={routeUrl(locale, item.route)}
                 class="hover:text-accent block transition-colors"
               >
-                <h3 class="text-accent font-medium">{item.label}</h3>
-                <p class="text-muted-foreground mt-1 text-sm leading-relaxed">
+                <h3
+                  class="text-accent font-medium"
+                  data-i18n={`about.hereItems.${itemIndex}.label`}
+                >
+                  {item.label}
+                </h3>
+                <p
+                  class="text-muted-foreground mt-1 text-sm leading-relaxed"
+                  data-i18n={`about.hereItems.${itemIndex}.desc`}
+                >
                   {item.desc}
                 </p>
               </a>

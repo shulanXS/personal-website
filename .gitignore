@@ -41,6 +41,11 @@ outline-test.html
 design-proposals-*.html
 
 # cloudflare local state
-# The cache that `wrangler dev` and the local D1/R2/KV emulators write
+# The cache that `wrangler dev` and the local D1/D2/KV emulators write
 # while previewing. It is machine-local and regenerated on every run.
 .wrangler/
+
+# the font build cache
+# The upstream typeface that `npm run font:reading` subsets. It is 25 MB
+# and it is downloaded on demand; the *subset* is committed, not this.
+.cache/

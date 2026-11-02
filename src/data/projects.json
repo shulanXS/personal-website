@@ -1,31 +1,129 @@
 {
   "projects": [
     {
-      "name": "个人网站",
-      "description": "基于 Astro + Tailwind CSS 的个人数字空间，涵盖技术博客、碎碎念、文学创作与项目展示。",
-      "techStack": ["Astro", "TypeScript", "Tailwind CSS"],
-      "tags": ["Astro", "个人网站", "复盘"],
-      "github": "https://github.com/",
+      "name": "RAG Center",
+      "description": "多租户 RAG 能力中心：按租户隔离知识库，文档分块后写入 pgvector 并异步索引到 Elasticsearch，支持向量、BM25 与双路混合检索（RRF 融合），可用 Qwen3-Rerank 二次精排，每次检索都留下日志。",
+      "techStack": ["Python", "FastAPI", "pgvector", "Elasticsearch", "React"],
+      "tags": ["RAG", "Python", "AI", "后端"],
+      "github": "https://github.com/shulanXS/rag-center",
+      "screenshot": "/uploads/rag-center-evaluation.jpg",
+      "pubDatetime": "2026-10-24T16:09:30.000Z",
       "featured": true,
       "order": 1
     },
     {
-      "name": "RAG 检索实验",
-      "description": "一个把个人笔记与文档接入向量检索的实验项目，用来验证问答式检索的准确率。",
-      "techStack": ["Python", "RAG", "LLM"],
-      "tags": ["RAG", "Python", "实验"],
-      "github": "https://github.com/",
-      "demo": "https://example.com/",
+      "name": "Offer Agent",
+      "description": "AI 模拟面试官：上传简历后生成面试计划并人工确认，用 LangGraph 做动态追问，按证据驱动给出评分报告与逐题复盘。支持 SSE 流式输出、双语界面与 Stripe 订阅额度。",
+      "techStack": ["Python", "FastAPI", "LangGraph", "React", "Stripe"],
+      "tags": ["AI", "Agent", "Python", "后端"],
+      "github": "https://github.com/shulanXS/offer-agent",
+      "pubDatetime": "2026-10-15T09:07:31.000Z",
       "featured": true,
       "order": 2
     },
     {
-      "name": "标签检索组件",
-      "description": "一个可复用的前端标签过滤与跨集合检索组件，支持按内容类型分组展示结果。",
-      "techStack": ["TypeScript", "Web Components"],
-      "tags": ["TypeScript", "前端", "工具"],
-      "github": "https://github.com/",
+      "name": "企业级 RAG 架构",
+      "description": "FAANG 标准的企业级 RAG 架构：BM25 与稠密向量双路召回、RRF 融合、交叉编码器重排，Redis HNSW 语义缓存节省六成 LLM 成本，RAGAS 离线评测配合在线采样，Self-RAG 三分支兜底保证回答质量。",
+      "techStack": ["Python", "Qdrant", "LangGraph", "Redis", "OpenTelemetry"],
+      "tags": ["RAG", "AI", "Python", "实验"],
+      "github": "https://github.com/shulanXS/RAG",
+      "pubDatetime": "2026-06-13T10:05:00.000Z",
+      "featured": true,
       "order": 3
+    },
+    {
+      "name": "golearn",
+      "description": "面向 Go 初学者的实战教程项目，用一个完整的 Todo CRUD API 演示工程化实践：Handler / Service / Repository 分层、依赖注入、请求追踪、优雅停机与可回滚的数据库迁移。",
+      "techStack": ["Go", "Gin", "GORM", "PostgreSQL", "Docker"],
+      "tags": ["Go", "后端", "教程"],
+      "github": "https://github.com/shulanXS/golearn",
+      "pubDatetime": "2026-05-17T06:12:52.000Z",
+      "featured": true,
+      "order": 4
+    },
+    {
+      "name": "Seekie",
+      "description": "SocialAI 社交平台：Go 后端与 Next.js 前端的 pnpm monorepo，用 sqlc 从 SQL 生成类型安全代码，支持 AI 图片生成与社交动态，是一次把现代前端与后端工具链串起来的尝试。",
+      "techStack": ["Go", "Next.js", "TypeScript", "PostgreSQL", "pnpm"],
+      "tags": ["Go", "TypeScript", "前端", "实验"],
+      "github": "https://github.com/shulanXS/Seekie",
+      "pubDatetime": "2026-05-14T14:28:14.000Z",
+      "order": 5
+    },
+    {
+      "name": "SlothAI",
+      "description": "AI 恋爱大师 Agent：基于 Spring AI 与 LangChain4j 构建，串联 RAG 知识库、Tool Calling 与 MCP，按 ReAct 模式自主调用搜索、下载等工具，能记住多轮对话的上下文并给出情绪建议。",
+      "techStack": ["Java", "Spring Boot", "Spring AI", "MCP", "PGvector"],
+      "tags": ["AI", "Agent", "Java"],
+      "github": "https://github.com/shulanXS/SlothAI",
+      "screenshot": "/uploads/slothai-chat.jpg",
+      "pubDatetime": "2025-07-06T16:54:42.000Z",
+      "order": 6
+    },
+    {
+      "name": "SlothNimbus",
+      "description": "企业级智能协同云图库：Spring Boot 加 Vue 3 与腾讯云 COS，支持公开图库、私有空间与企业团队空间的图片上传、审核、检索与实时协同编辑，用 MySQL 分库分表和多级缓存扛住素材量。",
+      "techStack": ["Java", "Spring Boot", "Vue 3", "COS", "WebSocket"],
+      "tags": ["Java", "前端", "后端"],
+      "github": "https://github.com/shulanXS/SlothNimbus",
+      "screenshot": "/uploads/slothnimbus-create.jpg",
+      "pubDatetime": "2025-07-06T17:21:04.000Z",
+      "order": 7
+    },
+    {
+      "name": "MunchGo",
+      "description": "全栈外卖平台：顾客浏览餐厅下单、商家维护菜单与订单、骑手跑配送，三端同在一个系统里流转。前后端分离，后端 Spring Boot 4 加 PostgreSQL，前端 React 19 配 Tailwind CSS。",
+      "techStack": ["Java", "Spring Boot", "React", "PostgreSQL", "TypeScript"],
+      "tags": ["Java", "TypeScript", "后端", "前端"],
+      "github": "https://github.com/shulanXS/MunchGo",
+      "pubDatetime": "2026-05-11T12:17:47.000Z",
+      "order": 8
+    },
+    {
+      "name": "OnlineOrder",
+      "description": "在线订餐系统脚手架：Spring Boot 3 与 React 的前后端分离骨架，Spring Security 加 JWT 无状态认证、Spring Data JDBC 轻量持久化、Flyway 版本化迁移，开箱即用的二次开发底座。",
+      "techStack": ["Java", "Spring Boot", "React", "PostgreSQL", "Flyway"],
+      "tags": ["Java", "TypeScript", "后端", "前端"],
+      "github": "https://github.com/shulanXS/OnlineOrder",
+      "pubDatetime": "2026-05-10T16:19:24.000Z",
+      "order": 9
+    },
+    {
+      "name": "SkyDrop 无人配送前端",
+      "description": "无人配送商超 App 的前端：React 与 Vite 实现从商品浏览、加购、结算到无人机和地面机器人配送追踪的完整流程，用 Capacitor 打包成 Android 与 iOS 应用。",
+      "techStack": ["React", "Vite", "TypeScript", "Capacitor", "Tailwind CSS"],
+      "tags": ["TypeScript", "前端", "实验"],
+      "github": "https://github.com/shulanXS/Dispatch-Delivery-App-Frontend",
+      "pubDatetime": "2026-06-10T16:15:12.000Z",
+      "order": 10
+    },
+    {
+      "name": "Target Diarization 语音分离",
+      "description": "目标说话人语音分离：把目标说话人的声音从多人混合音频里分离出来，再对所有说话人做 ASR 与说话人日志（diarization），可作为流式处理。用于处理会议与访谈录音。",
+      "techStack": ["Python", "PyTorch", "Pyannote", "ASR"],
+      "tags": ["Python", "AI", "实验"],
+      "github": "https://github.com/shulanXS/TargetDiarization",
+      "pubDatetime": "2026-01-19T06:47:09.000Z",
+      "order": 11
+    },
+    {
+      "name": "Milvus 文档相似性搜索",
+      "description": "基于 Milvus 向量数据库的最小可行产品：用 sentence-transformers 把文档向量化后入库，支持相似度搜索、增删改查与集合管理，是理解向量检索最短的一条路径。",
+      "techStack": ["Python", "Milvus", "sentence-transformers"],
+      "tags": ["Python", "RAG", "实验"],
+      "github": "https://github.com/shulanXS/Milvus-MVP",
+      "pubDatetime": "2025-12-16T01:30:38.000Z",
+      "order": 12
+    },
+    {
+      "name": "个人网站",
+      "description": "基于 Astro 与 Tailwind CSS 的个人数字空间，涵盖技术博客、碎碎念、文学创作与项目展示，支持中英双语切换与 Pagefind 全文搜索。",
+      "techStack": ["Astro", "TypeScript", "Tailwind CSS"],
+      "tags": ["Astro", "个人网站", "TypeScript", "复盘"],
+      "github": "https://github.com/shulanXS/personal-website",
+      "pubDatetime": "2026-10-30T20:41:08.000Z",
+      "featured": true,
+      "order": 13
     }
   ]
 }

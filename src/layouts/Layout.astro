@@ -4,7 +4,11 @@ import { ClientRouter } from "astro:transitions";
 import { fileUrl } from "@/utils/routes";
 import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
 import { getAssetPath } from "@/utils/withBase";
-import { useTranslations } from "@/i18n";
+import {
+  flatRuntimeTranslations,
+  formatTemplate,
+  useTranslations,
+} from "@/i18n";
 import config from "@/config";
 import "@/styles/global.css";
 
@@ -13,6 +17,14 @@ type Props = {
   description?: string;
   ogImage?: string;
   canonicalURL?: string;
+  /**
+   * Translation key of the document title.
+   *
+   * The title in the browser tab is part of the interface, so it has to
+   * follow the language switch like every other string. Without the key
+   * the title would stay in the language the page was rendered in.
+   */
+  titleKey?: string;
   /**
    * Width scale of the page shell.
    *
@@ -28,11 +40,32 @@ const t = useTranslations(site.uiLang);
 
 const {
   title = t.site.title,
-  description = t.site.description,
+  description,
   ogImage = resolveDefaultOgImagePath(config),
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  titleKey,
   width = "default",
 } = Astro.props;
+
+/*
+ * The title of the browser tab.
+ *
+ * It is composed from the dictionary, so that the separator between the
+ * page name and the site name can differ between the languages, and so
+ * that the runtime switcher can rebuild the whole title in the other
+ * language. The page name is given in `data-i18n-args` — the first
+ * argument is the name of the page, the second the name of the site.
+ */
+const dict = flatRuntimeTranslations[site.uiLang] ?? {};
+
+/*
+ * Without a key the title is left exactly as the caller wrote it — a
+ * post's own title, for instance, is the author's words and is not
+ * composed from the dictionary.
+ */
+const documentTitle = titleKey
+  ? formatTemplate(t.documentTitle, dict, [titleKey, "site.title"])
+  : title;
 
 const widthClass = {
   default: "",
@@ -96,8 +129,13 @@ const uiLang = site.uiLang;
     />
 
     <!-- Primary meta -->
-    <title>{title}</title>
-    <meta name="title" content={title} />
+    <title
+      data-i18n={titleKey ? "documentTitle" : undefined}
+      data-i18n-args={titleKey ? `${titleKey},site.title` : undefined}
+    >
+      {documentTitle}
+    </title>
+    <meta name="title" content={documentTitle} />
     <meta name="description" content={description} />
     <meta name="author" content={t.site.author} />
     <link rel="sitemap" href={getAssetPath("sitemap-index.xml")} />
@@ -212,6 +250,7 @@ const uiLang = site.uiLang;
       import "@/scripts/i18n";
       import "@/scripts/tagFilter";
       import "@/scripts/clipboard";
+      import "@/scripts/headerHeight";
     </script>
   </body>
 </html>

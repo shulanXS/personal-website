@@ -1,0 +1,33 @@
+---
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+/*
+ * The message that says that a filter has matched nothing.
+ *
+ * It is not a stray line of grey text at the foot of an empty page: a
+ * filter that matches nothing is a thing the reader *did* — they asked
+ * for a tag and got nothing — and so the message says what happened and
+ * offers the way back. Without the button the reader is left with a
+ * sentence and no way to undo the filter except by hunting for the chip
+ * they clicked.
+ *
+ * The whole block is hidden until a filter actually comes out empty, so
+ * it is written once and shown when it is needed.
+ */
+const t = useTranslations(config.site.uiLang);
+---
+
+<div class="app-tag-empty" data-tag-empty hidden>
+  <p class="app-tag-empty-text" data-i18n="tags.empty">
+    {t.tags.empty}
+  </p>
+  <button
+    type="button"
+    class="app-tag-empty-reset"
+    data-tag-empty-reset
+    data-i18n="tags.emptyReset"
+  >
+    {t.tags.emptyReset}
+  </button>
+</div>

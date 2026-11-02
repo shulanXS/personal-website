@@ -16,9 +16,22 @@ type Props = {
    * use `h3`.
    */
   headingLevel?: "h2" | "h3";
+  /**
+   * Which shape of the card to render.
+   *
+   * The *grid* shape is the one on the project page: the picture sits on
+   * top of the card and the card is as tall as the picture is wide.
+   *
+   * The *compact* shape is the one on the home page. It has the same parts
+   * in the same order — the picture, the name, the description, the tags,
+   * the links — but the picture is a little shorter and the type is a
+   * little smaller, because the card on the home page is one of a pair
+   * and is not the only thing on the page.
+   */
+  variant?: "grid" | "compact";
 };
 
-const { project, headingLevel: Heading = "h3" } = Astro.props;
+const { project, headingLevel: Heading = "h3", variant = "grid" } = Astro.props;
 
 const t = useTranslations(config.site.uiLang);
 
@@ -26,80 +39,134 @@ const tags = project.tags ?? [];
 const tagSlugs = tags.map(tagSlug);
 ---
 
-<li
-  class="app-card flex h-full flex-col p-5"
-  data-tagged-item
-  data-tags={tagSlugs.join(",")}
->
-  {
-    project.screenshot && (
-      <img
-        src={project.screenshot}
-        alt={`${project.name} screenshot`}
-        loading="lazy"
-        class="border-border mb-4 aspect-[16/9] w-full rounded border object-cover sm:aspect-[16/10]"
-      />
-    )
-  }
-  <Heading class="text-lg font-semibold">{project.name}</Heading>
-  {
-    project.description && (
-      <p class="mt-2 grow text-sm">{project.description}</p>
-    )
-  }
-  {
-    project.techStack && project.techStack.length > 0 && (
-      <ul class="mt-4 flex flex-wrap gap-2">
-        {project.techStack.map(tech => (
-          <li class="border-border text-muted-foreground rounded border px-2 py-0.5 text-xs">
-            {tech}
-          </li>
-        ))}
-      </ul>
-    )
-  }
-  {
-    tags.length > 0 && (
-      <ul class="mt-3 flex flex-wrap gap-2">
-        {tags.map(tag => (
-          <li>
-            <TagChip
-              slug={tagSlug(tag)}
-              name={tagDisplayName(tag)}
-              mode="static"
-              size="sm"
-            />
-          </li>
-        ))}
-      </ul>
-    )
-  }
-  <div class="mt-4 flex flex-wrap gap-4 text-sm">
-    {
-      project.github && (
-        <a
-          href={project.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-accent decoration-dashed underline-offset-4 hover:underline"
-        >
-          <span data-i18n="projects.github">{t.projects.github}</span>
-          <IconArrowRight class="inline-block rtl:-rotate-180" />
-        </a>
-      )
-    }
-    {
-      project.demo && (
-        <a
-          href={project.demo}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-accent decoration-dashed underline-offset-4 hover:underline"
-        >
-          <span data-i18n="projects.demo">{t.projects.demo}</span>
-          <IconArrowRight class="inline-block rtl:-rotate-180" />
-        </a>
-      )
-    }
-  </div>
-</li>
+{
+  variant === "compact" ? (
+    <li
+      class="app-card flex h-full flex-col p-4"
+      data-tagged-item
+      data-tags={tagSlugs.join(",")}
+    >
+      {project.screenshot && (
+        <img
+          src={project.screenshot}
+          alt={`${project.name} screenshot`}
+          loading="lazy"
+          class="border-border mb-3 aspect-[16/9] w-full rounded border object-cover"
+        />
+      )}
+      <Heading class="text-base leading-snug font-bold">{project.name}</Heading>
+      {project.description && (
+        <p class="text-muted-foreground mt-1.5 line-clamp-3 grow text-[0.8125rem] leading-relaxed">
+          {project.description}
+        </p>
+      )}
+      {/*
+      A project carries two sets of labels: the technologies it is built
+      with, and the site-wide tags that link it to the rest of the content.
+      Only the tags are shown — they are the ones that work across the
+      site, and the technologies are already named in the description.
+      */}
+      {tags.length > 0 && (
+        <ul class="mt-3 flex flex-wrap gap-1.5">
+          {tags.map(tag => (
+            <li>
+              <TagChip
+                slug={tagSlug(tag)}
+                name={tagDisplayName(tag)}
+                mode="static"
+                size="sm"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+      <div class="mt-3 flex flex-wrap gap-3 text-xs">
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent decoration-dashed underline-offset-4 hover:underline"
+          >
+            <span data-i18n="projects.github">{t.projects.github}</span>
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
+          </a>
+        )}
+        {project.demo && (
+          <a
+            href={project.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent decoration-dashed underline-offset-4 hover:underline"
+          >
+            <span data-i18n="projects.demo">{t.projects.demo}</span>
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
+          </a>
+        )}
+      </div>
+    </li>
+  ) : (
+    <li
+      class="app-card flex h-full flex-col p-5"
+      data-tagged-item
+      data-tags={tagSlugs.join(",")}
+    >
+      {project.screenshot && (
+        <img
+          src={project.screenshot}
+          alt={`${project.name} screenshot`}
+          loading="lazy"
+          class="border-border mb-4 aspect-[16/9] w-full rounded border object-cover sm:aspect-[16/10]"
+        />
+      )}
+      <Heading class="text-lg font-bold">{project.name}</Heading>
+      {project.description && (
+        <p class="mt-2 grow text-sm">{project.description}</p>
+      )}
+      {/*
+      A project carries two sets of labels: the technologies it is built
+      with, and the site-wide tags that link it to the rest of the content.
+      Only the tags are shown — they are the ones that work across the
+      site, and the technologies are already named in the description.
+      */}
+      {tags.length > 0 && (
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {tags.map(tag => (
+            <li>
+              <TagChip
+                slug={tagSlug(tag)}
+                name={tagDisplayName(tag)}
+                mode="static"
+                size="sm"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+      <div class="mt-4 flex flex-wrap gap-4 text-sm">
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent decoration-dashed underline-offset-4 hover:underline"
+          >
+            <span data-i18n="projects.github">{t.projects.github}</span>
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
+          </a>
+        )}
+        {project.demo && (
+          <a
+            href={project.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent decoration-dashed underline-offset-4 hover:underline"
+          >
+            <span data-i18n="projects.demo">{t.projects.demo}</span>
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
+          </a>
+        )}
+      </div>
+    </li>
+  )
+}

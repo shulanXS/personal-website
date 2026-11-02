@@ -57,25 +57,48 @@ async function withPage(ctx, fn) {
 
   // 4. dates update on language switch and match the server format
   await withPage(ctx, async (page) => {
-    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    // Only the day format carries language-specific text: the listing of
+    // the writing page shows the day alone ("2026年10月26日" / "26 Oct,
+    // 2026"), while the compact timeline date is the same numeric form in
+    // every language. The check therefore runs on the writing page.
+    await page.goto(BASE + "/writing/", { waitUntil: "networkidle" });
     await page.waitForTimeout(300);
-    // Only the full date format carries language-specific text. The compact
-    // timeline date is the same numeric form in every language.
-    const before = await page.evaluate(() => document.querySelector("time[data-date]")?.textContent?.trim());
+    const before = await page.evaluate(() => document.querySelector("time[data-date-day]")?.textContent?.trim());
     await page.locator("#lang-btn").click();
     await page.waitForTimeout(600);
-    const after = await page.evaluate(() => document.querySelector("time[data-date]")?.textContent?.trim());
+    const after = await page.evaluate(() => document.querySelector("time[data-date-day]")?.textContent?.trim());
     check("日期随语言切换更新", before !== after && /,/.test(after ?? ""), `before=${before} after=${after}`);
   });
 
-  // 5. chapter number survives a language switch
+  // 5. the chapter labels survive a language switch
+  //
+  // The listing shows the place of a chapter in its own column ("第 1 章"
+  // / "Chapter 1"), and that column has to follow the language — it is
+  // part of the interface, not part of the work.
   await withPage(ctx, async (page) => {
     await page.goto(BASE + "/writing/", { waitUntil: "networkidle" });
     await page.waitForTimeout(300);
+    const before = await page.evaluate(() => document.querySelector(".app-writing-row-label")?.textContent?.trim());
     await page.locator("#lang-btn").click();
     await page.waitForTimeout(600);
-    const txt = await page.evaluate(() => document.querySelector("[data-i18n='writing.chapterLabel']")?.parentElement?.textContent?.trim());
-    check("章节号在语言切换后保留", /\d/.test(txt ?? ""), `text=${txt}`);
+    const after = await page.evaluate(() => document.querySelector(".app-writing-row-label")?.textContent?.trim());
+    check("章节编号随语言切换更新", !!before && !!after && before !== after, `before=${before} after=${after}`);
+  });
+
+  // 5b. the numbers that describe a work follow the language
+  //
+  // The character count of a work is written for the active language:
+  // Chinese groups a count by ten thousands ("约 1.8 万字"), English
+  // separates it by thousands ("about 18,338 characters"). The count sits
+  // in the head of the series, beside the number of chapters.
+  await withPage(ctx, async (page) => {
+    await page.goto(BASE + "/writing/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(300);
+    const before = await page.evaluate(() => document.querySelector("[data-writing-characters-about]")?.textContent?.trim());
+    await page.locator("#lang-btn").click();
+    await page.waitForTimeout(600);
+    const after = await page.evaluate(() => document.querySelector("[data-writing-characters-about]")?.textContent?.trim());
+    check("字数随语言切换更新", !!before && !!after && before !== after, `before=${before} after=${after}`);
   });
 
   // 6. search widget re-initialises with new translations
@@ -155,7 +178,7 @@ async function withPage(ctx, fn) {
     const moved = [];
     for (const [name, path, sel] of [
       ["首页碎碎念", "/", 'ul[data-list-layout="notes"] > li > article'],
-      ["技术文章", "/posts/", 'ul[data-list-layout="vertical"] > li > article'],
+      ["技术文章", "/posts/", ".app-post-row"],
       ["文学创作", "/writing/", 'ul[data-list-layout="series"] > li > article'],
       ["项目", "/projects/", ".app-card"],
     ]) {

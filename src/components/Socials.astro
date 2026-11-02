@@ -119,7 +119,9 @@ const iconSizeClasses = {
                 ]}
               />
             </span>
-            <span class="sr-only">{title}</span>
+            <span class="sr-only" data-i18n={i18nKey}>
+              {title}
+            </span>
           </button>
         ) : (
           <a
@@ -142,7 +144,9 @@ const iconSizeClasses = {
                 ]}
               />
             </span>
-            <span class="sr-only">{title}</span>
+            <span class="sr-only" data-i18n={i18nKey}>
+              {title}
+            </span>
           </a>
         )
       )}

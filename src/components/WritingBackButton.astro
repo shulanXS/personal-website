@@ -1,0 +1,77 @@
+---
+import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import { routeUrl } from "@/utils/routes";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(config.site.uiLang);
+
+/*
+ * The list of works is where the reader came from, so that is where the
+ * button takes them back to. It is the fallback: the script below replaces
+ * the target with the page the reader actually left, when there was one.
+ */
+const listUrl = routeUrl(locale, "writing");
+---
+
+{/*
+  The floating button of a chapter.
+
+  It is pinned to the bottom-left corner of the viewport, because that is
+  where the thumb of a hand that is holding a phone already is, and because
+  the corner is the one place on a screen that nothing else ever wants.
+
+  It is fixed rather than sticky, so that it stays put while the chapter
+  scrolls underneath it — the reader can always find the way back without
+  having to scroll to the top of a long chapter first.
+
+  The label is inside the button rather than beside it, and it is short:
+  the button is small, and a long label would make it a banner.
+*/}
+<a
+  id="writing-back-button"
+  class="app-writing-back"
+  href={listUrl}
+  aria-label={t.writing.backToList}
+  data-i18n-attr="aria-label"
+>
+  <IconChevronLeft class="app-writing-back-icon rtl:rotate-180" />
+  <span class="app-writing-back-label" data-i18n="writing.backToList">
+    {t.writing.backToList}
+  </span>
+</a>
+
+<script>
+  /*
+   * The target of the button.
+
+   * The list of works is the obvious place to go back to, but the reader
+   * may have arrived at the chapter from somewhere else — a search result,
+   * a link in another chapter, the home page. The page that was left
+   * before this one is recorded in the session storage by the pages that
+   * can be left, so the button goes back the way the reader came whenever
+   * it can, and falls back to the list of works when it cannot.
+   */
+  function updateBackTarget(): void {
+    const button: HTMLAnchorElement | null =
+      document.querySelector<HTMLAnchorElement>("#writing-back-button");
+    if (!button) return;
+
+    const backUrl = sessionStorage.getItem("backUrl");
+    if (!backUrl) return;
+
+    // Only a URL of this site may be used: an external one would send the
+    // reader off the site from a button that says "back".
+    try {
+      const target = new URL(backUrl, window.location.origin);
+      if (target.origin !== window.location.origin) return;
+      button.href = target.pathname + target.search + target.hash;
+    } catch {
+      // A URL that cannot be parsed is simply ignored.
+    }
+  }
+
+  document.addEventListener("astro:page-load", updateBackTarget);
+  updateBackTarget();
+</script>

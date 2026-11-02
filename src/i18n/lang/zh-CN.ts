@@ -43,8 +43,17 @@ export default {
     publishedAt: "发布于",
     updatedAt: "更新于",
     sharePostIntro: "分享这篇文章：",
-    sharePostOn: "分享到 {{platform}}",
+    sharePostOn: "分享到 {{0}}",
     sharePostViaEmail: "通过邮件分享",
+    sharePlatforms: {
+      wechat: "分享到微信",
+      weibo: "分享到微博",
+      whatsapp: "分享到 WhatsApp",
+      facebook: "分享到 Facebook",
+      x: "分享到 X",
+      telegram: "分享到 Telegram",
+      pinterest: "分享到 Pinterest",
+    },
     tagLabel: "标签",
     backToTop: "回到顶部",
     goBack: "返回",
@@ -61,6 +70,16 @@ export default {
     prev: "上一页",
     next: "下一页",
     page: "页",
+  },
+  posts: {
+    /**
+     * The number of articles in a year, e.g. "7 篇".
+     *
+     * It is written on the heading of the year group, and it follows the
+     * tag filter: the figure is the number of articles the reader will
+     * actually see, not the number the year holds in total.
+     */
+    yearCount: "{{0}} 篇",
   },
   home: {
     /**
@@ -86,23 +105,63 @@ export default {
     keywords: "AI 应用 · 技术笔记 · 文学创作",
     /** The label of the RSS feed link in the hero. */
     rss: "订阅 RSS",
-    featured: "精选文章",
-    featuredProjects: "精选项目",
-    recentPosts: "最近文章",
+    /** The heading of the activity timeline on the home page. */
+    activity: "最近动态",
+    /** The sentence under the heading of the activity timeline. */
+    activityDesc:
+      "这里记录着这个站点发生过的每件事——碎碎念、文章、创作与项目，按时间排列。",
+    /** Shown when the timeline has nothing to show. */
+    activityEmpty: "还没有发布任何内容。",
+    /** The heading of the notes section on the wide layout. */
     recentNotes: "最近动态",
+    /** The heading of the projects section on the wide layout. */
+    featuredProjects: "最近项目",
+    /** The heading of the posts section on the wide layout. */
+    recentPosts: "最近文章",
+    /** The heading of the writing section on the wide layout. */
     recentWriting: "最近创作",
     allPosts: "全部文章",
     allNotes: "全部动态",
     allWriting: "全部创作",
     allProjects: "全部项目",
   },
+  /**
+   * The labels of the activity timeline.
+   */
+  activity: {
+    /** A note — a short, personal entry. */
+    note: "碎碎念",
+    /** A technical article. */
+    post: "文章",
+    /** A piece of literary work. */
+    writing: "创作",
+    /** A project. */
+    project: "项目",
+  },
   notes: {
     expand: "展开",
     collapse: "收起",
+    /** The heading of the month index beside the notes. */
+    byMonth: "按月份",
+    /** The number of notes of a month, e.g. "3 条". */
+    monthCount: "{{0}} 条",
+    /** The number of notes of a month, in the singular. */
+    monthCountOne: "{{0}} 条",
+    /** The number of notes of a month in the index — just the figure. */
+    monthCountShort: "{{0}}",
   },
   tags: {
     all: "全部",
     empty: "该标签下暂无内容。",
+    /**
+     * The button that clears the filter when nothing matched.
+     *
+     * It is the way back: without it, a reader whose filter came out
+     * empty is left with a sentence and no way to undo the filter.
+     */
+    emptyReset: "清除筛选",
+    /** The label of the level of the writing filter that holds the tags. */
+    title: "按标签",
   },
   search: {
     tagsTitle: "按标签查找",
@@ -119,10 +178,31 @@ export default {
     standalone: "独立作品",
     ongoing: "连载中",
     completed: "已完结",
-    chapter: "第",
-    chapterLabel: "第",
     tableOfContents: "作品目录",
     chapterNavigation: "章节导航",
+    chapter: "第 {{0}} 章",
+    /**
+     * The number of chapters of a series, e.g. "共 7 章".
+     *
+     * The word "共" ("in total") is there because the count is the whole
+     * of the series and not just the part that is finished: a series
+     * that is still being written has chapters too, and how many of them
+     * there are says more than whether it is over.
+     */
+    chapters: "共 {{0}} 章",
+    characters: "约 {{0}}字",
+    type: "类型",
+    chapterCount: "章节",
+    length: "字数",
+    period: "起止",
+    /** The label of the first level of the writing filter. */
+    byType: "按类型",
+    /** The label of the second level of the writing filter. */
+    byWork: "按作品",
+    /** The option that clears one level of the writing filter. */
+    allWorks: "全部作品",
+    /** The floating button that returns from a chapter to the list. */
+    backToList: "返回",
   },
   projects: {
     github: "源码",
@@ -140,6 +220,7 @@ export default {
     /** The accessible title of the CMS link. */
     manageTitle: "在 Pages CMS 中管理本站内容",
   },
+  documentTitle: "{{0}} | {{1}}",
   pages: {
     tagTitle: "标签",
     tagDesc: "该标签下的全部文章",
@@ -149,6 +230,7 @@ export default {
 
     postsTitle: "技术文章",
     postsDesc: "我写下的全部技术文章。",
+    postsEmpty: "还没有发布任何技术文章。",
 
     notesTitle: "碎碎念",
     notesDesc: "随手记录的想法、日常与片段。",
@@ -236,7 +318,6 @@ export default {
     noResults: "没有找到结果",
     goToPreviousPage: "上一页",
     goToNextPage: "下一页",
-    paginationNavigation: "分页导航",
     breadcrumb: "面包屑导航",
     rssFeed: "RSS 订阅",
     backToTop: "回到顶部",

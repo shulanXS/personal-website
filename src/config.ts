@@ -22,10 +22,16 @@ const config: ResolvedAstroPaperConfig = {
       userConfig.site.googleVerification || PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
   posts: {
-    perPage: userConfig.posts?.perPage ?? 4,
     perIndex: userConfig.posts?.perIndex ?? 4,
     scheduledPostMargin:
       userConfig.posts?.scheduledPostMargin ?? 15 * 60 * 1000,
+  },
+  home: {
+    activityLimit: userConfig.home?.activityLimit ?? 12,
+    recentNotes: userConfig.home?.recentNotes ?? 3,
+    recentPosts: userConfig.home?.recentPosts ?? 3,
+    recentWriting: userConfig.home?.recentWriting ?? 3,
+    recentProjects: userConfig.home?.recentProjects ?? 2,
   },
   features: {
     lightAndDarkMode: userConfig.features?.lightAndDarkMode ?? true,

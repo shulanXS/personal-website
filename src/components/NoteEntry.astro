@@ -1,0 +1,276 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
+import { renderMarkdown, noteFallbackTitle } from "@/utils/markdown";
+import { formatWallDate, formatFullDate } from "@/utils/formatDate";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+import TagChip from "./TagChip.astro";
+import IconChevronDown from "@/assets/icons/IconChevronDown.svg";
+
+type Props = {
+  note: CollectionEntry<"notes">;
+};
+
+const { note } = Astro.props;
+const { data, id } = note;
+
+const t = useTranslations(config.site.uiLang);
+
+/*
+ * The body of a note is Markdown, even though it is stored in a frontmatter
+ * field rather than in the body of the file. It is rendered through the
+ * same pipeline as the articles, so that a note may contain lists, quotes,
+ * emphasis and code — and look like it.
+ */
+const html = await renderMarkdown(data.content);
+
+/*
+ * A note without a title still needs a heading, because Pagefind turns every
+ * heading into its own search result ("sub result"). The first words of the
+ * note serve as that heading — visually hidden, so that the list still reads as
+ * a clean wall of notes.
+ *
+ * The text is sanitized because Pagefind parses `key:value` pairs — a colon
+ * inside the value would be read as the start of the next pair.
+ */
+const indexTitle = (
+  data.title ??
+  (noteFallbackTitle(data.content) || "note")
+).replace(/[\r\n:;]+/g, " ");
+
+const tags = data.tags ?? [];
+const tagSlugs = tags.map(tagSlug);
+
+/*
+ * The parts of the date, each written where it belongs.
+ *
+ * The day goes in the margin of the entry, and the moment of the day
+ * under it. The month and the year are not written here at all: they are
+ * the heading of the month group the note belongs to, and repeating them
+ * on every entry is what made the old date column narrow and hard to
+ * read.
+ *
+ * The home page has no month group to carry them, so there the date is
+ * written whole — "2026年10月20日" — in a single element. Splitting it
+ * into a numeric year-month and a day with a counter would put a code
+ * next to a figure, which does not read as a date.
+ */
+const stamp = data.pubDatetime;
+const when = formatWallDate(stamp, config.site.uiLang, config.site.timezone);
+const iso = new Date(stamp).toISOString();
+const fullDate = formatFullDate(
+  stamp,
+  config.site.uiLang,
+  config.site.timezone
+);
+
+/*
+ * Whether a note is *probably* long enough to be clamped.
+ *
+ * The guess is made on the server, from the length of the visible text, so
+ * that a note which is clearly long arrives already clamped — with the
+ * expand button next to it — even before the script runs. The browser then
+ * measures the note for real and corrects the guess.
+ */
+const isLong = (data.content ?? "").length > 120;
+---
+
+<article class="app-note-entry" data-tagged-item data-tags={tagSlugs.join(",")}>
+  {
+    /*
+    The date, in the margin.
+
+    Only the day is written here, in large figures, because the day is the
+    one part of the date a reader compares with "today" at a glance. The
+    weekday sits under it — the one part of a date that has to be computed
+    rather than read. The month and the year are the heading of the group
+    above, and the moment of the day is the quietest fact about the entry,
+    so it goes at the end of it.
+    */
+  }
+  <div class="app-note-entry-when" data-pagefind-ignore>
+    {
+      /*
+      The day, and the counter that goes with it.
+
+      The two are separate elements so that the counter can be written
+      smaller and quieter than the number it counts — "20" is the fact,
+      and "号" is the grammar that holds it in place.
+
+      In Chinese the counter is written out; in English the day stands on
+      its own as a bare number.
+      */
+    }
+    <b class="app-note-entry-day">
+      <span data-date-day-only={iso}>{when.day}</span>
+      <span class="app-note-entry-counter" data-date-day-counter={iso}>
+        {when.counter}
+      </span>
+    </b>
+    {
+      /*
+      The moment of the day, under the day.
+
+      It belongs to the date rather than to the foot of the entry: the
+      two facts — the day and the moment — are one piece of information,
+      and the moment was the one that had been pushed away from them.
+
+      The weekday is not written at all. It is the one part of a date
+      that has to be computed rather than read, and a reader who wants
+      to know it can see it in a calendar; writing it in the margin of
+      every entry spent a line of the narrowest column on the least
+      useful fact about the note.
+      */
+    }
+    <span class="app-note-entry-time">
+      <time datetime={iso} data-date-stacked-time={iso}>{when.time}</time>
+    </span>
+    {
+      /*
+      The whole date, written only where there is no month group to carry
+      the year and the month — the home page's section of recent notes. On
+      the listing the group heading says them instead, and repeating them
+      here would say the same thing twice on the same screen.
+
+      It is written as one piece — "2026年10月20日" — because that is what a
+      date is. Written as a numeric year-month beside a day with a
+      counter ("2026.10" and "20号"), it reads as a code next to a figure.
+      */
+    }
+    <span class="app-note-entry-month" data-date-full={iso}>
+      {fullDate}
+    </span>
+  </div>
+
+  <div class="app-note-entry-body">
+    {
+      /*
+      The heading gives every note its own search result. For a note that
+      has a title it is the visible title; for an untitled note it is a
+      hidden fallback so that the entry is still findable and still shows
+      up as a sub result under the listing.
+
+      The `id` matters: Pagefind turns a heading with an id into a
+      sub result that links straight to this note.
+      */
+    }
+    {
+      data.title ? (
+        <h2 id={`note-${id}`} class="app-note-entry-title">
+          {data.title}
+        </h2>
+      ) : (
+        <h2 id={`note-${id}`} class="sr-only">
+          {indexTitle}
+        </h2>
+      )
+    }
+
+    {
+      data.content && (
+        <div
+          class:list={[
+            "app-prose app-note-entry-prose",
+            { "app-note-body-clamped": isLong },
+          ]}
+          data-note-body
+          data-note-long={isLong ? "true" : "false"}
+          data-note-expanded="false"
+          set:html={html}
+        />
+      )
+    }
+
+    {
+      data.images && data.images.length > 0 && (
+        <ul class="app-note-entry-images">
+          {data.images.map((src, index) => {
+            const alt = data.imageAlts?.[index] ?? "";
+            return (
+              <li>
+                <img
+                  src={src}
+                  alt={alt}
+                  loading="lazy"
+                  width={400}
+                  height={300}
+                  class="border-border h-full w-full rounded border object-cover"
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )
+    }
+
+    {
+      /*
+      The button is always in the markup, but hidden unless the note
+      really overflows its clamp. The server guesses from the length of
+      the text; the browser measures the rendered height and corrects the
+      guess.
+      */
+    }
+    <div
+      class="app-note-entry-expand-wrap"
+      data-note-expand-wrap
+      hidden={!isLong}
+    >
+      <button
+        type="button"
+        class="app-note-expand"
+        data-note-expand
+        aria-expanded="false"
+      >
+        <IconChevronDown class="app-note-expand-icon" />
+        <span data-note-label-expand data-i18n="notes.expand">
+          {t.notes.expand}
+        </span>
+        <span data-note-label-collapse data-i18n="notes.collapse" hidden>
+          {t.notes.collapse}
+        </span>
+      </button>
+    </div>
+
+    {
+      /*
+      The foot of the entry: the tags.
+
+      The tags are aligned with the text above them rather than with the
+      edge of the column, so that the eye reads them as belonging to the
+      words and not as a separate row of metadata. The chip carries its
+      own padding, and that padding is what has to be cancelled out —
+      otherwise the label of the first chip would sit a little to the
+      right of the first character of the note.
+      */
+    }
+    <div class="app-note-entry-foot">
+      {
+        tags.length > 0 && (
+          <ul class="app-note-entry-tags" data-pagefind-ignore>
+            {tags.map(tag => (
+              <li>
+                <TagChip
+                  slug={tagSlug(tag)}
+                  name={tagDisplayName(tag)}
+                  mode="static"
+                  size="sm"
+                />
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+</article>
+
+<script>
+  /*
+    The clamp and the expand button belong to the note, so the script that
+    drives them is imported here rather than by the list that holds the
+    notes.
+  */
+  import "@/scripts/noteClamp";
+</script>

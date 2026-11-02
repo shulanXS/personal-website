@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="field" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="hsl(252 35% 51%)" />
+      <stop offset="100%" stop-color="hsl(238 39% 39%)" />
+    </linearGradient>
+    <linearGradient id="haze" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="hsl(268 27% 69%)" stop-opacity="0.42" />
+      <stop offset="65%" stop-color="hsl(268 27% 69%)" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="hsl(238 30% 93%)" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="hsl(238 39% 39%)" stop-opacity="0.28" />
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="800" fill="url(#field)" />
+  <rect width="600" height="800" fill="url(#haze)" />
+
+  <!--
+    The horizon.
+
+    A cold field and a pale band of water below it. The band is a
+    gradient rather than a line, because a river seen from a distance is
+    not a line.
+  -->
+  <rect x="0" y="512" width="600" height="288" fill="url(#water)" />
+  <rect x="0" y="512" width="600" height="1" fill="hsl(238 30% 93%)" opacity="0.4" />
+
+  <!-- The spine: the band down the left edge of a bound book. -->
+  <rect x="0" y="0" width="16" height="800" fill="#000" opacity="0.18" />
+</svg>

@@ -61,6 +61,15 @@ export interface UIStrings {
     sharePostIntro: string;
     sharePostOn: string;
     sharePostViaEmail: string;
+    /**
+     * The label of each sharing button, keyed by platform.
+     *
+     * One entry per platform rather than one template plus a parameter,
+     * because the platform's own name differs between the languages —
+     * 微信 in Chinese, WeChat in English — and a parameter would freeze
+     * whichever one the page was rendered with.
+     */
+    sharePlatforms: Record<string, string>;
     tagLabel: string;
     backToTop: string;
     goBack: string;
@@ -78,6 +87,16 @@ export interface UIStrings {
     next: string;
     page: string;
   };
+  posts: {
+    /**
+     * The number of articles in a year, e.g. "7 篇" / "7 posts".
+     *
+     * It is written on the heading of the year group, and it follows the
+     * tag filter: the figure is the number of articles the reader will
+     * actually see, not the number the year holds in total.
+     */
+    yearCount: string;
+  };
   home: {
     /**
      * The one-line identity shown above the name in the hero section.
@@ -93,21 +112,71 @@ export interface UIStrings {
     keywords: string;
     /** The label of the RSS feed link in the hero. */
     rss: string;
-    featured: string;
-    featuredProjects: string;
-    recentPosts: string;
+    /** The heading of the activity timeline on the home page. */
+    activity: string;
+    /** The sentence under the heading of the activity timeline. */
+    activityDesc: string;
+    /** Shown when the timeline has nothing to show. */
+    activityEmpty: string;
+    /** The heading of the notes section on the wide layout. */
     recentNotes: string;
+    /** The heading of the projects section on the wide layout. */
+    featuredProjects: string;
+    /** The heading of the posts section on the wide layout. */
+    recentPosts: string;
+    /** The heading of the writing section on the wide layout. */
     recentWriting: string;
     allPosts: string;
     allNotes: string;
     allWriting: string;
     allProjects: string;
   };
+  /**
+   * The labels of the activity timeline.
+   *
+   * The timeline holds every kind of content at once, so each entry needs
+   * to say what kind of thing it is.
+   */
+  activity: {
+    /** A note — a short, personal entry. */
+    note: string;
+    /** A technical article. */
+    post: string;
+    /** A piece of literary work. */
+    writing: string;
+    /** A project. */
+    project: string;
+  };
   notes: {
     /** Label of the button that expands a clamped note in place. */
     expand: string;
     /** Label of the button that collapses an expanded note again. */
     collapse: string;
+    /**
+     * The heading of the month index beside the notes.
+     *
+     * The index is a way to find a note by the month it was written in, so
+     * the heading says what the column lists.
+     */
+    byMonth: string;
+    /**
+     * The number of notes of a month, e.g. "3 条" / "3 notes".
+     *
+     * The number is supplied by the page as `{{0}}`, so the label follows
+     * the interface language. The English form needs a singular of its
+     * own — "1 note" and "2 notes" are two different words — so the
+     * count is written in one of two keys.
+     */
+    monthCount: string;
+    /**
+     * The number of notes of a month, in the singular: "1 条" / "1 note".
+     */
+    monthCountOne: string;
+    /**
+     * The number of notes of a month in the month index, where there is
+     * no room for the word itself: just the figure.
+     */
+    monthCountShort: string;
   };
   /**
    * The tag system.
@@ -121,6 +190,18 @@ export interface UIStrings {
     all: string;
     /** Shown when a tag filter matches nothing. */
     empty: string;
+    /**
+     * The button that clears the filter when nothing matched.
+     *
+     * It is the way back: without it, a reader whose filter came out
+     * empty is left with a sentence and no way to undo the filter.
+     */
+    emptyReset: string;
+    /**
+     * The label of the level of the writing filter that holds the tags,
+     * e.g. "按标签".
+     */
+    title: string;
   };
   /**
    * The tag search on the search page.
@@ -142,10 +223,62 @@ export interface UIStrings {
     standalone: string;
     ongoing: string;
     completed: string;
-    chapter: string;
-    chapterLabel: string;
     tableOfContents: string;
     chapterNavigation: string;
+    /**
+     * The label of a chapter's number in a listing, e.g. "第 3 章".
+     *
+     * The number is supplied by the page as `{{0}}`, so that the same
+     * label serves a series of any length.
+     */
+    chapter: string;
+    /**
+     * The number of chapters of a series, e.g. "共 7 章".
+     *
+     * The count is the whole of the series, whether it is finished or
+     * not — a series that is still being written has chapters too.
+     */
+    chapters: string;
+    /**
+     * The length of a work, e.g. "约 2.6 万字".
+     *
+     * The count itself is supplied by the page as `{{0}}`, already
+     * formatted for the active language.
+     */
+    characters: string;
+    /**
+     * The label of the kind of a work, e.g. "类型".
+     */
+    type: string;
+    /**
+     * The label of the number of chapters, e.g. "章节".
+     */
+    chapterCount: string;
+    /**
+     * The label of the length of a work, e.g. "字数".
+     */
+    length: string;
+    /**
+     * The label of the period a work spans, e.g. "起止".
+     */
+    period: string;
+    /**
+     * The label of the first level of the writing filter, e.g. "按类型".
+     */
+    byType: string;
+    /**
+     * The label of the second level of the writing filter, e.g. "按作品".
+     */
+    byWork: string;
+    /**
+     * The option that clears one level of the writing filter, e.g. "全部作品".
+     */
+    allWorks: string;
+    /**
+     * The label of the floating button that returns from a chapter to the
+     * list of works, e.g. "返回".
+     */
+    backToList: string;
   };
   projects: {
     github: string;
@@ -163,6 +296,14 @@ export interface UIStrings {
     /** The accessible title of the CMS link. */
     manageTitle: string;
   };
+  /**
+   * The title of the browser tab.
+   *
+   * `{{0}}` is the name of the page and `{{1}}` the name of the site. The
+   * separator lives in the dictionary so that a language may order the
+   * two differently.
+   */
+  documentTitle: string;
   pages: {
     tagTitle: string;
     tagDesc: string;
@@ -172,6 +313,7 @@ export interface UIStrings {
 
     postsTitle: string;
     postsDesc: string;
+    postsEmpty: string;
 
     notesTitle: string;
     notesDesc: string;
@@ -261,7 +403,6 @@ export interface UIStrings {
     noResults: string;
     goToPreviousPage: string;
     goToNextPage: string;
-    paginationNavigation: string;
     breadcrumb: string;
     rssFeed: string;
     backToTop: string;

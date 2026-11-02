@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./theme.css";
 @import "./typography.css";
+@import "./reading-font.css";
 @import "rehype-callouts/theme/obsidian";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -107,6 +108,34 @@
      * page, and the site would stop reading as one application.
      */
     --app-chrome-width: var(--container-6xl);
+    /*
+     * The height of the header bar.
+     *
+     * The bar is sticky, so anything that also sticks has to sit below it
+     * rather than on top of it, and anything that is jumped to has to land
+     * below it rather than under it. The height is not a fixed number —
+     * the bar is two rows tall on a phone and one row tall on a wide
+     * screen — so it is measured and published by
+     * `@/scripts/headerHeight`. The value here is the fallback for the
+     * moment before the script runs, and for the pages where the bar is
+     * the tall one.
+     */
+    --app-header-height: 5rem;
+    /*
+     * The space between the header and the thing that sits below it.
+     *
+     * The header is a band of light and the page is a sheet of paper
+     * below it; a thing that touches the header looks cut off rather than
+     * tucked under.
+     */
+    --app-header-gap: 0.75rem;
+    /*
+     * The offset that keeps a thing clear of the header.
+     *
+     * It is the height of the header plus the gap above, and it is what
+     * `scroll-margin-top` is set to.
+     */
+    --app-header-offset: calc(var(--app-header-height) + var(--app-header-gap));
   }
 
   @media (min-width: 40rem) {
@@ -687,51 +716,324 @@
   }
 
   /*
-   * The notes timeline.
+   * The articles listing — a table of contents grouped by year.
    *
-   * A single column read from top to bottom, with a vertical rule on the
-   * left and a node dot per entry. The date sits in a narrow column to the
-   * left of the rule, so the moment a note was written is obvious without
-   * having to read the whole entry.
+   * The listing is not a stack of cards. A card says "here is an object,
+   * look at it", and an article list is not a shelf of objects: it is an
+   * index, read the way a book is read — down the page, along the line of
+   * dates.
    *
-   * Each entry is a raised panel: on the warm page tone it reads as a
-   * sheet of paper lying on the desk rather than as text floating in white
-   * space.
+   * So the entries are rows, separated by a hairline rather than by a gap,
+   * and each row carries a column of its own on the left for the date.
+   * The year is not written on the rows — it is the heading of the group
+   * above them — so what is left in that column is the month and the day,
+   * and the day numbers line up under each other into a line the eye can
+   * scan straight down.
+   */
+  .app-posts-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-8);
+    margin-top: var(--app-space-6);
+  }
+
+  /*
+   * The head of a year group.
    *
-   * The three parts — rule, date, panel — are laid out with a grid, so the
-   * date column is exactly as wide as it needs to be whatever the length
-   * of the timestamp.
+   * The rule that follows the count fades out towards the right, so that
+   * it reads as the beginning of a section rather than as a box drawn
+   * around it. A rule that ran all the way across would close the group
+   * off; one that fades says "this continues".
+   */
+  .app-posts-group-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--app-space-3);
+    margin-bottom: var(--app-space-2);
+  }
+
+  .app-posts-group-year {
+    margin: 0;
+    font-size: 1.375rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .app-posts-group-count {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-posts-group-rule {
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /*
+   * The rows of a year group.
+   *
+   * The rule is drawn on the row rather than on the list, so that it stops
+   * at the last row instead of running past it.
+   */
+  .app-posts-group-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .app-posts-group-list > li {
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+  }
+
+  .app-posts-group-list > li:last-child {
+    border-bottom: 0;
+  }
+
+  /*
+   * A row of the table of contents.
+   *
+   * The date column is right-aligned against the body, so that the days
+   * line up in a column of their own instead of raggedly following the
+   * length of the month name.
+   */
+  .app-post-row {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    column-gap: var(--app-space-6);
+    align-items: baseline;
+    padding: var(--app-space-4) 0;
+  }
+
+  .app-post-row-date {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /*
+   * The date is right-aligned against the body of the row, so that the
+   * days line up in a column of their own instead of raggedly following
+   * the length of the month name.
+   *
+   * The date element is a flex row (it may carry an icon and an
+   * "updated" marker), and a flex row ignores the `text-align` of its
+   * parent — its children are placed by `justify-content`, which starts
+   * at the left. The alignment therefore has to be asked for here.
+   */
+  .app-post-row-date > div {
+    justify-content: flex-end;
+  }
+  /*
+   * The body of a row.
+   *
+   * `min-width: 0` lets the long lines inside it break instead of
+   * pushing the grid wider than the page.
+   */
+  .app-post-row-body {
+    min-width: 0;
+  }
+
+  /*
+   * The title of a row.
+   *
+   * It is set larger than the text around it, because it is the one thing
+   * on the row that the reader is looking for.
+   */
+  .app-post-row-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .app-post-row-title h2 {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  /*
+   * The summary of a row.
+   *
+   * Two lines are enough to say what the article is about; the rest is one
+   * click away, and a summary that runs on says nothing.
+   */
+  .app-post-row-desc {
+    margin: 0.25rem 0 0;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    max-width: 72ch;
+  }
+
+  .app-post-row-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /*
+   * The tags are flush with the title and the summary above them.
+   *
+   * The chip is a plain label with a hash in front of it — no border, no
+   * pill — so the hash is the leftmost thing the eye sees on the row, and
+   * the hash is what has to line up with the title.
+   *
+   * The chip's own left padding would push that hash to the right of the
+   * title above it, so the flush chip gives the label no left padding at
+   * all. The hash then starts on exactly the same vertical line as the
+   * first character of the title.
+   *
+   * The hash is a drawing, and a drawing carries a little air inside its
+   * own box: the `#` is drawn from a quarter of the way in. That air is
+   * taken back here, so that it is the *ink* of the hash — not its box —
+   * that sits on the line with the title.
+   */
+  .app-tag-flush {
+    position: relative;
+  }
+
+  .app-tag-flush .app-tag-flush-hash {
+    margin-inline-start: -0.11rem;
+  }
+
+  /*
+   * The empty state of a filter.
+   *
+   * It is not a stray grey line at the foot of an empty page. A filter
+   * that matches nothing is something the reader *did* — they asked for
+   * a tag and got nothing — so the message says what happened, and the
+   * button beside it is the way back. Without the button the reader is
+   * left with a sentence and no way to undo the filter except by hunting
+   * for the chip they clicked.
+   *
+   * The block is set as a small card rather than as plain text: it is
+   * the only thing on the page, and it should read as a state the page
+   * is in rather than as a paragraph that failed to load.
+   */
+  .app-tag-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    max-width: 32rem;
+    margin-top: 2rem;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+    border-radius: 0.5rem;
+    background: color-mix(in oklab, var(--muted) 35%, transparent);
+  }
+
+  .app-tag-empty-text {
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  .app-tag-empty-reset {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--muted-foreground);
+    transition:
+      color var(--app-transition) ease,
+      border-color var(--app-transition) ease;
+  }
+
+  .app-tag-empty-reset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .app-tag-empty-reset:focus-visible {
+    outline: 2px dashed var(--accent);
+    outline-offset: 2px;
+  }
+
+  /*
+   * On a phone the date column is narrowed and the summary is dropped.
+   *
+   * A summary is the first thing a reader skips on a small screen, and the
+   * rows themselves are what a phone is good at showing: many of them,
+   * one screenful at a time.
+   */
+  @media (max-width: 40rem) {
+    .app-post-row {
+      /*
+       * The date column has to hold the longest month-day there is,
+       * "12月28日". The column is 4rem, and the text is right-aligned
+       * inside it, so the days line up in a column of their own and
+       * nothing spills over the edge of the page.
+       */
+      grid-template-columns: 4rem minmax(0, 1fr);
+      column-gap: var(--app-space-3);
+      padding: var(--app-space-3) 0;
+    }
+
+    .app-post-row-title {
+      font-size: 0.9375rem;
+    }
+
+    .app-post-row-desc {
+      display: none;
+    }
+  }
+
+  /*
+   * The list of notes.
+   *
+   * The notes listing itself is drawn by the *notes wall* (see below) —
+   * the month groups, the index and the entries. What is left here is
+   * the list that the home page's section of recent notes uses, which
+   * holds three notes and no month groups.
+   *
+   * The date of a note in that list is the home page's own business:
+   * there is no group heading to carry the month, so the entry writes
+   * it out itself.
    */
   ul[data-list-layout="notes"] {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--app-space-5);
+    gap: 0;
   }
 
   ul[data-list-layout="notes"] > li {
     position: relative;
-    display: grid;
-    grid-template-columns: 1fr;
-    column-gap: var(--app-space-5);
-    row-gap: var(--app-space-2);
   }
 
   /*
-   * The date column.
+   * The date of a note.
    *
-   * On a phone the date sits above the entry. From `sm` upwards it moves
-   * into its own column on the left of the rule, where it becomes the axis
-   * of the timeline.
+   * The activity timeline on the home page shares the class, because it
+   * holds a note in the same shape and shows the same date.
    */
-  ul[data-list-layout="notes"] .app-timeline-date {
+  :is(ul[data-list-layout="notes"], ul[data-list-layout="activity"])
+    .app-timeline-date {
     color: var(--muted-foreground);
     font-size: 0.8125rem;
     line-height: 1.5;
     font-variant-numeric: tabular-nums;
   }
 
-  ul[data-list-layout="notes"] .app-timeline-date time {
+  :is(ul[data-list-layout="notes"], ul[data-list-layout="activity"])
+    .app-timeline-date
+    time {
     display: block;
   }
 
@@ -757,311 +1059,366 @@
       align-items: stretch;
       gap: 0;
     }
-  } /*
-   * The bubble that holds one entry.
+  }
+
+  /*
+   * The activity timeline.
    *
-   * A note is a message, and a message has a shape: a rounded panel with a
-   * small tail on its left edge. The article is only the container that
-   * holds the bubble — it is transparent, so that the bubble reads as the
-   * actual object rather than as a frame around one.
+   * The timeline holds every kind of content at once, and it is drawn as
+   * one continuous column of entries separated by hairlines — a table of
+   * contents, rather than a stack of cards.
    *
-   * The bubble is a flat surface rather than the old lit-from-above
-   * gradient: the tail has to be filled with exactly the same colour as
-   * the bubble, and a gradient would leave the tail a different shade.
-   * The sense of depth comes from the hairline and the shadow instead.
+   * Nothing on it has a frame. A card is a thing that stands apart from
+   * its neighbours, and a timeline is the opposite of that: it is a
+   * sequence, and every entry is a line in it. The earlier version gave
+   * each kind its own shape — a bubble, a ruled card, a bare block, a
+   * raised panel — and the result read as four separate sections
+   * stitched together rather than as one axis.
    *
-   * The bubble does not move when the pointer passes over it. A list of
-   * notes is read from top to bottom; a panel that jumped under the
-   * pointer would move the text out from under the reader.
+   * The four kinds are told apart by three quiet means instead:
+   *
+   *   * An icon, so that the kind can be read without reading a word.
+   *   * The face the title is set in — a literary work is set in the
+   *     serif face, a project in the mono face, because those are the
+   *     two that are read as something other than prose.
+   *   * The weight of the summary below the title.
+   *
+   * The palette stays the site's own: one warm page, one hairline, one
+   * accent. A fourth colour on the timeline would pull it away from the
+   * rest of the site.
    */
-  ul[data-list-layout="notes"] > li > article {
-    position: relative;
+
+  /*
+   * The list itself.
+   *
+   * The entries are separated by a hairline instead of by a rule with
+   * nodes on it: the rule belongs to the notes listing, whose bubbles
+   * point at it. Here the separation is horizontal, and the whole column
+   * reads as one page of text.
+   */
+  ul[data-list-layout="activity"] {
     display: flex;
-    align-items: flex-start;
-    /*
-     * The padding on the left is the room the tail needs: the tail is
-     * drawn outside the bubble, and without the padding it would hang off
-     * the edge of the content column — and off the edge of the screen on
-     * a phone.
-     */
-    padding-left: 0.75rem;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
+    flex-direction: column;
+    row-gap: 0;
+  }
+
+  ul[data-list-layout="activity"] > li {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: var(--app-space-6);
+    row-gap: var(--app-space-2);
+    padding-block: var(--app-space-4);
+    border-top: 1px solid var(--border);
+  }
+
+  ul[data-list-layout="activity"] > li:first-child {
+    border-top: none;
+    padding-top: var(--app-space-1);
   }
 
   /*
-   * The column that holds the bubble.
+   * From `sm` upwards the date moves into a column of its own on the left
+   * of the entries.
    *
-   * `min-width: 0` lets the long lines inside the bubble break instead of
-   * pushing the column wider than the page.
+   * The column is as wide as the longest line it has to hold — the day,
+   * "2026.10.28" — and not one pixel more. A narrower column would push
+   * the day out of the column and across the gap.
    */
-  ul[data-list-layout="notes"] .app-note-column {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  ul[data-list-layout="notes"] .app-note-bubble {
-    position: relative;
-    /*
-     * The outline is a ring rather than a border. A border is drawn inside
-     * the element's box, and the tail's stroke runs past the corner the
-     * border would stop at — the two would not meet, and the bubble would
-     * look as though it had been cut out of a frame. A ring is drawn
-     * outside the box, so the bubble's outline and the tail's outline lie
-     * on the same line.
-     */
-    box-shadow:
-      0 0 0 1px var(--app-bubble-border, var(--border)),
-      var(--app-shadow),
-      inset 0 1px 0
-        color-mix(in oklab, var(--surface-raised) 90%, var(--foreground));
-    background: var(--app-bubble-bg, var(--app-bubble-fill));
-    /*
-     * Every corner is rounded — the top-left one included. The tail is
-     * built out of the bubble's own top-left corner (see below), so a
-     * square corner here would break the curve where the two meet.
-     *
-     * The radius is the bubble's own, not the site's standard one: it has
-     * to match the 1rem curve of the tail's wedge, or the two outlines
-     * would meet in a step instead of running into each other.
-     */
-    border-radius: var(--app-radius-bubble);
-    padding: var(--app-space-4) var(--app-space-5);
-    transition:
-      box-shadow var(--app-transition) ease,
-      background-color var(--app-transition) ease;
-  }
-
-  /*
-   * The tail.
-   *
-   * The shape Apple Messages draws: a wedge whose top-right corner is
-   * rounded off, with a second piece of the page background laid over
-   * its left half to carve the crescent out of it. What is left is the
-   * tail — a crescent whose tip points up and to the left, into the empty
-   * space where the speaker would be.
-   *
-   * The wedge is not glued to the side of the bubble: it is placed at the
-   * bubble's top-left corner, overlapping it, so that the crescent's
-   * upper edge runs into the bubble's own rounded corner and its lower
-   * edge runs into the bubble's left edge. The two outlines meet without
-   * a step, and the bubble reads as one shape rather than as a rectangle
-   * with a spike glued to its side.
-   *
-   * The crescent is a single shape rather than two overlapping boxes. The
-   * reference builds it by laying a page-coloured box over the wedge, but
-   * that paints over whatever stroke lies underneath it. An outline that
-   * runs beneath the cut is simply erased, which is why a tail built this
-   * way cannot carry a complete border: the cut takes the left half of
-   * the stroke with it, and the outer arc — which the reference never
-   * strokes, because it has no border — is left with none at all.
-   *
-   * So the crescent is drawn as one path instead: the wedge, minus the
-   * cut, filled in a single even-odd shape. Nothing is painted over
-   * anything, and the outline of the tail can be drawn on top of it in
-   * one unbroken stroke.
-   *
-   * The tail takes its colours from the same custom properties as the
-   * bubble, so the two stay in step when the pointer passes over the entry.
-   */
-  ul[data-list-layout="notes"] .app-note-bubble::before {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    /*
-     * The wedge sits at the bubble's top-left corner, overlapping it: it
-     * starts a little to the left of the bubble's edge and runs down over
-     * the corner, so that the crescent's lower edge runs into the bubble's
-     * left border and its upper edge runs into the bubble's top border.
-     *
-     * The three numbers are the wedge of the reference: 18 wide, 20 tall,
-     * its top-right corner rounded off with a 16px radius.
-     */
-    left: -0.5rem;
-    top: 0;
-    width: 1.125rem;
-    height: 1.25rem;
-    background: var(--app-bubble-bg, var(--app-bubble-fill));
-    /*
-     * The path is in the wedge's own box, whose origin is the wedge's
-     * top-left corner — 8px to the left of the bubble's edge.
-     *
-     *   M0 0         the wedge's top-left corner
-     *   L2 0         along the top edge to where the arc begins
-     *   A16 16       the outer arc, down to the wedge's right edge
-     *   L18 20       down the right edge
-     *   L8 20        back along the bottom edge to the cut
-     *   L8 10        up the cut's right edge
-     *   A10 10       the cut's own arc, closing the crescent
-     *
-     * `evenodd` is what makes the cut a hole rather than a second shape:
-     * both sub-paths are filled, and the region they share — the part of
-     * the wedge the cut covers — is left empty.
-     */
-    clip-path: path(
-      evenodd,
-      "M0 0L2 0A16 16 0 0 1 18 16L18 20L8 20L8 10A10 10 0 0 0 0 0.2Z"
-    );
-    transition: background-color var(--app-transition) ease;
-  }
-
-  /*
-   * The outline of the tail.
-   *
-   * One path, stroked in one piece, tracing the crescent from end to end:
-   * the wedge's outer arc, its top edge, its left edge, the cut's arc,
-   * and a short run down the bubble's left edge. At both ends it runs
-   * into the bubble's own ring, so the two continue into each other as
-   * one unbroken line rather than stopping beside each other.
-   *
-   * The path is drawn as a stroke inside a masked box rather than as a
-   * border, because a stroke can follow the arc exactly — a border can
-   * only ever be a rectangle.
-   */
-  ul[data-list-layout="notes"] .app-note-bubble::after {
-    content: "";
-    position: absolute;
-    z-index: 3;
-    /*
-     * The box the path is drawn in. It starts a little to the left of and
-     * a little above the bubble's corner, so that the stroke has room to
-     * run around the outside of the bubble's top-left corner.
-     */
-    left: -0.6875rem;
-    top: -0.1875rem;
-    width: 2.125rem;
-    height: 1.625rem;
-    background: var(--app-bubble-border, var(--border));
-    /*
-     * The mask is the stroke itself: an SVG path, one pixel wide, in
-     * white on a transparent background. The box is filled with the
-     * border colour and the mask cuts everything away but the stroke.
-     *
-     * The path is in the box's own coordinates, whose origin is 11px to
-     * the left of and 3px above the bubble's top-left corner:
-     *
-     *   M16.174 7.548   where the tail's outer arc leaves the bubble
-     *   A16 16          the tail's outer arc, back up to its top
-     *   L5 3            along the wedge's top edge
-     *   L3 3            along the wedge's left edge
-     *   A10 10          the cut's arc, down to the bubble's left edge
-     *   L11 16          down the bubble's left edge, into its ring
-     */
-    -webkit-mask-image: var(--app-note-tail-outline);
-    mask-image: var(--app-note-tail-outline);
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    pointer-events: none;
-    transition: background-color var(--app-transition) ease;
-  }
-
-  ul[data-list-layout="notes"] > li:hover {
-    /*
-     * The hover tints the bubble rather than lifting it, and it tints the
-     * wedge of the tail along with it — both read the same custom
-     * property, so the tail can never drift a shade away from the bubble
-     * it belongs to.
-     */
-    --app-bubble-bg: color-mix(
-      in oklab,
-      var(--accent) 6%,
-      var(--app-bubble-fill)
-    );
-    --app-bubble-border: color-mix(in oklab, var(--accent) 40%, var(--border));
-  }
   @media (min-width: 40rem) {
-    ul[data-list-layout="notes"] > li {
-      /*
-       * The date column is as wide as the longest line it has to hold — the
-       * day, "2026.10.28" — and not one pixel more. A narrower column
-       * would push the text out of the column and across the rule.
-       */
+    ul[data-list-layout="activity"] > li {
       grid-template-columns: 5.5rem 1fr;
-      row-gap: 0;
     }
 
     /*
-     * The date sits in its own column, right-aligned against the rule so
-     * that the days line up in a column of their own and the eye can scan
-     * down the axis without reading any of them.
+     * The date is right-aligned against the entries so that the days
+     * line up in a column of their own and the eye can scan down the axis
+     * without reading any of them.
      */
-    ul[data-list-layout="notes"] .app-timeline-date {
+    ul[data-list-layout="activity"] .app-timeline-date {
       text-align: right;
       padding-top: 0.0625rem;
     }
+  }
 
-    /*
-     * The rule that runs through all the nodes.
-     *
-     * It sits in the middle of the gap between the date column and the
-     * panel, so that the dates and the panels are the same distance from
-     * it on either side. The rule fades out at both ends, so that it reads
-     * as a continuation of the axis rather than as a box drawn around the
-     * list.
-     */
-    ul[data-list-layout="notes"]::before {
-      content: "";
-      position: absolute;
-      left: 6.0625rem;
-      top: 0.5rem;
-      bottom: 0.5rem;
-      width: 1px;
-      background: linear-gradient(
-        180deg,
-        transparent,
-        var(--border) 6%,
-        var(--border) 94%,
-        transparent
-      );
-    }
+  /*
+   * The body of an entry.
+   */
+  ul[data-list-layout="activity"] .app-activity-entry {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-2);
+  }
 
-    /*
-     * The dot that marks the entry on the rule.
-     *
-     * It is centred on the rule, and it sits level with the *tip of the
-     * bubble's tail* — the two belong together, so that the eye reads the
-     * tail as pointing at the node it marks rather than at the panel
-     * beside it.
-     *
-     * The tip is at the top of the bubble, and the bubble starts at the
-     * top of the entry, so the dot's centre has to be a half of its own
-     * height above the entry's top edge: `top` is negative by exactly
-     * half the dot's diameter.
-     */
-    ul[data-list-layout="notes"] > li::before {
-      content: "";
-      position: absolute;
-      left: 5.875rem;
-      top: -0.1875rem;
-      width: 0.375rem;
-      height: 0.375rem;
-      border-radius: 9999px;
-      border: 1px solid var(--border);
-      background: var(--background);
-      transition:
-        border-color 200ms ease,
-        background-color 200ms ease;
-    }
+  /*
+   * The header of an entry: the kind of the thing, and its title.
+   *
+   * The icon and the label come first and the title second, so that the
+   * line of titles down the page stays aligned — every entry begins at
+   * the same x, and the eye can run down the titles alone.
+   */
+  ul[data-list-layout="activity"] .app-activity-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--app-space-2) var(--app-space-3);
+    min-height: 1.25rem;
+  }
 
-    ul[data-list-layout="notes"] > li:hover::before {
-      border-color: var(--accent);
-      background: var(--accent);
-    }
+  /*
+   * The label of the kind.
+   *
+   * It carries an icon rather than a colour. An icon says "this is a
+   * note" without introducing a hue the rest of the site does not have.
+   *
+   * The label is set in the foreground colour and given a border and a
+   * filled ground, so that it reads as a badge rather than as another
+   * line of muted metadata. It is the one thing on the entry that tells
+   * the reader what kind of thing they are looking at, and it has to be
+   * findable without reading the title.
+   */
+  ul[data-list-layout="activity"] .app-activity-kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--muted) 65%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    padding: 0.0625rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  ul[data-list-layout="activity"] .app-activity-kind-icon {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    flex: none;
+  }
+
+  /*
+   * The title of an entry.
+   *
+   * The face depends on the kind: a literary work is set in the serif
+   * face, a project in the mono face. Those are the two kinds that are
+   * not prose — a chapter is read like a book, a project is named like
+   * a repository — and the face says so before the title is read.
+   */
+  ul[data-list-layout="activity"] .app-activity-title {
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  ul[data-list-layout="activity"]
+    li[data-activity-kind="writing"]
+    .app-activity-title {
+    font-family: var(--font-serif);
+    font-size: 1.1875rem;
+    letter-spacing: 0.01em;
+  }
+
+  /*
+   * A project is named like everything else on the page.
+   *
+   * It used to be set in the mono face, on the grounds that a repository
+   * name is code. But a project here is a piece of work, not a piece of
+   * code — the technologies it is built with are the technical part, and
+   * they live in the tags below the title. The name itself reads better
+   * in the same face as every other title, so that the eye can run down
+   * the column of names without changing gear.
+   */
+  ul[data-list-layout="activity"]
+    li[data-activity-kind="project"]
+    .app-activity-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  ul[data-list-layout="activity"] .app-activity-link {
+    color: var(--foreground);
+    text-decoration: none;
+    transition: color var(--app-transition) ease;
+  }
+
+  ul[data-list-layout="activity"] .app-activity-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  ul[data-list-layout="activity"] .app-activity-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /*
+   * The summary of an entry.
+   *
+   * Two lines is enough to say what the thing is about; the rest is one
+   * click away, and a timeline that shows everything shows nothing.
+   */
+  ul[data-list-layout="activity"] .app-activity-summary {
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  /*
+   * A literary work is read, not scanned, so its summary is set in the
+   * serif face with a generous line height, and it is allowed a little
+   * more room than the other kinds.
+   */
+  ul[data-list-layout="activity"]
+    li[data-activity-kind="writing"]
+    .app-activity-summary {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    line-height: 1.95;
+    color: color-mix(in oklab, var(--foreground) 76%, var(--background));
+  }
+
+  ul[data-list-layout="activity"] .app-activity-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /*
+   * A note on the timeline.
+   *
+   * The note is shown in full — it is a short piece of writing, and the
+   * timeline is the place where reading it makes sense — but it is drawn
+   * without a frame of any kind. The notes listing gives each note a
+   * bubble because a bubble is the right shape for a note standing on
+   * its own; here, in a column of entries, a note is simply a paragraph
+   * with a label above it.
+   *
+   * Its body is set a shade larger than the summaries around it, because
+   * it is the note itself rather than a description of it.
+   */
+  ul[data-list-layout="activity"] .app-note-inline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-2);
+  }
+
+  ul[data-list-layout="activity"] .app-note-inline .app-note-body {
+    font-size: 0.9375rem;
+    line-height: 1.85;
+    max-width: none;
+  }
+
+  ul[data-list-layout="activity"]
+    .app-note-inline
+    .app-note-body
+    > :first-child {
+    margin-top: 0;
+  }
+
+  ul[data-list-layout="activity"]
+    .app-note-inline
+    .app-note-body
+    > :last-child {
+    margin-bottom: 0;
+  }
+
+  ul[data-list-layout="activity"] .app-note-inline .app-note-body p {
+    margin-bottom: var(--app-space-3);
+  }
+
+  ul[data-list-layout="activity"] .app-note-inline .app-note-body ul,
+  ul[data-list-layout="activity"] .app-note-inline .app-note-body ol {
+    margin-bottom: var(--app-space-3);
+    padding-left: 1.25rem;
   }
 
   /*
    * The literary works. A chapter list is a plain list on a phone; on a
    * wide screen the chapters of a series sit side by side.
-   */
+  */
   @media (min-width: 64rem) {
     ul[data-list-layout="series"] {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       column-gap: 2.5rem;
     }
+  }
+
+  /*
+   * The standfirst of a chapter.
+   *
+   * The one-line summary that sits between the header and the story. It
+   * is set in the serif face, like the chapter itself, and it is *not*
+   * italic: a slanted CJK face is a faked oblique that reads as a
+   * mistake rather than as emphasis.
+   *
+   * A rule above it and a generous space around it make it read as a
+   * standfirst — a line set apart from the text — rather than as the
+   * first paragraph of the story.
+   */
+  .app-writing-standfirst {
+    font-family: var(--font-reading-serif);
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--muted-foreground);
+    padding-top: var(--app-space-4);
+    margin-bottom: var(--app-space-6);
+    border-top: 1px solid var(--border);
+  }
+
+  /*
+   * The header of a chapter.
+   *
+   * The title is set in the reading serif, like the chapter it heads:
+   * a chapter whose title is in the sans face reads as a document with
+   * an attachment, rather than as a piece of writing. The series name
+   * above it stays in the interface face and is kept small — it is the
+   * context, not the headline.
+   */
+  .app-writing-title {
+    font-family: var(--font-reading-serif);
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+  }
+
+  .app-writing-series {
+    color: var(--muted-foreground);
+    letter-spacing: 0.08em;
+  }
+
+  /*
+   * The header of a chapter.
+   *
+   * The title is set in the reading serif, like the chapter it heads:
+   * a chapter whose title is in the sans face reads as a document with
+   * an attachment, rather than as a piece of writing. The series name
+   * above it stays in the interface face and is kept small — it is the
+   * context, not the headline.
+   */
+  .app-writing-title {
+    font-family: var(--font-reading-serif);
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+  }
+
+  .app-writing-series {
+    color: var(--muted-foreground);
+    letter-spacing: 0.08em;
   }
 
   /*
@@ -1091,6 +1448,1401 @@
   ul[data-list-layout="series"] > li:hover > article {
     border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
     background: var(--surface-raised);
+  }
+
+  /*
+   * The writing page.
+   *
+   * Each series is a row of its own: the table of contents on the left
+   * and the card of the series on the right. The contents answers "what is
+   * there, and in what order is it read"; the card answers "what kind of
+   * work is this". The two questions are different, so the two answers are
+   * kept apart.
+   *
+   * The card is drawn per series rather than once for the page, so that it
+   * sits level with the name of the series it belongs to and stays in
+   * view while the reader works through the chapters beside it.
+   */
+  .app-writing-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-12);
+  }
+
+  /*
+   * A group of works: a series with its chapters, or the standalone works.
+   *
+   * It is a grid of two columns — the contents and the card — so that the
+   * card lines up with the head of the series. The card is sticky, so it
+   * stays level with the head of the series while the reader scrolls
+   * through the chapters.
+   */
+  .app-writing-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: var(--app-space-12);
+    align-items: start;
+  }
+
+  .app-writing-group-main {
+    min-width: 0;
+  }
+
+  /*
+   * A group with no card of its own — the stand-alone works — spans the
+   * whole width, because the column of the card would otherwise be an
+   * empty strip down the side of the page.
+   */
+  .app-writing-group-wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-writing-group-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--app-space-2) var(--app-space-3);
+    padding-bottom: var(--app-space-3);
+    margin-bottom: var(--app-space-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /*
+   * The name of a series.
+   *
+   * It is set in the reading serif, like the chapters it heads: the name
+   * of a novel belongs to the same voice as the novel.
+   */
+  .app-writing-group-name {
+    font-family: var(--font-reading-serif);
+    font-size: 1.375rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  .app-writing-status {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted-foreground);
+    background: var(--surface);
+  }
+
+  .app-writing-group-meta {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    margin-left: auto;
+    display: flex;
+    align-items: baseline;
+    gap: var(--app-space-2);
+  }
+
+  /*
+   * The dot between the two facts of a series.
+   *
+   * It is drawn by the stylesheet rather than written into the markup: a
+   * separator written as text would be swept away by the language switch,
+   * which replaces the content of the marked elements.
+   */
+  .app-writing-group-meta > span + span::before {
+    content: "·";
+    margin-right: var(--app-space-2);
+  }
+
+  /*
+   * The contents of a group.
+   *
+   * One row per chapter, in the order the chapters are read. The rows are
+   * separated by a hairline rather than by space, because the list is a
+   * table of contents and a table of contents is ruled.
+   */
+  .app-writing-toc {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app-writing-row {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .app-writing-row:last-child {
+    border-bottom: none;
+  }
+
+  /*
+   * The link of a row.
+   *
+   * It is the whole row: the anchor is a grid that lays the row out, so
+   * a tap anywhere on the row opens the chapter. On a phone, where there
+   * is no pointer to aim with, that is the difference between reading a
+   * chapter and missing the target.
+   *
+   * The row is also the hover target, and its reaction is deliberately
+   * quiet: the title darkens, a rule appears at the left, and the row
+   * lifts a hair. Nothing moves, so the list stays a list.
+   */
+  .app-writing-row-link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    gap: var(--app-space-4);
+    align-items: baseline;
+    padding: var(--app-space-3) 0;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--app-transition) ease;
+  }
+
+  .app-writing-row-link::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--app-space-3) * -1);
+    top: 50%;
+    width: 2px;
+    height: 0;
+    background: var(--accent);
+    transform: translateY(-50%);
+    transition: height var(--app-transition) ease;
+  }
+
+  .app-writing-row-link:hover {
+    background: var(--surface);
+  }
+
+  .app-writing-row-link:hover::before {
+    height: 1.5rem;
+  }
+
+  .app-writing-row-link:hover .app-writing-row-title {
+    color: var(--accent);
+  }
+
+  /*
+   * The label of a row: the number of the chapter, or the kind of the work
+   * when the work stands on its own.
+   *
+   * It sits in the margin like the number of a page in a book, and it is
+   * kept small and quiet — the number is a way of finding the chapter, not
+   * a headline.
+   */
+  .app-writing-row-label {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .app-writing-row-body {
+    min-width: 0;
+  }
+
+  /*
+   * The prefix of a chapter title — "第一天", "第三章".
+   *
+   * It is kept in the markup but hidden from the listing: the column of
+   * numbers already says which chapter this is, and the prefix would
+   * repeat it. The chapter's own page still shows the full title.
+   */
+  .app-writing-row-prefix {
+    display: none;
+  }
+
+  .app-writing-row-title {
+    display: block;
+    font-family: var(--font-reading-serif);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: var(--foreground);
+    transition: color var(--app-transition) ease;
+  }
+
+  .app-writing-row-desc {
+    display: block;
+    font-family: var(--font-reading-serif);
+    font-size: 0.875rem;
+    line-height: 1.8;
+    color: var(--muted-foreground);
+    margin-top: 0.125rem;
+  }
+
+  /*
+   * The date at the end of a row.
+   *
+   * It shows the day only: a table of contents says when a chapter
+   * appeared, and the hour it was written belongs to the chapter's own
+   * page.
+   */
+  .app-writing-row-date {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * The card of a series.
+   *
+   * It is *static*: the card sits in the flow of the page and stays where
+   * it is put. It used to be sticky, so that a long list of chapters kept
+   * the card of its own series in view — but a card that slides along
+   * behind the reader's eyes is a card that is never read at rest. It is
+   * level with the head of the series, which is where the eye looks for
+   * the name of the book, and it stays level with it.
+   */
+  .app-writing-aside {
+    position: static;
+  }
+
+  .app-writing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+    padding: var(--app-space-4);
+  }
+
+  /*
+   * The cover of a work.
+   *
+   * It is the picture made for the series — a photograph of the work's
+   * own artwork, or a drawn field of colour. Nothing is written on it.
+   * A series with no cover of its own falls back to a tinted panel with
+   * its name on it.
+   */
+  .app-writing-cover {
+    aspect-ratio: 3 / 4;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface-raised);
+    overflow: hidden;
+    margin-bottom: var(--app-space-3);
+  }
+
+  .app-writing-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .app-writing-cover-plain {
+    aspect-ratio: auto;
+    height: 8.25rem;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--app-space-3);
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklab, var(--accent) 16%, var(--surface-raised)),
+      var(--surface-raised)
+    );
+  }
+
+  .app-writing-cover-plain span {
+    font-family: var(--font-reading-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: color-mix(in oklab, var(--accent) 78%, var(--foreground));
+  }
+
+  .app-writing-card-title {
+    font-family: var(--font-reading-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0 0 var(--app-space-2);
+  }
+
+  /*
+   * The tags of a work.
+   *
+   * They sit at the bottom of the card, separated from the title above by
+   * a little space, so that they read as a separate kind of information.
+   */
+  .app-writing-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-space-1) var(--app-space-2);
+    list-style: none;
+    margin: var(--app-space-3) 0 0;
+    padding: var(--app-space-3) 0 0;
+    border-top: 1px solid var(--border);
+  }
+
+  /*
+   * Below the wide layout the two columns cannot sit side by side, so the
+   * card would have to move below the contents of its own series.
+   *
+   * It does not move: it is simply not drawn. A phone screen has room for
+   * one thing at a time, and a cover of a book beside a list of its
+   * chapters is a picture of something the reader has not asked for yet.
+   * The name of the series is in the heading of the group anyway, so
+   * nothing is lost by leaving the card out.
+   *
+   * The breakpoint is just under the wide layout rather than exactly on
+   * it, so that a screen of exactly 1024 pixels — a very common laptop
+   * width — still gets the two columns, which is where the card belongs.
+   */
+  @media (max-width: 63.99rem) {
+    .app-writing-group {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--app-space-6);
+    }
+
+    .app-writing-aside {
+      display: none;
+    }
+  }
+
+  /*
+   * The floating button of a chapter.
+   *
+   * It is pinned to the bottom-left corner of the viewport: the corner is
+   * the one place on a screen that nothing else wants, and it is where the
+   * thumb of a hand holding a phone already is.
+   *
+   * It is fixed, so that it stays in the same corner while the chapter
+   * scrolls underneath it — the reader never has to scroll back to the
+   * top of a long chapter to find the way out of it.
+   *
+   * The label is inside the button rather than next to it. A label that
+   * sat outside would have to be positioned next to the button, and it
+   * would hang over the text of the chapter; inside, it can only ever
+   * cover the button itself.
+   */
+  .app-writing-back {
+    position: fixed;
+    left: var(--app-space-6);
+    bottom: var(--app-space-6);
+    z-index: 40;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--app-space-2);
+
+    padding: 0.5rem 0.875rem 0.5rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--surface-raised) 88%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--app-shadow);
+
+    color: var(--foreground);
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    text-decoration: none;
+
+    transition:
+      color var(--app-transition) ease,
+      border-color var(--app-transition) ease;
+  }
+
+  .app-writing-back:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .app-writing-back-icon {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+
+  /*
+   * On a phone the row of a chapter loses its date column: the date is
+   * the first thing that can go, because the title and the summary are
+   * what the reader is looking for.
+   */
+  @media (max-width: 30rem) {
+    .app-writing-row-link {
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+      gap: var(--app-space-3);
+    }
+
+    .app-writing-row-date {
+      grid-column: 2;
+    }
+
+    .app-writing-group-meta {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+
+  /*
+   * The filter of the writing page.
+   *
+   * The writing collection is not a bag of tagged items like the rest of
+   * the site: a piece of writing is a novel, an essay or a short story,
+   * and it belongs to a series or it stands on its own. So the filter is
+   * built the way the collection actually is — in levels — rather than as
+   * one flat row of tags.
+   *
+   * Each level is a labelled row: the label says what the level is about
+   * ("按类型"), and the options say what can be chosen. The label is set
+   * in the margin rather than above the options, so that the levels line
+   * up as a column and the page reads as a small table of choices.
+   */
+  .app-writing-filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-space-3);
+    margin-bottom: var(--app-space-8);
+    padding-bottom: var(--app-space-6);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .app-writing-filter-level {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--app-space-4);
+    align-items: baseline;
+  }
+
+  .app-writing-filter-label {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+    padding-top: 0.3125rem;
+  }
+
+  .app-writing-filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-space-2);
+    align-items: center;
+  }
+
+  /*
+   * An option of the filter.
+   *
+   * It is a chip like the tags elsewhere on the site, so that the reader
+   * recognises it — but without the hash mark, because these are not
+   * tags: they are the kinds and the works of the collection.
+   */
+  .app-writing-filter-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color var(--app-transition) ease,
+      color var(--app-transition) ease,
+      background-color var(--app-transition) ease;
+  }
+
+  .app-writing-filter-option:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .app-writing-filter-option-active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
+  }
+
+  /*
+   * An option that belongs to another kind.
+   *
+   * It is dimmed rather than removed, so that the level does not change
+   * its length while the reader is choosing.
+   */
+  .app-writing-filter-option-dim {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  /*
+   * The count beside an option: how many works it stands for.
+   *
+   * It is set in its own size rather than in `em` relative to the option,
+   * so that it never falls below the smallest legible size when the
+   * option itself is small.
+   */
+  .app-writing-filter-count {
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+
+  /*
+   * On a phone the label of a level goes above its options, because there
+   * is no room for a column of labels.
+   */
+  @media (max-width: 40rem) {
+    .app-writing-filter-level {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--app-space-2);
+    }
+
+    .app-writing-filter-label {
+      padding-top: 0;
+    }
+  }
+
+  /*
+   * The home page's own sections.
+   *
+   * On the wide layout the home page shows four sections at once, and
+   * three of them are lists of text: the notes, the articles and the
+   * literary works. Only the projects are *objects* — a project has a name,
+   * a description and a picture of itself — so only the projects keep
+   * their frame.
+   *
+   * The other three are read, not browsed: a note is a sentence, an article
+   * is a title and a summary, a chapter is a title and a line about it.
+   * Putting a panel around each of them would line three kinds of frame up
+   * side by side on one screen and make the page read as a shelf of widgets
+   * rather than as a page.
+   *
+   * What replaces the frame is nothing at all. The sections are not
+   * separated by rules either: the whole page is one continuous flow of
+   * text, and a hairline above a list would draw a box around the section
+   * even though the box has no sides.
+   */
+
+  /*
+   * The head of a section: its title, and the way out of it.
+   *
+   * The title is the quietest of the two — the link is the one the reader
+   * is meant to reach for — but it is still set larger than the text
+   * beneath it, because it is the name of the thing the section holds.
+   */
+  .app-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--app-space-4);
+  }
+
+  /*
+   * The "see everything" link of a section.
+   *
+   * It sits on the same line as the title and is set in the muted colour
+   * with a small arrow, so that it reads as the way out of the section
+   * rather than as another heading. The arrow nudges to the right on
+   * hover, which says "this goes somewhere" without a transition that
+   * moves the text.
+   */
+  .app-section-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: none;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color var(--app-transition) ease;
+  }
+
+  .app-section-more svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    transition: transform var(--app-transition) ease;
+  }
+
+  .app-section-more:hover {
+    color: var(--accent);
+  }
+
+  .app-section-more:hover svg {
+    transform: translateX(0.125rem);
+  }
+
+  .app-section-more:focus-visible {
+    outline: 2px dashed var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  #recent-notes ul[data-list-layout="notes"] > li > article {
+    /* The room the bubble's tail needed; the tail is gone. */
+    padding-left: 0;
+  }
+
+  /*
+   * The recent notes on the home page.
+   *
+   * They are rendered with the same components as the notes listing, so
+   * that a note reads the same wherever it is met — the listing and the
+   * home page are two views of the same wall, not two designs.
+   *
+   * The difference is the date: on the listing the month is the heading
+   * of a group, and here there is no group, so the day of the month is
+   * written out in full instead.
+   */
+  #recent-notes ul[data-list-layout="notes"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  #recent-notes ul[data-list-layout="notes"] > li {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+  }
+
+  #recent-notes ul[data-list-layout="notes"] > li:first-child {
+    padding-top: 0;
+  }
+
+  #recent-notes ul[data-list-layout="notes"] > li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  /*
+   * The home page has no month index, so the date of a note is written
+   * out in full: the day of the month in the margin, and the month and
+   * the year with it.
+   */
+  #recent-notes .app-note-entry {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  @media (min-width: 40rem) {
+    #recent-notes .app-note-entry {
+      grid-template-columns: 8.5rem minmax(0, 1fr);
+    }
+  }
+
+  /*
+   * The date on the home page.
+   *
+   * The listing writes the month as the heading of a group, and the
+   * margin of an entry holds only the day. Here there is no group, so
+   * the whole date has to be written in the margin.
+   *
+   * It is written as one date on one line — "2026年10月20日" — with the
+   * moment of the day under it. Split into three figures and stacked, a
+   * date reads as three separate facts; a date written out reads as the
+   * one fact it is.
+   */
+  #recent-notes .app-note-entry-when {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    text-align: right;
+  }
+
+  /*
+   * The date itself.
+   *
+   * It is set in the reading face, like the note beside it: a date is
+   * part of the writing, not a label stuck to the margin, and a serif
+   * Chinese date sits next to a serif Chinese paragraph as though the
+   * two had been written by the same hand. The month-and-day form is
+   * used on the listing, where the group heading carries the year.
+   */
+  #recent-notes .app-note-entry-month {
+    display: block;
+    order: -1;
+    font-family: var(--font-reading-serif);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    color: var(--foreground);
+    white-space: nowrap;
+  }
+
+  /*
+   * The day of the month.
+   *
+   * The date above it already says the day, so it is not written again
+   * here — the column holds one date, not two.
+   */
+  #recent-notes .app-note-entry-day {
+    display: none;
+  }
+
+  /*
+   * The moment of the day, under the date.
+   *
+   * It is the finest fact about the note, and it is the quietest.
+   */
+  #recent-notes .app-note-entry-time {
+    display: block;
+    margin-inline-start: 0;
+  }
+
+  #recent-notes .app-note-entry-prose {
+    max-width: none;
+    font-size: 0.9375rem;
+    line-height: 1.85;
+  }
+
+  #recent-notes .app-note-entry-foot {
+    max-width: none;
+  }
+
+  /*
+   * The articles.
+   *
+   * The list keeps a little air between its entries, so that the titles
+   * do not run into one another, but it is air rather than a rule: the
+   * entries are separated by space, not by a line.
+   */
+  #recent-posts ul[data-list-layout="vertical"] {
+    gap: 0;
+  }
+
+  #recent-posts ul[data-list-layout="vertical"] > li {
+    padding-bottom: var(--app-space-4);
+  }
+
+  #recent-posts ul[data-list-layout="vertical"] > li:last-child {
+    padding-bottom: 0;
+  }
+
+  #recent-posts ul[data-list-layout="vertical"] > li > article {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  /* The inner highlight that sits on the top edge of a raised card. */
+  #recent-posts ul[data-list-layout="vertical"] > li > article::before {
+    display: none;
+  }
+
+  #recent-posts ul[data-list-layout="vertical"] > li:hover > article {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  /*
+   * The title of an article.
+   *
+   * It is a reference rather than a heading, so it is set in the size of
+   * the text around it rather than in the size of a title. A page of
+   * section headings is a page of signposts; the articles themselves are
+   * what the reader came for.
+   */
+  #recent-posts ul[data-list-layout="vertical"] h2 {
+    font-size: 1rem;
+    line-height: 1.55;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /*
+   * The literary works.
+   *
+   * The writing list was already frameless, so nothing has to be taken
+   * away from it — but it did carry its own rhythm: the entries were
+   * padded apart, separated by a hairline, and the summary sat between
+   * the title and the date. On the home page all three go: the summary
+   * is dropped, the hairline goes with it, and the entry is tightened to
+   * match the articles beside it — the title, the date, the tags.
+   */
+  #recent-writing ul[data-list-layout="writing"] > li {
+    padding-top: var(--app-space-4);
+    padding-bottom: var(--app-space-4);
+    border-bottom: 0;
+  }
+
+  #recent-writing ul[data-list-layout="writing"] > li:first-child {
+    padding-top: 0;
+  }
+
+  #recent-writing ul[data-list-layout="writing"] > li:last-child {
+    padding-bottom: 0;
+  }
+
+  /*
+   * The title of a work.
+   *
+   * A literary work is read rather than scanned, so its title is set in
+   * the serif face — the same face its own page is set in. That is the
+   * one thing on the home page that tells the reader at a glance that
+   * this is a piece of writing and not an article.
+   */
+  #recent-writing ul[data-list-layout="writing"] h2 {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /*
+   * The date of a work, in the compact layout.
+   *
+   * It uses the same class as the date of an article, so that the two
+   * kinds of date are set the same way — the same size, the same weight,
+   * the same numerals.
+   */
+  #recent-writing ul[data-list-layout="writing"] .app-vertical-date {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ==========================================================================
+     The notes wall
+     ==========================================================================
+     The notes listing is a *wall*: a column of notes read from top to
+     bottom, with the time axis moved out of the content and into an index
+     beside it.
+
+     Three decisions shape it.
+
+     The first is that the date is split across the page rather than
+     written out whole. The month and the year are the heading of the
+     month group the note belongs to; the day sits in the margin of the
+     entry; the weekday is under the day; and the moment of the day is at
+     the very end of the entry. Nothing is repeated that the reader does
+     not need twice, and the one fact that has to be computed — the
+     weekday — is the one that is written next to the day it belongs to.
+
+     The second is that the notes are not in frames. A note is a piece of
+     writing, and writing that is boxed reads like a quotation of itself.
+     The entries are separated by hairlines instead, and the whole column
+     reads as one page of text.
+
+     The third is the type. The notes are set in the reading serif rather
+     than in the interface sans: a note is something to be *read*, and
+     the serif is the face the site already reserves for reading.
+     ========================================================================== */
+
+  /*
+   * The two columns: the index and the wall.
+   *
+   * The index is a narrow column of its own and the wall takes the rest.
+   * On a phone the index is dropped entirely — a sticky column of
+   * months is not something a thumb can reach — and the notes fall back
+   * to a single column with the date above the entry.
+   */
+  .app-notes-wall {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 3rem;
+    align-items: start;
+  }
+
+  @media (min-width: 64rem) {
+    .app-notes-wall {
+      grid-template-columns: 9.5rem minmax(0, 1fr);
+    }
+  }
+
+  /*
+   * The month index.
+   *
+   * It is an index, not a control panel: a list of months, each with the
+   * number of notes it holds. The current month is marked by a bar in the
+   * margin rather than by a filled pill — a filled pill would draw the
+   * eye to the thing the reader has already reached, which is backwards.
+   */
+  .app-notes-index {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .app-notes-index {
+      display: block;
+      /*
+       * The index sticks below the header.
+       *
+       * The header is sticky too, so the index has to clear it: a sticky
+       * element at `top: 0` would slide *under* the bar and be half
+       * hidden by it. The offset is the height of the bar plus a little
+       * air, and the bar's height is measured at runtime rather than
+       * written down here — it is two rows tall on a narrow screen and one
+       * on a wide one.
+       */
+      position: sticky;
+      top: var(--app-header-offset);
+      padding-right: 1rem;
+      border-right: 1px solid
+        color-mix(in oklab, var(--border) 70%, transparent);
+    }
+  }
+
+  .app-notes-index-heading {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    margin: 0 0 0.9rem;
+  }
+
+  .app-notes-index-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .app-notes-index-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+    text-decoration: none;
+    padding: 0.3rem 0.55rem;
+    border-radius: 5px;
+    border-left: 2px solid transparent;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transition:
+      color var(--app-transition) ease,
+      background-color var(--app-transition) ease;
+  }
+
+  .app-notes-index-count {
+    font-size: 0.6875rem;
+    opacity: 0.7;
+  }
+
+  .app-notes-index-link:hover {
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--accent) 5%, transparent);
+  }
+
+  .app-notes-index-link[aria-current="true"] {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 7%, transparent);
+  }
+
+  .app-notes-index-link[aria-current="true"] .app-notes-index-count {
+    opacity: 1;
+  }
+
+  /*
+   * The groups.
+   *
+   * A group is a month: a heading and the notes written in it.
+   *
+   * The space between two months is carried by the *group's* margin, not
+   * by the heading's own padding. The two used to add up — a margin
+   * above the group and a padding above the heading — and the result was
+   * a heading with a wide empty band over it and its first note almost
+   * touching its underside. The heading now belongs to the notes under
+   * it, and the gap above it belongs to the month that has ended.
+   */
+  .app-notes-group + .app-notes-group {
+    margin-top: 2rem;
+  }
+
+  /*
+   * The first group the reader sees carries no margin above it.
+   *
+   * The margin belongs to the gap *between* two months. When a filter
+   * has hidden the months above the first visible one, that gap is
+   * gone, and the margin would leave the first heading stranded in
+   * the middle of an empty band.
+   */
+  .app-notes-group[data-notes-first] {
+    margin-top: 0;
+  }
+
+  /*
+   * The heading of a month.
+   *
+   * A rule runs out of the heading and fades away, so that the heading
+   * reads as the head of a section rather than as a label floating in the
+   * margin.
+   *
+   * The heading sits closer to the notes it introduces than to the month
+   * that has ended: it is their title, not a divider between the two.
+   * The space above it belongs to the gap between two months, and the
+   * space below it is the air that separates a title from the first
+   * line of what it titles.
+   */
+  .app-notes-month {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    padding: 0 0 1.75rem;
+    /*
+     * A jump to a month lands *below* the header.
+     *
+     * Without the offset the heading would come to rest under the sticky
+     * bar, with the reader looking at the middle of the month rather than
+     * at its title.
+     */
+    scroll-margin-top: var(--app-header-offset);
+  }
+
+  /*
+   * The first group on the page.
+   *
+   * The rule belongs to the first group the reader actually sees, not to
+   * the first one in the markup: a tag filter hides the groups that have
+   * no notes left, and the group that ends up first on the screen is
+   * then the second or the fifth in the document. A `:first-child`
+   * selector would give its heading the top padding of the page while
+   * every other heading sat a little lower — so filtering by a tag
+   * would change the spacing of the first month.
+   *
+   * The script marks the first visible group instead.
+   */
+  .app-notes-group[data-notes-first] .app-notes-month {
+    padding-top: 0.35rem;
+  }
+
+  .app-notes-month-title {
+    font-family: var(--font-reading-serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+
+  .app-notes-month-count {
+    font-size: 0.71875rem;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-notes-month-rule {
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /*
+   * One note.
+   *
+   * The margin holds the day, the body holds the writing. The two are
+   * separated by a hairline rather than by a frame, so that the column
+   * reads as one continuous text.
+   */
+  .app-note-entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 1.6rem;
+    padding: 1.5rem 0 1.6rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+  }
+
+  @media (min-width: 40rem) {
+    .app-note-entry {
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+    }
+  }
+
+  .app-notes-group:last-child .app-note-entry:last-child {
+    border-bottom: 0;
+  }
+
+  /*
+   * The whole date.
+   *
+   * On the notes listing the month is the heading of the group the note
+   * belongs to, so it is not written here — the two would say the same
+   * thing twice on the same screen. On the home page there is no group,
+   * so the date is written out whole.
+   */
+  .app-note-entry-month {
+    display: none;
+  }
+
+  /*
+   * The date, in the margin.
+   *
+   * The two facts of a date that are written down — the day and the
+   * moment of the day — are one piece of information, so they are set
+   * together in the margin of the entry.
+   *
+   * On a phone they sit above the entry instead: a three-rem column
+   * beside the writing would push the writing into a narrow strip, and a
+   * note read on a phone is read in a single column.
+   */
+  .app-note-entry-when {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  @media (min-width: 40rem) {
+    .app-note-entry-when {
+      display: block;
+      text-align: right;
+      margin-bottom: 0;
+      padding-top: 0.15rem;
+    }
+  }
+
+  /*
+   * The day.
+   *
+   * It is the one part of a date a reader compares with "today", so it is
+   * written in the strongest ink on the page — the foreground colour, not
+   * the muted grey of the metadata around it. A day written in grey reads
+   * as a caption; a day written in black reads as a date.
+   */
+  .app-note-entry-day {
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--app-transition) ease;
+  }
+
+  @media (min-width: 40rem) {
+    .app-note-entry-day {
+      display: block;
+    }
+  }
+
+  /*
+   * The counter that goes with the day — "号".
+   *
+   * It is written smaller and in the quiet grey, because it is the
+   * grammar that holds the number in place rather than a fact in its own
+   * right. The number next to it is the fact.
+   */
+  .app-note-entry-counter {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--muted-foreground);
+    margin-inline-start: 0.1em;
+    letter-spacing: 0;
+  }
+
+  /*
+   * The moment of the day.
+   *
+   * It sits under the day, in the quiet grey: it is the finest fact
+   * about the entry, and the day above it is the one a reader compares
+   * with "today".
+   */
+  .app-note-entry-time {
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 40rem) {
+    .app-note-entry-time {
+      display: block;
+      margin-top: 0.15rem;
+    }
+  }
+
+  .app-note-entry:hover .app-note-entry-day {
+    color: var(--accent);
+  }
+
+  .app-note-entry-body {
+    min-width: 0;
+  }
+
+  /*
+   * The title of a note.
+   *
+   * It is part of the writing, so it is set in the same face as the words
+   * under it.
+   */
+  .app-note-entry-title {
+    font-family: var(--font-reading-serif);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    margin: 0 0 0.3rem;
+  }
+
+  /*
+   * The prose of a note.
+   *
+   * The measure is fixed in rem rather than in `ch`, so that the prose
+   * and the foot beneath it end on exactly the same line — the `ch` unit
+   * of the sans face is a different width, and a foot that ran wider
+   * than the text would break the alignment.
+   */
+  .app-note-entry-prose {
+    font-family: var(--font-reading-serif);
+    font-size: 1rem;
+    line-height: 1.95;
+    letter-spacing: 0.01em;
+    max-width: 33.75rem;
+  }
+
+  .app-note-entry-prose > :first-child {
+    margin-top: 0;
+  }
+
+  .app-note-entry-prose > :last-child {
+    margin-bottom: 0;
+  }
+
+  .app-note-entry-prose p {
+    margin-bottom: 0.7rem;
+  }
+
+  .app-note-entry-prose ul,
+  .app-note-entry-prose ol {
+    margin-bottom: 0.7rem;
+    padding-inline-start: 1.25rem;
+  }
+
+  .app-note-entry-prose h1,
+  .app-note-entry-prose h2,
+  .app-note-entry-prose h3,
+  .app-note-entry-prose h4 {
+    font-family: var(--font-reading-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  /*
+   * A long note is clamped, so that one long entry does not push the
+   * rest of the month out of sight. The cut is faded rather than cut
+   * off, so that the reader can see that there is more.
+   *
+   * The class is the one the clamp script toggles, so that the server's
+   * guess and the browser's measurement agree on which notes are folded
+   * away. The wall clamps more generously than a bubble does: a wall is
+   * read rather than skimmed, so a note there may be twice as long
+   * before it is folded.
+   */
+  .app-note-entry-prose.app-note-body-clamped {
+    max-height: 12lh;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 78%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 78%,
+      transparent 100%
+    );
+  }
+
+  .app-note-entry-images {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    max-width: 33.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .app-note-entry-images {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .app-note-entry-images li {
+    list-style: none;
+  }
+
+  /*
+   * The foot of an entry: the tags.
+   *
+   * The foot is a row of chips on the left. It carries no right-hand
+   * partner any more — the moment of the day moved up into the date
+   * column of the entry — so it is a plain block that holds the row.
+   */
+  .app-note-entry-foot {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.9rem;
+    max-width: 33.75rem;
+  }
+
+  .app-note-entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /*
+   * The tags are aligned with the text above them.
+   *
+   * The row of tags starts on the same vertical line as the first
+   * character of the note: the list itself is on the body's left edge,
+   * and the chip's own left padding — the air in front of the hash — is
+   * the only thing that would push it to the right of that line.
+   *
+   * The padding is therefore given up rather than counted: the hash
+   * itself then starts exactly where the text starts, and the chip's
+   * label follows it a little to the right, the way a label is
+   * supposed to.
+   */
+  .app-note-entry-tags > li:first-child > span {
+    margin-inline-start: -0.5rem;
+  }
+
+  /*
+   * The expand button.
+   *
+   * It sits above the foot rather than inside it, so that the foot stays
+   * a single clean line of metadata.
+   */
+  .app-note-entry-expand-wrap {
+    margin-top: 0.75rem;
+    max-width: 33.75rem;
+  }
+
+  /*
+   * The `hidden` attribute, in this layer.
+   *
+   * The rules of this layer beat the utility that implements `hidden`, so
+   * a rule that sets `display` on one of these elements would make it
+   * impossible to hide. The elements that the tag filter and the month
+   * index hide are listed here explicitly, rather than by a blanket rule,
+   * so that the exemption stays visible.
+   */
+  .app-note-entry[hidden],
+  .app-notes-group[hidden],
+  .app-notes-index-list > li[hidden],
+  .app-note-entry-expand-wrap[hidden] {
+    display: none;
   }
 
   /*
@@ -1179,6 +2931,12 @@
   }
 }
 
+/*
+ * A jump to an anchor lands below the sticky header.
+ *
+ * The offset is the height of the bar plus a little air, and the height
+ * is measured at runtime — see `@/scripts/headerHeight`.
+ */
 :target {
-  scroll-margin-block: 1rem;
+  scroll-margin-block: var(--app-header-offset);
 }
