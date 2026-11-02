@@ -169,18 +169,37 @@ export default defineAstroPaperConfig({
 - **图片上传到 `public/uploads/`**，文件名会被随机重命名。Markdown 里写 `/uploads/xxx.png` 这样的绝对路径。
 - **草稿不是保密机制**：仓库公开时，草稿源文件仍能在 GitHub 上看到。
 
+### 图片上传失败的两种原因
+
+Pages CMS 把图片当作一次 JSON 请求发出去，请求体里装着 base64 编码的图片。因此有两道坎：
+
+1. **体积上限。** 托管版 CMS 的请求体上限约 4.3 MB，而 base64 会把图片撑大三分之一，所以**原图必须小于 3.2 MB**。手机照片通常远大于此，上传会直接失败（`FUNCTION_PAYLOAD_TOO_LARGE`），仓库里什么都不会留下。
+2. **并发抢占。** 一次选中多张图时，CMS 会并发上传，每张都是一次独立的提交，于是它们互相抢占分支头，只有一张能成功，其余报 `is at <sha> but expected <sha>`。**一次传一张**即可。
+
+预置脚本会把照片压到能上传的大小，并把 HEIC / AVIF 转成 CMS 接受的格式：
+
+```bash
+npm run image:prepare -- ~/Pictures/IMG_1234.HEIC
+# -> ~/Pictures/IMG_1234.jpg  2000x1333 jpeg, 8 MB -> 715 KB
+```
+
+然后在 CMS 里上传生成的 `.jpg` 就行。
+
+> `HEIC` 转换依赖 `ffmpeg`（已解码 HEVC）。`AVIF` 可由 sharp 直接读取，无需额外依赖。
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:
 
-| Command          | Action                                                                                                                           |
-| :--------------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm install`   | Installs dependencies                                                                                                            |
-| `pnpm dev`       | Starts local dev server at `localhost:4321`                                                                                      |
-| `pnpm build`     | Type-checks, builds the site, runs Pagefind indexing, and copies the index to `public/pagefind/`                                 |
-| `pnpm preview`   | Preview your build locally, before deploying                                                                                     |
-| `pnpm sync`      | Generates TypeScript types for all Astro modules. [Learn more](https://docs.astro.build/en/reference/cli-reference/#astro-sync). |
-| `pnpm astro ...` | Run CLI commands like `astro add`, `astro check`                                                                                 |
+| Command                        | Action                                                                                                                            |
+| :----------------------------- | :-------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install`                 | Installs dependencies                                                                                                             |
+| `pnpm dev`                     | Starts local dev server at `localhost:4321`                                                                                       |
+| `pnpm build`                   | Type-checks, builds the site, runs Pagefind indexing, and copies the index to `public/pagefind/`                                  |
+| `pnpm preview`                 | Preview your build locally, before deploying                                                                                      |
+| `pnpm sync`                    | Generates TypeScript types for all Astro modules. [Learn more](https://docs.astro.build/en/reference/cli-reference/#astro-sync).  |
+| `pnpm astro ...`               | Run CLI commands like `astro add`, `astro check`                                                                                  |
+| `pnpm image:prepare -- <file>` | Prepares an image for upload to Pages CMS: converts HEIC/AVIF to JPEG, scales it down, and compresses it under the CMS size limit |
 
 ## ✨ Feedback & Suggestions
 

@@ -55,6 +55,11 @@ media:
     output: /uploads
     rename: random
     extensions: [png, jpg, jpeg, webp, gif, avif]
+    commit:
+      templates:
+        create: "media(images): create {filename}"
+        update: "media(images): update {filename}"
+        delete: "media(images): delete {filename}"
 
 components:
   # -------------------------------------------------------------------------
@@ -275,6 +280,7 @@ content:
           multiple:
             max: 9
           unique: true
+        description: 单张请控制在 3 MB 以内。手机照片请先压缩再上传（`npm run image:prepare -- <文件>`）；一次只传一张，多张同时上传会互相抢占分支而失败。
       - name: imageAlts
         type: string
         required: false
@@ -445,6 +451,7 @@ content:
             label: 截图
             options:
               media: images
+            description: 单张请控制在 3 MB 以内；手机截图请先压缩再上传（`npm run image:prepare -- <文件>`）。
           - name: featured
             type: boolean
             required: false
