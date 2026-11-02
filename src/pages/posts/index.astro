@@ -1,0 +1,112 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import PostCard from "@/components/PostCard.astro";
+import TagBar from "@/components/TagBar.astro";
+import Footer from "@/components/Footer.astro";
+import { getPublishedPosts } from "@/utils/content";
+import { groupPostsByYear } from "@/utils/postYears";
+import { getTagIndex } from "@/utils/tagIndex";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const posts = await getPublishedPosts();
+
+/*
+ * The articles are grouped by the year they were published in.
+ *
+ * The grouping is what makes the listing a table of contents rather than a
+ * list of cards: the year is written once, as the heading of its group,
+ * and every entry below it carries only what actually varies.
+ */
+const yearGroups = groupPostsByYear(posts, config.site.timezone);
+
+const t = useTranslations(config.site.uiLang);
+
+// Only the tags that actually occur in the blog posts are offered here —
+// a tag that leads to an empty listing is noise.
+const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
+const postTags = tags.filter(tag => tag.counts.posts > 0);
+---
+
+<Layout
+  title={`${t.pages.postsTitle} | ${t.site.title}`}
+  titleKey="pages.postsTitle"
+  width="list"
+>
+  <Header />
+
+  <Breadcrumb />
+
+  <Main
+    pageTitle={t.pages.postsTitle}
+    pageDesc={t.pages.postsDesc}
+    titleKey="pages.postsTitle"
+    descKey="pages.postsDesc"
+  >
+    <div data-tag-scope="collection">
+      <TagBar tags={postTags} source="posts" />
+
+      {
+        yearGroups.length === 0 ? (
+          <p class="text-muted-foreground" data-i18n="pages.postsEmpty">
+            {t.pages.postsEmpty}
+          </p>
+        ) : (
+          <div class="app-posts-groups">
+            {yearGroups.map(group => (
+              /*
+              One year of articles.
+
+              The group carries the year and the number of articles in it.
+              Both are written once here rather than repeated on every
+              entry, and the rule that follows the heading fades out to
+              the right — it reads as the beginning of a section rather
+              than as a box drawn around it.
+              */
+              <section class="app-posts-group" data-posts-group={group.key}>
+                <div class="app-posts-group-head">
+                  <h2 class="app-posts-group-year">{group.key}</h2>
+                  <span
+                    class="app-posts-group-count"
+                    data-posts-count
+                    data-i18n="posts.yearCount"
+                    data-i18n-args={String(group.posts.length)}
+                  >
+                    {t.posts.yearCount.replace(
+                      "{{0}}",
+                      String(group.posts.length)
+                    )}
+                  </span>
+                  <span class="app-posts-group-rule" />
+                </div>
+
+                <ul class="app-posts-group-list">
+                  {group.posts.map(post => (
+                    <PostCard post={post} variant="catalog" />
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )
+      }
+
+      <p
+        class="text-muted-foreground mt-8 hidden"
+        data-tag-empty
+        data-i18n="tags.empty"
+      >
+        {t.tags.empty}
+      </p>
+    </div>
+  </Main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import "@/scripts/postsGroups";
+</script>
