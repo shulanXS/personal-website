@@ -280,7 +280,7 @@ content:
           multiple:
             max: 9
           unique: true
-        description: 单张请控制在 3 MB 以内（托管版 CMS 的请求体上限约 4.5 MB，base64 编码会撑大三分之一）。手机照片请先压缩再上传（`npm run image:prepare -- <文件>`）；一次只传一张，多张同时上传会互相抢占分支而失败。
+        description: 单张请控制在 3 MB 以内（托管版 CMS 的请求体上限约 4.5 MB，base64 编码会撑大三分之一）。手机照片请先压缩再上传（`npm run image:prepare -- <文件>`），或用 `npm run image:upload -- <文件>` 直接提交到 GitHub（可绕过体积限制）；一次只传一张，多张同时上传会互相抢占分支而失败。
       - name: imageAlts
         type: string
         required: false

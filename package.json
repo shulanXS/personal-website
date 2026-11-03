@@ -24,7 +24,8 @@
     "audit:writing": "node scripts/writing-audit.mjs",
     "font:reading": "node scripts/build-reading-font.mjs",
     "covers:build": "node scripts/build-covers.mjs",
-    "image:prepare": "node scripts/prepare-image.mjs"
+    "image:prepare": "node scripts/prepare-image.mjs",
+    "image:upload": "node scripts/upload-image.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.4",

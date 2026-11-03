@@ -176,16 +176,35 @@ Pages CMS 把图片当作一次 JSON 请求发出去，请求体里装着 base64
 1. **体积上限（`413`）。** 托管版 CMS 跑在 Vercel 上，函数请求体上限约 4.5 MB。base64 会把图片撑大三分之一，所以**原图必须小于 3.3 MB**。手机照片通常远大于此，上传会直接失败，报 `Failed to upload file: 413`，仓库里什么都不会留下。
 2. **并发抢占。** 一次选中多张图时，CMS 会并发上传，每张都是一次独立的提交，于是它们互相抢占分支头，只有一张能成功，其余报 `is at <sha> but expected <sha>`。**一次传一张**即可。
 
-预置脚本会把照片压到 CMS 一定能接受的尺寸，并把 HEIC 转成 CMS 接受的格式：
+### 传大图：绕开 CMS 的上传接口
+
+`413` 是托管版 CMS 服务端的限制，**改 `.pages.yml` 解决不了**——上传路径根本不走配置文件。但如果想传手机原图，不必压到 3 MB 以下：脚本可以直接把文件提交到 GitHub，走 GitHub 自己的 API，体积上限高得多。
+
+```bash
+npm run image:upload -- ~/Pictures/IMG_1234.HEIC
+#   -> public/uploads/mvzyx4b5-8rg8x5ny.jpg
+#      741 KB, scaled to 2400px, quality 85
+#      commit 8fea874 on main
+```
+
+几点说明：
+
+- **不需要压到 3 MB。** 只有「文件本身就大于 3 MB」时才会缩放，因为站点里图片只以几百像素宽的网格显示（`max-width: 33.75rem`），超大原图纯属浪费带宽。小于 3 MB 的图**原样提交**，像素和字节都不动。
+- **HEIC 自动转 JPEG**，因为 CMS 不接受这个扩展名。
+- **文件会出现在 CMS 的媒体库里**，可以像平常一样在碎碎念里选它。命名和提交信息都按 CMS 的惯例（`<时间戳>-<随机>.ext`、`media(images): create ...`），所以看不出来是脚本传的。
+- **一次只传一张**。绕开 CMS 也绕不开它那个分支头抢占的老问题；脚本本身是串行的，但如果你在 CMS 里同时编辑内容，仍可能撞车。
+- 需要 `gh auth login`（脚本从 GitHub CLI 读 token，不用自己配环境变量）。
+
+> `HEIC` 转换依赖 `ffmpeg`（已解码 HEVC）。`AVIF` 可由 sharp 直接读取，无需额外依赖。
+
+如果只是想**压小**再在 CMS 界面里上传，用另一个脚本：
 
 ```bash
 npm run image:prepare -- ~/Pictures/IMG_1234.HEIC
 # -> ~/Pictures/IMG_1234.jpg  2000x1333 jpeg, 8 MB -> 715 KB
 ```
 
-脚本保证产出的文件**不超过 3 MB**：先降质量，再缩小尺寸，直到满足预算为止。所以先跑脚本、再在 CMS 里上传，就不会再遇到 `413`。
-
-> `HEIC` 转换依赖 `ffmpeg`（已解码 HEVC）。`AVIF` 可由 sharp 直接读取，无需额外依赖。
+它保证产出的文件**不超过 3 MB**：先降质量，再缩小尺寸，直到满足预算为止。所以先跑脚本、再在 CMS 里上传，就不会再遇到 `413`。
 
 ## 🧞 Commands
 
@@ -200,6 +219,7 @@ All commands are run from the root of the project, from a terminal:
 | `pnpm sync`                    | Generates TypeScript types for all Astro modules. [Learn more](https://docs.astro.build/en/reference/cli-reference/#astro-sync).  |
 | `pnpm astro ...`               | Run CLI commands like `astro add`, `astro check`                                                                                  |
 | `pnpm image:prepare -- <file>` | Prepares an image for upload to Pages CMS: converts HEIC/AVIF to JPEG, scales it down, and compresses it under the CMS size limit |
+| `pnpm image:upload -- <file>`  | Commits an image straight to GitHub, bypassing the CMS upload size limit, and makes it available in the CMS media library         |
 
 ## ✨ Feedback & Suggestions
 
