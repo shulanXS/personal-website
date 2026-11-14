@@ -20,8 +20,17 @@ export type NoteMonthGroup = {
 /**
  * Groups the notes by the month they were written in.
  *
- * The notes are expected to be sorted newest first, and the groups come
- * back in that order too — the first group is the most recent month.
+ * The notes are sorted by their *publication* date before they are
+ * grouped, and the groups come back in that order too — the first group
+ * is the most recent month.
+ *
+ * The sort is done here rather than relying on the order the caller
+ * happens to have: the collection is read back by "last updated", which
+ * is the right order for a list of recent activity but the wrong one
+ * here. A note written in August and edited in October sorts to the top
+ * of that list, and grouping by the month it was *written* would then
+ * produce a separate group for it — the months would come out in no
+ * order at all.
  *
  * The month is the one of the *site's* timezone rather than of the
  * reader's: a note written at half past midnight in Shanghai belongs to
@@ -33,9 +42,13 @@ export function groupNotesByMonth(
   notes: CollectionEntry<"notes">[],
   timezone: string = config.site.timezone
 ): NoteMonthGroup[] {
+  const sorted = [...notes].sort(
+    (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
+  );
+
   const groups: NoteMonthGroup[] = [];
 
-  for (const note of notes) {
+  for (const note of sorted) {
     const key = monthKey(note.data.pubDatetime, timezone);
     const last = groups[groups.length - 1];
 

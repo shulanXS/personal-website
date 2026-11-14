@@ -198,7 +198,13 @@ export async function getTagIndex(
     items.push({
       title: entry.data.title ?? noteFallbackTitle(entry.data.content),
       url: getNotesUrl(locale),
-      date: (entry.data.modDatetime ?? entry.data.pubDatetime).toISOString(),
+      /*
+       * A note is dated by its publication, never by its revision: the
+       * notes listing shows the day it was written and says nothing about
+       * later edits, and a search result that carried a different day
+       * would contradict it.
+       */
+      date: entry.data.pubDatetime.toISOString(),
       description: stripMarkdown(entry.data.content).slice(0, 160),
       tags,
       tagSlugs: tags.map(tagSlug),

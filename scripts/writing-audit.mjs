@@ -302,6 +302,18 @@ mp.on("pageerror", e => errors.push(`MOBILE PAGEERROR ${e.message}`));
 await mp.goto(BASE + "/writing/", { waitUntil: "networkidle" });
 await mp.waitForTimeout(400);
 
+// The row has to be in the viewport for the probe to mean anything:
+// `elementFromPoint` returns null for a point outside the window, which
+// would be reported as "the row is not clickable" while the row is in
+// fact perfectly clickable — it is simply further down the page, below
+// the fold of a phone.
+await mp.evaluate(() => {
+  document
+    .querySelector(".app-writing-row-link")
+    ?.scrollIntoView({ block: "center" });
+});
+await mp.waitForTimeout(300);
+
 const mobileRowHit = await mp.evaluate(() => {
   const row = document.querySelector(".app-writing-row-link");
   if (!row) return null;

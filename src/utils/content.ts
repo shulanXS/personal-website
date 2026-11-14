@@ -1,6 +1,10 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { postFilter } from "./postFilter";
-import { getSortedPosts, sortByDateDesc } from "./getSortedPosts";
+import {
+  getSortedPosts,
+  sortByDateDesc,
+  sortByPubDateDesc,
+} from "./getSortedPosts";
 
 /**
  * Single entry point for reading publishable content.
@@ -17,10 +21,21 @@ export async function getPublishedPosts(): Promise<CollectionEntry<"posts">[]> {
   return getSortedPosts(posts);
 }
 
-/** Published notes, sorted by publish date descending. */
+/**
+ * Published notes, sorted by publish date descending.
+ *
+ * The sort is by the *publication* date rather than by the effective
+ * date (the revision, when there is one). A note shows the day it was
+ * written and nothing else — it never says that it was edited later — so
+ * ordering the notes by a revision date would order them by something
+ * the reader cannot see, and would break the month groups of the wall:
+ * a note written in August and edited in October would sort among the
+ * October notes, splitting the August group in two and leaving the
+ * months in no order at all.
+ */
 export async function getPublishedNotes(): Promise<CollectionEntry<"notes">[]> {
   const notes = await getCollection("notes");
-  return sortByDateDesc(notes.filter(entry => postFilter(entry)));
+  return sortByPubDateDesc(notes.filter(entry => postFilter(entry)));
 }
 
 /** Published literary works, sorted by publish date descending. */

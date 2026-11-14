@@ -69,6 +69,19 @@ function effectiveDate(data: {
 }
 
 /**
+ * The moment a note was written.
+ *
+ * A note is dated by its publication, never by its revision. The notes
+ * listing shows the day a note was written and says nothing about later
+ * edits, and a note in the timeline is the same note — if the timeline
+ * dated it by its revision, the two listings would show the same note
+ * under two different days.
+ */
+function noteDate(data: { pubDatetime: Date }): Date {
+  return data.pubDatetime;
+}
+
+/**
  * Collects every published thing that happened, newest first.
  *
  * The four collections are read through the `getPublished*` helpers, so a
@@ -93,7 +106,7 @@ export async function getActivityEntries(
       // A note may have no title: the opening words of the note stand in
       // for it, exactly as they do in the notes listing.
       title: note.data.title ?? noteFallbackTitle(note.data.content),
-      date: effectiveDate(note.data),
+      date: noteDate(note.data),
       // Notes have no page of their own — they live on the listing.
       url: getNotesUrl(locale),
       description: stripMarkdown(note.data.content).slice(0, 160),

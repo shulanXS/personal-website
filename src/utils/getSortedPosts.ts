@@ -36,3 +36,26 @@ export function sortByDateDesc<T extends DatedEntry>(entries: T[]): T[] {
       )
   );
 }
+
+/**
+ * Sorts entries by their *publication* date descending.
+ *
+ * The sort ignores `modDatetime` on purpose. A revision date is a fact
+ * about the editing of a work, and it belongs to a work that shows it —
+ * an article says "updated on ..." next to its date. A note does not:
+ * its date is the date it was written, and nothing on the page ever
+ * mentions that it was edited later.
+ *
+ * Sorting by the revision date would therefore order the notes by
+ * something the reader cannot see, and it would break the month groups
+ * of the wall: a note written in August and edited in October sorts
+ * among the October notes, so the August group ends up split in two and
+ * the months come out in no order at all.
+ */
+export function sortByPubDateDesc<T extends DatedEntry>(entries: T[]): T[] {
+  return [...entries].sort(
+    (a, b) =>
+      Math.floor(new Date(b.data.pubDatetime).getTime() / 1000) -
+      Math.floor(new Date(a.data.pubDatetime).getTime() / 1000)
+  );
+}
