@@ -1,5 +1,5 @@
 ---
-title: 《上古卷轴5：天际》
+title: 我心目中排名第一的游戏——《上古卷轴5：天际》
 slug: shang-gu-juan-ax-5-tian-jie
 type: essay
 description: 从存在主义自由、史诗底色下的孤独、碎片化叙事到 Mod 生态，看《上古卷轴5：天际》为什么是我心里断档的第一，甚至是可以玩一辈子的游戏
