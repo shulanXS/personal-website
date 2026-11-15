@@ -75,7 +75,7 @@ export default {
     /**
      * The one-line identity shown above the name in the hero section.
      */
-    identity: "Master's student · Applied AI",
+    identity: "Master's student in Computer Science · Applied AI",
     /**
      * The greeting that opens the hero section.
      */
@@ -87,9 +87,12 @@ export default {
       "I care about how AI lands in real products, and I believe technology only matters once it becomes part of everyday life.",
     /**
      * The second paragraph of the hero — what the site actually holds.
+     *
+     * It says that the site is alive: the reader should know that
+     * coming back is worth it, because something new will be here.
      */
     about:
-      "This is my personal corner of the web: quick notes, technical articles, and some literary writing in my spare time.",
+      "This is my personal corner of the web: quick notes, technical articles, and some creative writing in my spare time. I keep it seriously — every now and then something new shows up here.",
     /**
      * The three keywords that echo the content sections of the site.
      */
@@ -237,7 +240,7 @@ export default {
     notesEmpty: "No notes yet.",
 
     writingTitle: "Writing",
-    writingDesc: "Original novels, essays and short stories.",
+    writingDesc: "Original novels and essays, updated weekly.",
     writingEmpty: "No writing published yet.",
 
     projectsTitle: "Projects",
@@ -250,7 +253,7 @@ export default {
   about: {
     title: "About",
     desc: "Who I am, what I do, and why this site exists.",
-    identity: "Master's student · Applied AI",
+    identity: "Master's student in Computer Science · Applied AI",
     lead: "Hi, I'm Che Wenjie, a master's student working on applied AI. I care about how technology actually reaches everyday life, and I believe a technology only matters once ordinary people actually use it.",
     sections: [
       {

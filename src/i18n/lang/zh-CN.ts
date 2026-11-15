@@ -85,7 +85,7 @@ export default {
     /**
      * The one-line identity shown above the name in the hero section.
      */
-    identity: "硕士在读 · AI 应用方向",
+    identity: "计算机科学硕士在读 · AI 应用方向",
     /**
      * The greeting that opens the hero section.
      */
@@ -96,9 +96,12 @@ export default {
     intro: "我关注 AI 如何落到真实场景里，也相信技术的价值在于被日常使用。",
     /**
      * The second paragraph of the hero — what the site actually holds.
+     *
+     * It says that the site is alive: the reader should know that
+     * coming back is worth it, because something new will be here.
      */
     about:
-      "这里是我的个人数字空间：随手记下的碎碎念、写下来的技术文章，以及业余时间的一些创作。",
+      "这里是我的个人数字空间：随手记下的碎碎念、写下来的技术文章，以及业余时间的一些创作。我很认真地在维护它——时不时的，就会更新一点新的东西。",
     /**
      * The three keywords that echo the content sections of the site.
      */
@@ -246,7 +249,7 @@ export default {
     notesEmpty: "还没有发布任何动态。",
 
     writingTitle: "创作",
-    writingDesc: "原创的小说、随笔与短篇故事。",
+    writingDesc: "原创小说与随笔，每周更新。",
     writingEmpty: "还没有发布任何作品。",
 
     projectsTitle: "项目",
@@ -259,7 +262,7 @@ export default {
   about: {
     title: "关于我",
     desc: "我是谁，我在做什么，以及这个站点为什么存在。",
-    identity: "硕士在读 · AI 应用方向",
+    identity: "计算机科学硕士在读 · AI 应用方向",
     lead: "你好，我是车文杰，一名正在攻读硕士学位的研究生，研究方向是 AI 的实际应用。我关心技术如何真正落到日常的生活里，也相信一项技术的价值，取决于它有没有被普通人用起来。",
     sections: [
       {
