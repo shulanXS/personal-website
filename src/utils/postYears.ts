@@ -25,12 +25,12 @@ export type PostYearGroup = {
  * the most recent year.
  *
  * The sort is done here rather than relying on the order the caller
- * happens to have: the collection is read back by "last updated", which
- * is the right order for a list of recent activity but the wrong one
- * here. An article that was published in 2022 and touched in 2026 sorts
- * to the top of the list, and grouping by the year it was *published*
- * would then produce a separate group for every article — eight groups
- * for eight articles, where three would do.
+ * happens to have: the collection is read back by its publication date,
+ * which is the right order for a list of recent activity but the wrong
+ * one here. An article that was published in 2022 and touched in 2026
+ * sorts to the top of the list, and grouping by the year it was
+ * *published* would then produce a separate group for every article —
+ * eight groups for eight articles, where three would do.
  *
  * The year is the one of the *site's* timezone rather than of the
  * reader's: an article published at half past midnight in Shanghai

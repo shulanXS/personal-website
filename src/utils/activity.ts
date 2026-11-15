@@ -54,30 +54,16 @@ export type ActivityEntry = {
 };
 
 /**
- * The moment a content entry last changed.
+ * The moment a content entry was published.
  *
- * The same rule the listings use: an article that was revised is dated by
- * its revision, not by its first publication. The timeline shows when
- * things happened, so a revised article happens again on the day it was
- * revised.
+ * One rule for every kind of content: an entry is dated by the moment it
+ * was written, never by the moment it was last touched. The revision date
+ * of an entry is a fact that the page of that entry shows and that a
+ * listing does not — so a listing that ordered by it would order by
+ * something the reader cannot see, and the home page would show two
+ * different notions of "the most recent thing" on the same screen.
  */
-function effectiveDate(data: {
-  pubDatetime: Date;
-  modDatetime?: Date | null;
-}): Date {
-  return data.modDatetime ?? data.pubDatetime;
-}
-
-/**
- * The moment a note was written.
- *
- * A note is dated by its publication, never by its revision. The notes
- * listing shows the day a note was written and says nothing about later
- * edits, and a note in the timeline is the same note — if the timeline
- * dated it by its revision, the two listings would show the same note
- * under two different days.
- */
-function noteDate(data: { pubDatetime: Date }): Date {
+function effectiveDate(data: { pubDatetime: Date }): Date {
   return data.pubDatetime;
 }
 
@@ -106,7 +92,7 @@ export async function getActivityEntries(
       // A note may have no title: the opening words of the note stand in
       // for it, exactly as they do in the notes listing.
       title: note.data.title ?? noteFallbackTitle(note.data.content),
-      date: noteDate(note.data),
+      date: effectiveDate(note.data),
       // Notes have no page of their own — they live on the listing.
       url: getNotesUrl(locale),
       description: stripMarkdown(note.data.content).slice(0, 160),

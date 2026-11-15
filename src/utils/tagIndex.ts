@@ -179,7 +179,10 @@ export async function getTagIndex(
     items.push({
       title: entry.data.title,
       url: getPostUrl(entry.id, entry.filePath, locale),
-      date: (entry.data.modDatetime ?? entry.data.pubDatetime).toISOString(),
+      // The publication date, for the same reason every listing uses it:
+      // the search result says when the article appeared, and a revision
+      // date is a fact that belongs to the page of the article itself.
+      date: entry.data.pubDatetime.toISOString(),
       description: entry.data.description,
       tags,
       tagSlugs: tags.map(tagSlug),
@@ -218,7 +221,8 @@ export async function getTagIndex(
     items.push({
       title: entry.data.title,
       url: getWritingUrl(entry.data.slug, locale),
-      date: (entry.data.modDatetime ?? entry.data.pubDatetime).toISOString(),
+      // The publication date, for the same reason every listing uses it.
+      date: entry.data.pubDatetime.toISOString(),
       description: entry.data.description,
       tags,
       tagSlugs: tags.map(tagSlug),

@@ -57,12 +57,19 @@ const tagSlugs = tags.map(tagSlug);
         </a>
 
         <div class="app-vertical-date">
-          <Datetime
-            pubDatetime={data.pubDatetime}
-            modDatetime={data.modDatetime ?? null}
-            bare
-            compact
-          />
+          {/*
+          Only the publication date.
+
+          The card is a *reference* to the article, and it sits in a list
+          that is ordered by the moment each article was written. Showing
+          the revision date here would put a different day next to the
+          day that decided the article's place in the list — the list
+          would say one thing and the entries another.
+
+          The revision date still has its place: it is on the page of the
+          article itself, next to the publication date.
+          */}
+          <Datetime pubDatetime={data.pubDatetime} bare compact />
         </div>
 
         {tags.length > 0 && (
@@ -138,12 +145,19 @@ const tagSlugs = tags.map(tagSlug);
     ) : (
       <article class="flex flex-col gap-2.5">
         <div class="app-vertical-date">
-          <Datetime
-            pubDatetime={data.pubDatetime}
-            modDatetime={data.modDatetime ?? null}
-            bare
-            compact
-          />
+          {/*
+          Only the publication date.
+
+          The card is a *reference* to the article, and it sits in a list
+          that is ordered by the moment each article was written. Showing
+          the revision date here would put a different day next to the
+          day that decided the article's place in the list — the list
+          would say one thing and the entries another.
+
+          The revision date still has its place: it is on the page of the
+          article itself, next to the publication date.
+          */}
+          <Datetime pubDatetime={data.pubDatetime} bare compact />
         </div>
 
         <a
