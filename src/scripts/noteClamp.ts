@@ -1,4 +1,5 @@
-import { initLightbox } from "@/scripts/lightbox";
+import { initLightbox, decorateImages } from "@/scripts/lightbox";
+import { HOME_CONTENT_UPDATED_EVENT } from "@/utils/homeSections";
 
 /**
  * The clamp of a long note, and the button that lifts it.
@@ -162,5 +163,34 @@ export function setupNoteLightbox() {
   }
 }
 
+/**
+ * Rebinds the notes that were just put on the page.
+ *
+ * The home page can replace the entries of a section with newer ones
+ * while the reader is looking at it. The markup that was bound is gone,
+ * so the clamp and the lightbox have to be bound to the new markup
+ * instead — otherwise a long note would arrive expanded past its clamp
+ * with no button to close it, and a picture would not open.
+ */
+function rebindNotes() {
+  setupNoteExpand();
+
+  /*
+   The lightbox attaches itself to a container once and never again, so
+   a container that was already bound is skipped by the lightbox itself.
+   The *images* inside it are not, though: they are marked one by one,
+   and the new ones have never been marked. So they are marked here.
+   */
+  for (const selector of [
+    'ul[data-list-layout="notes"]',
+    'ul[data-list-layout="activity"]',
+    ".app-notes-wall",
+  ]) {
+    const container = document.querySelector<HTMLElement>(selector);
+    if (container) decorateImages(container);
+  }
+}
+
 document.addEventListener("astro:page-load", setupNoteExpand);
 document.addEventListener("astro:page-load", setupNoteLightbox);
+document.addEventListener(HOME_CONTENT_UPDATED_EVENT, rebindNotes);

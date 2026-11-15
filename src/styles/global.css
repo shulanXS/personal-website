@@ -2195,6 +2195,44 @@
     border-radius: 2px;
   }
 
+  /*
+   * The mark of a section whose content has just been replaced.
+   *
+   * The home page can put newer content on the screen while the reader
+   * is looking at it. Without any sign of that, the list would simply
+   * be different from the one the reader was reading a moment ago, and
+   * they would have no way of telling that it had changed — or of
+   * knowing that it was worth reading again.
+   *
+   * The sign is a single, quiet flash: the ground of the section lifts
+   * to the accent and settles back down. It is deliberately short, and
+   * it is taken away afterwards, so that a section that has just been
+   * refreshed does not keep looking as though it were still changing.
+   */
+  [data-home-updated] > [data-home-section-body] {
+    animation: app-home-refreshed 1.2s ease-out;
+  }
+
+  @keyframes app-home-refreshed {
+    0% {
+      background-color: color-mix(in oklab, var(--accent) 14%, transparent);
+    }
+
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  /*
+   * The animation is decoration, and a reader who has asked for less
+   * motion should not be given any.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    [data-home-updated] > [data-home-section-body] {
+      animation: none;
+    }
+  }
+
   #recent-notes ul[data-list-layout="notes"] > li > article {
     /* The room the bubble's tail needed; the tail is gone. */
     padding-left: 0;

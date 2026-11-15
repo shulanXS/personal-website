@@ -43,6 +43,35 @@ function currentLocale(): string {
   return document.documentElement.lang || "zh-CN";
 }
 
+/**
+ * Marks the images of a container as things that can be opened.
+ *
+ * The images are given the role and the keyboard affordances of a button,
+ * so that a picture can be opened with the keyboard as well as with a
+ * click. The work is deferred by a frame, because it must not push the
+ * LCP timestamp of the page.
+ *
+ * The label of the image is read in the active language, so that the
+ * announcement a screen reader makes is in the language the reader is
+ * reading the page in.
+ */
+export function decorateImages(article: HTMLElement): void {
+  const locale = currentLocale();
+  const zoomImageLabel = getString("post.zoomImage", locale);
+
+  const images = Array.from(article.querySelectorAll("img"));
+  for (const image of images) {
+    if (image.closest("a")) continue;
+    image.setAttribute("role", "button");
+    image.setAttribute("tabindex", "0");
+    image.setAttribute("aria-haspopup", "dialog");
+    image.setAttribute(
+      "aria-label",
+      image.alt ? `${zoomImageLabel}: ${image.alt}` : zoomImageLabel
+    );
+  }
+}
+
 export function initLightbox(options: LightboxOptions = {}) {
   const container = options.containerSelector
     ? document.querySelector<HTMLElement>(options.containerSelector)
@@ -51,7 +80,6 @@ export function initLightbox(options: LightboxOptions = {}) {
   const article: HTMLElement = container;
 
   const locale = currentLocale();
-  const zoomImageLabel = getString("post.zoomImage", locale);
   const closeLabel = getString("post.closeImagePreview", locale);
   const previewLabel = getString("post.imagePreview", locale);
   // Don't attach twice to the same container.
@@ -66,17 +94,7 @@ export function initLightbox(options: LightboxOptions = {}) {
 
   // Defer attribute mutations so they don't push the LCP timestamp.
   requestAnimationFrame(() => {
-    const images = Array.from(article.querySelectorAll("img"));
-    for (const image of images) {
-      if (image.closest("a")) continue;
-      image.setAttribute("role", "button");
-      image.setAttribute("tabindex", "0");
-      image.setAttribute("aria-haspopup", "dialog");
-      image.setAttribute(
-        "aria-label",
-        image.alt ? `${zoomImageLabel}: ${image.alt}` : zoomImageLabel
-      );
-    }
+    decorateImages(article);
   });
 
   function open(src: string, alt: string, trigger: HTMLElement | null) {

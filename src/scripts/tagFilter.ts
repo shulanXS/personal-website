@@ -16,6 +16,7 @@
  */
 
 import { flatRuntimeTranslations, defaultLocale } from "@/i18n";
+import { HOME_CONTENT_UPDATED_EVENT } from "@/utils/homeSections";
 
 /** The collections a tag result can belong to, in display order. */
 const SOURCE_ORDER = ["posts", "notes", "writing", "projects"] as const;
@@ -323,6 +324,15 @@ document.addEventListener("click", handleEmptyResetClick);
 
 document.addEventListener("astro:page-load", applyFromUrl);
 document.addEventListener("astro:after-swap", applyFromUrl);
+
+/*
+ * The home page can replace its content while the reader is looking at
+ * it. The entries that arrive have to be put under the same filter as
+ * the ones that were there before — otherwise an active tag would
+ * suddenly stop filtering, and the reader would see entries carrying a
+ * tag they had filtered away.
+ */
+document.addEventListener(HOME_CONTENT_UPDATED_EVENT, applyFromUrl);
 
 // The grouped results are generated on the client, so they have to be
 // rebuilt when the interface language changes.

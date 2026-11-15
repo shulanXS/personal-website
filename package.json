@@ -22,6 +22,7 @@
     "audit:visual": "node scripts/visual-audit.mjs",
     "audit:layout": "node scripts/layout-audit.mjs",
     "audit:writing": "node scripts/writing-audit.mjs",
+    "audit:home-refresh": "node scripts/check-home-refresh.mjs",
     "font:reading": "node scripts/build-reading-font.mjs",
     "covers:build": "node scripts/build-covers.mjs",
     "image:prepare": "node scripts/prepare-image.mjs",

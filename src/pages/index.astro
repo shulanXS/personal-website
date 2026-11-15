@@ -11,6 +11,7 @@ import NoteEntry from "@/components/NoteEntry.astro";
 import WritingCard from "@/components/WritingCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
 import ActivityEntry from "@/components/ActivityEntry.astro";
+import HomeSection from "@/components/HomeSection.astro";
 import {
   getPublishedNotes,
   getPublishedPosts,
@@ -19,6 +20,7 @@ import {
 import { getProjectsByDate } from "@/utils/getProjects";
 import { routeUrl } from "@/utils/routes";
 import { getRecentActivity } from "@/utils/activity";
+import { getHomeFingerprint } from "@/utils/homeFingerprint";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -38,9 +40,9 @@ const t = useTranslations(config.site.uiLang);
  * kinds are merged into one timeline instead, so that the whole of what
  * the site holds is read as one sequence of things that happened.
  *
- * Every list below is ordered by the moment its entries happened. A new
- * note, article, chapter or project therefore moves straight to the top
- * of its own section, with nothing arranged by hand.
+ * Every list below is ordered by the moment its entries were written. A
+ * new note, article, chapter or project therefore moves straight to the
+ * top of its own section, with nothing arranged by hand.
  */
 const notes = await getPublishedNotes();
 const posts = await getPublishedPosts();
@@ -53,6 +55,16 @@ const projects = getProjectsByDate();
 const activity = await getRecentActivity(locale, config.home.activityLimit);
 
 const homePath = routeUrl(locale, "home");
+
+/*
+ * The fingerprint of the content of this page.
+ *
+ * It is written into the markup, and the browser compares it with the
+ * fingerprint the server currently serves. When the two differ, the
+ * content on the screen is no longer what the site holds, and the page
+ * refreshes itself.
+ */
+const homeVersion = await getHomeFingerprint();
 ---
 
 <Layout width="wide">
@@ -62,6 +74,7 @@ const homePath = routeUrl(locale, "home");
     id="main-content"
     data-layout="index"
     data-home-path={homePath}
+    data-home-version={homeVersion}
     class="app-layout my-1"
   >
     <!-- Hero -->
@@ -165,8 +178,8 @@ const homePath = routeUrl(locale, "home");
 
       The home page keeps the four kinds of content in four sections, each
       one showing the latest of its kind. Every section is ordered by the
-      moment its entries happened, so a new note, a new article, a new
-      chapter or a new project moves straight to the top of its own
+      moment its entries were written, so a new note, a new article, a
+      new chapter or a new project moves straight to the top of its own
       section — nothing here is arranged by hand.
 
       The four sections are *not* four equal blocks of a grid. The page is
@@ -217,23 +230,15 @@ const homePath = routeUrl(locale, "home");
         }
         {
           notes.length > 0 && (
-            <section id="recent-notes" class="pt-12 pb-6">
-              <div class="app-section-head">
-                <h2
-                  class="text-xl font-semibold tracking-wide"
-                  data-i18n="home.recentNotes"
-                >
-                  {t.home.recentNotes}
-                </h2>
-                <a
-                  href={routeUrl(locale, "notes")}
-                  class="app-section-more"
-                  data-i18n="home.allNotes"
-                >
-                  {t.home.allNotes}
-                  <IconArrowRight class="inline-block rtl:-rotate-180" />
-                </a>
-              </div>
+            <HomeSection
+              name="notes"
+              id="recent-notes"
+              title={t.home.recentNotes}
+              titleKey="home.recentNotes"
+              href={routeUrl(locale, "notes")}
+              moreLabel={t.home.allNotes}
+              moreKey="home.allNotes"
+            >
               <ul class="mt-5" data-list-layout="notes" data-notes-wall>
                 {notes.slice(0, config.home.recentNotes).map(note => (
                   <li>
@@ -241,30 +246,22 @@ const homePath = routeUrl(locale, "home");
                   </li>
                 ))}
               </ul>
-            </section>
+            </HomeSection>
           )
         }
 
         <!-- Recent projects -->
         {
           projects.length > 0 && (
-            <section id="recent-projects" class="pt-12 pb-6">
-              <div class="app-section-head">
-                <h2
-                  class="text-xl font-semibold tracking-wide"
-                  data-i18n="home.featuredProjects"
-                >
-                  {t.home.featuredProjects}
-                </h2>
-                <a
-                  href={routeUrl(locale, "projects")}
-                  class="app-section-more"
-                  data-i18n="home.allProjects"
-                >
-                  {t.home.allProjects}
-                  <IconArrowRight class="inline-block rtl:-rotate-180" />
-                </a>
-              </div>
+            <HomeSection
+              name="projects"
+              id="recent-projects"
+              title={t.home.featuredProjects}
+              titleKey="home.featuredProjects"
+              href={routeUrl(locale, "projects")}
+              moreLabel={t.home.allProjects}
+              moreKey="home.allProjects"
+            >
               {/*
               Two projects side by side, at the size they are on the
               project page.
@@ -287,7 +284,7 @@ const homePath = routeUrl(locale, "home");
                   <ProjectCard project={project} variant="compact" />
                 ))}
               </ul>
-            </section>
+            </HomeSection>
           )
         }
       </div>
@@ -299,23 +296,15 @@ const homePath = routeUrl(locale, "home");
         <!-- Recent posts -->
         {
           posts.length > 0 && (
-            <section id="recent-posts" class="pt-12 pb-6">
-              <div class="app-section-head">
-                <h2
-                  class="text-xl font-semibold tracking-wide"
-                  data-i18n="home.recentPosts"
-                >
-                  {t.home.recentPosts}
-                </h2>
-                <a
-                  href={routeUrl(locale, "posts")}
-                  class="app-section-more"
-                  data-i18n="home.allPosts"
-                >
-                  {t.home.allPosts}
-                  <IconArrowRight class="inline-block rtl:-rotate-180" />
-                </a>
-              </div>
+            <HomeSection
+              name="posts"
+              id="recent-posts"
+              title={t.home.recentPosts}
+              titleKey="home.recentPosts"
+              href={routeUrl(locale, "posts")}
+              moreLabel={t.home.allPosts}
+              moreKey="home.allPosts"
+            >
               {/*
               The articles are a plain list of references: a title, the day
               it was written and the tags it carries. There is no rule above
@@ -328,30 +317,22 @@ const homePath = routeUrl(locale, "home");
                   <PostCard post={post} variant="compact" />
                 ))}
               </ul>
-            </section>
+            </HomeSection>
           )
         }
 
         <!-- Recent writing -->
         {
           writing.length > 0 && (
-            <section id="recent-writing" class="pt-12 pb-6">
-              <div class="app-section-head">
-                <h2
-                  class="text-xl font-semibold tracking-wide"
-                  data-i18n="home.recentWriting"
-                >
-                  {t.home.recentWriting}
-                </h2>
-                <a
-                  href={routeUrl(locale, "writing")}
-                  class="app-section-more"
-                  data-i18n="home.allWriting"
-                >
-                  {t.home.allWriting}
-                  <IconArrowRight class="inline-block rtl:-rotate-180" />
-                </a>
-              </div>
+            <HomeSection
+              name="writing"
+              id="recent-writing"
+              title={t.home.recentWriting}
+              titleKey="home.recentWriting"
+              href={routeUrl(locale, "writing")}
+              moreLabel={t.home.allWriting}
+              moreKey="home.allWriting"
+            >
               {/*
               The works are a list of titles. There is no summary beside
               them: a chapter's own line about itself is on its page, and
@@ -363,7 +344,7 @@ const homePath = routeUrl(locale, "home");
                   <WritingCard work={work} variant="compact" />
                 ))}
               </ul>
-            </section>
+            </HomeSection>
           )
         }
       </div>
@@ -373,13 +354,17 @@ const homePath = routeUrl(locale, "home");
       The narrow layout.
 
       Everything the site holds is merged into one list here and ordered by
-      the moment it happened, so that the home page reads as a running
+      the moment it was written, so that the home page reads as a running
       account of the site rather than as four separate sections.
 
       It is shown on a narrow screen only; the wide layout above takes
       over from `lg` upwards.
     -->
-    <section id="activity" class="pt-12 pb-6 lg:hidden">
+    <section
+      id="activity"
+      data-home-section="activity"
+      class="pt-12 pb-6 lg:hidden"
+    >
       <div class="max-w-app-flow mx-auto">
         <h2
           class="text-2xl font-semibold tracking-wide"
@@ -394,22 +379,24 @@ const homePath = routeUrl(locale, "home");
           {t.home.activityDesc}
         </p>
 
-        {
-          activity.length > 0 ? (
-            <ul class="mt-6" data-list-layout="activity">
-              {activity.map(entry => (
-                <ActivityEntry entry={entry} />
-              ))}
-            </ul>
-          ) : (
-            <p
-              class="text-muted-foreground mt-6"
-              data-i18n="home.activityEmpty"
-            >
-              {t.home.activityEmpty}
-            </p>
-          )
-        }
+        <div data-home-section-body>
+          {
+            activity.length > 0 ? (
+              <ul class="mt-6" data-list-layout="activity">
+                {activity.map(entry => (
+                  <ActivityEntry entry={entry} />
+                ))}
+              </ul>
+            ) : (
+              <p
+                class="text-muted-foreground mt-6"
+                data-i18n="home.activityEmpty"
+              >
+                {t.home.activityEmpty}
+              </p>
+            )
+          }
+        </div>
       </div>
     </section>
 
@@ -437,6 +424,8 @@ const homePath = routeUrl(locale, "home");
 </Layout>
 
 <script>
+  import "@/scripts/homeRefresh";
+
   document.addEventListener("astro:page-load", () => {
     const indexLayout = (document.querySelector("#main-content") as HTMLElement)
       ?.dataset;

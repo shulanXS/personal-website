@@ -1,6 +1,7 @@
 import { flatRuntimeTranslations, defaultLocale } from "@/i18n";
 import { formatTemplate } from "@/i18n/format";
 import { refreshDates } from "@/scripts/dateFormat";
+import { HOME_CONTENT_UPDATED_EVENT } from "@/utils/homeSections";
 
 const STORAGE_KEY = "uiLang";
 
@@ -166,6 +167,25 @@ export function setLang(locale: string): void {
 }
 
 /**
+ * Applies the interface language and the dates to the page.
+ *
+ * It is the pair of passes that a page needs after its markup has been
+ * replaced: the text of the new entries has to follow the language, and
+ * so do their dates.
+ *
+ * The home page can put new content on the screen while the reader is
+ * looking at it, and the markup it puts there was rendered by the
+ * server in the *default* language. Without this pass the reader would
+ * see a Chinese page with English labels in the entries that just
+ * arrived.
+ */
+export function refreshLocalizedContent(): void {
+  const lang = getStoredLang();
+  applyLang(lang);
+  refreshDates(lang);
+}
+
+/**
  * The language a toggle button switches *to*.
  *
  * The button always switches to the *other* available language, so its
@@ -228,6 +248,13 @@ setupI18n();
 
 // Re-apply after View Transitions navigation.
 document.addEventListener("astro:after-swap", setupI18n);
+
+/*
+ * The home page can replace its content while the reader is looking at
+ * it. The markup that arrives was rendered by the server in the default
+ * language, so the language and the dates have to be applied to it again.
+ */
+document.addEventListener(HOME_CONTENT_UPDATED_EVENT, refreshLocalizedContent);
 
 // Apply the stored language to the incoming document *before* it is swapped
 // in. Without this the new page is painted with the server-rendered language

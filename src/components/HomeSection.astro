@@ -1,0 +1,59 @@
+---
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+
+/**
+ * One section of the home page.
+ *
+ * The section is a heading, a "see everything" link and a body. The
+ * heading and the link do not change when a new entry is published — only
+ * the body does — so the body is marked with its own attribute, and the
+ * browser replaces *it* when it swaps the content of the page for a newer
+ * one. Replacing the whole section would also move the reader's place on
+ * the page for no reason.
+ */
+type Props = {
+  /** Which section this is. The name the browser knows it by. */
+  name: string;
+  /** The `id` of the section element. */
+  id: string;
+  /** The heading of the section. */
+  title: string;
+  /** The translation key of the heading, so it follows the language. */
+  titleKey: string;
+  /** Where the "see everything" link leads. */
+  href: string;
+  /** The label of the "see everything" link. */
+  moreLabel: string;
+  /** The translation key of the label of the link. */
+  moreKey: string;
+  /** The classes of the section element. */
+  class?: string;
+};
+
+const {
+  name,
+  id,
+  title,
+  titleKey,
+  href,
+  moreLabel,
+  moreKey,
+  class: className = "pt-12 pb-6",
+} = Astro.props;
+---
+
+<section id={id} data-home-section={name} class={className}>
+  <div class="app-section-head">
+    <h2 class="text-xl font-semibold tracking-wide" data-i18n={titleKey}>
+      {title}
+    </h2>
+    <a href={href} class="app-section-more" data-i18n={moreKey}>
+      {moreLabel}
+      <IconArrowRight class="inline-block rtl:-rotate-180" />
+    </a>
+  </div>
+
+  <div data-home-section-body>
+    <slot />
+  </div>
+</section>

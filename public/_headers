@@ -1,0 +1,33 @@
+# Cloudflare Pages headers.
+#
+# ---------------------------------------------------------------------------
+# The version file of the home page
+# ---------------------------------------------------------------------------
+#
+# The home page asks this file whether the content it is showing is still
+# the content of the site. The answer changes only when the content
+# changes — and the whole point of asking is to find out as soon as
+# possible whether it did.
+#
+# So the answer must not be held on to: `max-age=0` tells the browser to
+# ask again every time, and `must-revalidate` tells it to do so even when
+# a stale copy is already in the cache.
+#
+# The page itself fetches the file with `cache: "no-store"`, which already
+# bypasses the browser's cache. This rule is what makes the *edge* behave
+# the same way: without it, Cloudflare would be free to serve the file
+# from its own cache for as long as it liked, and the reader would never
+# hear about a new note.
+/home-version.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+# ---------------------------------------------------------------------------
+# Everything else
+# ---------------------------------------------------------------------------
+#
+# The built assets carry a hash in their name, so they can be held for as
+# long as the browser likes — a new build produces a new name, and the
+# old file simply stops being asked for.
+#
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
