@@ -19,9 +19,9 @@ export type WritingGroup = {
    */
   status: "ongoing" | "completed" | undefined;
   /**
-   * The kind of the work — a novel, an essay or a short story.
+   * The kind of the work — a novel, an essay, a review or a short story.
    */
-  type: "novel" | "essay" | "short";
+  type: "novel" | "essay" | "review" | "short";
   /**
    * The number of characters of the whole group.
    */
@@ -53,8 +53,35 @@ export type WritingGroup = {
  * their own.
  */
 export type WritingIndex = {
+  /** The series, newest first. */
   series: WritingGroup[];
+  /** The stand-alone works, newest first. */
   standalone: WritingGroup[];
+  /**
+   * The blocks of the page, ordered by the day the newest work in them
+   * appeared.
+   *
+   * The series and the stand-alone works are two blocks of the page, and
+   * they are not in a fixed order: whichever of them was written last
+   * comes first. A reader who arrives at the page wants the newest
+   * thing on it, whichever kind it is.
+   */
+  blocks: WritingBlock[];
+};
+
+/**
+ * A block of the writing page.
+ *
+ * A block is either the series or the stand-alone works. It is what the
+ * page shows as one section, with one heading over it.
+ */
+export type WritingBlock = {
+  /** Which of the two halves the block holds. */
+  kind: "series" | "standalone";
+  /** The groups of the block. */
+  groups: WritingGroup[];
+  /** The newest work of the block. */
+  date: Date;
 };
 
 /**
@@ -64,7 +91,23 @@ export type WritingIndex = {
  * filter does not rearrange itself as works are published: a novel is
  * always the first kind, because it is the one that carries a series.
  */
-export const WRITING_TYPES = ["novel", "essay", "short"] as const;
+export const WRITING_TYPES = ["novel", "essay", "review", "short"] as const;
+
+/**
+ * The tags that name a kind of work.
+ *
+ * A work carries its kind twice: in the `type` field, and often in a tag
+ * as well ("小说" on every chapter of a novel). The tag level of the
+ * filter leaves these out — the first level already says which kind a
+ * work is, and offering it twice would say the same thing in two places.
+ *
+ * The list is written out rather than derived from the interface
+ * dictionary, because the dictionary holds the *label* of a kind in the
+ * language of the interface ("原创小说") while the content holds the tag
+ * the author actually wrote ("小说"). The two are different strings, and
+ * the tag is the one that has to be recognised.
+ */
+export const WRITING_TYPE_TAGS = ["小说", "随笔", "观后感", "短篇"] as const;
 
 /**
  * One level of the filter of the writing page.
@@ -100,8 +143,22 @@ export type WritingWorkFacet = WritingFacet & { type: string };
 export type WritingFacets = {
   /** The kinds of work that occur. */
   types: WritingFacet[];
-  /** The series and the stand-alone works. */
-  works: WritingWorkFacet[];
+  /**
+   * The series.
+   *
+   * They are few and they carry their chapters, so they are always on
+   * screen: a series is the thing a reader is most likely to want to
+   * pick.
+   */
+  series: WritingWorkFacet[];
+  /**
+   * The stand-alone works.
+   *
+   * There are many of them and each one carries its whole title, so they
+   * are kept behind a button rather than spread over the width of the
+   * page.
+   */
+  standalone: WritingWorkFacet[];
   /**
    * The tags that are neither a kind nor the name of a work.
    *
@@ -187,13 +244,59 @@ export function groupWriting(
       tags: unionTags([work]),
     }));
 
-  // Each half is ordered by the day its first entry appeared.
-  const byDate = (a: WritingGroup, b: WritingGroup) =>
-    a.startDate.getTime() - b.startDate.getTime();
+  /*
+   * Each half is ordered by the day its newest entry appeared — newest
+   * first.
+   *
+   * The order is done here rather than relying on the order the caller
+   * happens to have: the collection is read back newest first, and a
+   * grouping that reversed that would put the oldest work at the top of
+   * the page.
+   *
+   * The tie-break is the title, so that two works written on the same day
+   * keep a stable order from one build to the next.
+   */
+  const byDate = (a: WritingGroup, b: WritingGroup) => {
+    const diff = b.endDate.getTime() - a.endDate.getTime();
+    if (diff !== 0) return diff;
+    return titleOf(a).localeCompare(titleOf(b), "zh-CN");
+  };
+
+  const sortedSeries = series.sort(byDate);
+  const sortedStandalone = standalone.sort(byDate);
+
+  /*
+   * The two halves become two blocks of the page, and the blocks are
+   * ordered by the newest work in them.
+   *
+   * A block is placed by its *newest* work rather than its oldest: a
+   * series that began long ago and was written up to yesterday is still
+   * the newest thing on the page.
+   */
+  const blocks: WritingBlock[] = [];
+
+  if (sortedSeries.length > 0) {
+    blocks.push({
+      kind: "series",
+      groups: sortedSeries,
+      date: newestOf(sortedSeries),
+    });
+  }
+
+  if (sortedStandalone.length > 0) {
+    blocks.push({
+      kind: "standalone",
+      groups: sortedStandalone,
+      date: newestOf(sortedStandalone),
+    });
+  }
+
+  blocks.sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return {
-    series: series.sort(byDate),
-    standalone: standalone.sort(byDate),
+    series: sortedSeries,
+    standalone: sortedStandalone,
+    blocks,
   };
 }
 
@@ -202,10 +305,14 @@ export function groupWriting(
  *
  * The labels of the kinds of work are written by the caller, because they
  * are the interface language rather than a fact about the work: a novel
- * is "小说" in Chinese and "Novel" in English.
+ * is "原创小说" in Chinese and "Novel" in English.
+ *
+ * Only the two halves of the collection are read; the blocks of the page
+ * are not, because the filter is about the shape of the collection
+ * rather than about the order the page happens to be in.
  */
 export function buildWritingFacets(
-  index: WritingIndex,
+  index: Pick<WritingIndex, "series" | "standalone">,
   labels: Record<WritingGroup["type"], string>
 ): WritingFacets {
   const groups = [...index.series, ...index.standalone];
@@ -230,13 +337,14 @@ export function buildWritingFacets(
   }));
 
   // The works: a series by its name, a stand-alone work by its title.
-  const works: WritingWorkFacet[] = [];
+  const series: WritingWorkFacet[] = [];
+  const standalone: WritingWorkFacet[] = [];
 
   for (const group of index.series) {
     const name = group.name;
     if (!name) continue;
     workCounts.set(name, group.works.length);
-    works.push({
+    series.push({
       value: name,
       label: name,
       type: group.type,
@@ -246,7 +354,7 @@ export function buildWritingFacets(
 
   for (const group of index.standalone) {
     for (const work of group.works) {
-      works.push({
+      standalone.push({
         value: work.data.title,
         label: work.data.title,
         type: group.type,
@@ -255,7 +363,7 @@ export function buildWritingFacets(
     }
   }
 
-  return { types, works, tags: [] };
+  return { types, series, standalone, tags: [] };
 }
 
 /**
@@ -267,6 +375,27 @@ function unionTags(works: CollectionEntry<"writing">[]): string[] {
     for (const tag of work.data.tags ?? []) tags.add(tag);
   }
   return [...tags];
+}
+
+/**
+ * The name a group is known by.
+ *
+ * A series is known by its name; a stand-alone work by its title. It is
+ * the same string the filter matches on, so the order of two works of the
+ * same day is decided by the name the reader sees.
+ */
+function titleOf(group: WritingGroup): string {
+  return group.name ?? group.works[0]?.data.title ?? "";
+}
+
+/**
+ * The newest day of a set of groups.
+ */
+function newestOf(groups: WritingGroup[]): Date {
+  return groups.reduce(
+    (newest, group) => (group.endDate > newest ? group.endDate : newest),
+    groups[0]!.endDate
+  );
 }
 
 /**

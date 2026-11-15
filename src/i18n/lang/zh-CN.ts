@@ -19,13 +19,13 @@ export default {
     name: "车文杰",
     author: "车文杰",
     description:
-      "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与文学创作。",
+      "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与创作。",
   },
   nav: {
     home: "首页",
     posts: "技术文章",
     notes: "碎碎念",
-    writing: "文学创作",
+    writing: "创作",
     projects: "项目",
     about: "关于我",
     search: "搜索",
@@ -98,11 +98,11 @@ export default {
      * The second paragraph of the hero — what the site actually holds.
      */
     about:
-      "这里是我的个人数字空间：随手记下的碎碎念、写下来的技术文章，以及业余时间的一些文学创作。",
+      "这里是我的个人数字空间：随手记下的碎碎念、写下来的技术文章，以及业余时间的一些创作。",
     /**
      * The three keywords that echo the content sections of the site.
      */
-    keywords: "AI 应用 · 技术笔记 · 文学创作",
+    keywords: "AI 应用 · 技术笔记 · 创作",
     /** The label of the RSS feed link in the hero. */
     rss: "订阅 RSS",
     /** The heading of the activity timeline on the home page. */
@@ -166,13 +166,14 @@ export default {
   search: {
     tagsTitle: "按标签查找",
     tagsDesc:
-      "点击任意标签，即可同时检索技术文章、碎碎念、文学创作与项目中的相关内容。",
+      "点击任意标签，即可同时检索技术文章、碎碎念、创作与项目中的相关内容。",
     noTagResults: "该标签下暂无内容。",
   },
   writing: {
     all: "全部",
-    novel: "小说",
-    essay: "散文",
+    novel: "原创小说",
+    essay: "随笔",
+    review: "观后感",
     short: "短篇",
     series: "系列作品",
     standalone: "独立作品",
@@ -201,6 +202,14 @@ export default {
     byWork: "按作品",
     /** The option that clears one level of the writing filter. */
     allWorks: "全部作品",
+    /**
+     * The button that opens the rest of the works of the writing filter.
+     *
+     * The list of works is long — every stand-alone piece carries its
+     * whole title — so the second level shows the series first and keeps
+     * the rest behind a button that says how many are waiting.
+     */
+    moreWorks: "更多作品 {{0}}",
     /** The floating button that returns from a chapter to the list. */
     backToList: "返回",
   },
@@ -236,8 +245,8 @@ export default {
     notesDesc: "随手记录的想法、日常与片段。",
     notesEmpty: "还没有发布任何动态。",
 
-    writingTitle: "文学创作",
-    writingDesc: "原创的小说、散文与短篇故事。",
+    writingTitle: "创作",
+    writingDesc: "原创的小说、随笔与短篇故事。",
     writingEmpty: "还没有发布任何作品。",
 
     projectsTitle: "项目",
@@ -257,13 +266,13 @@ export default {
         title: "在做什么",
         body: [
           "我的研究聚焦于把大模型能力接入真实的产品流程——不是停留在跑通 Demo，而是让它在具体业务里稳定、可解释、可用。",
-          "平时我会写技术文章，把踩过的坑和想通的事情整理出来；也写一些文学创作，那是另一条让我保持语言敏感度的路。",
+          "平时我会写技术文章，把踩过的坑和想通的事情整理出来；也写一些创作，那是另一条让我保持语言敏感度的路。",
         ],
       },
       {
         title: "这个站点",
         body: [
-          "这是我的个人数字空间。技术文章写给同样在折腾技术的人看，碎碎念记录那些还没长成文章的念头，文学创作则是我工作之外的另一面。",
+          "这是我的个人数字空间。技术文章写给同样在折腾技术的人看，碎碎念记录那些还没长成文章的念头，创作则是我工作之外的另一面。",
           "我尽量让每一篇文章都值得读：与其追求更新频率，不如保证写下来的东西真的解决了某个问题。",
         ],
       },
@@ -287,8 +296,8 @@ export default {
         route: "notes",
       },
       {
-        label: "文学创作",
-        desc: "小说、散文与短篇故事。",
+        label: "创作",
+        desc: "小说、随笔与短篇故事。",
         route: "writing",
       },
       {

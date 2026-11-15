@@ -23,7 +23,7 @@ export default defineAstroPaperConfig({
      * dictionary (`site.description`).
      */
     description:
-      "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与文学创作。",
+      "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与创作。",
     author: "车文杰",
     profile: "",
     ogImage: "default-og.jpg",

@@ -117,7 +117,7 @@
     },
     {
       "name": "个人网站",
-      "description": "基于 Astro 与 Tailwind CSS 的个人数字空间，涵盖技术博客、碎碎念、文学创作与项目展示，支持中英双语切换与 Pagefind 全文搜索。",
+      "description": "基于 Astro 与 Tailwind CSS 的个人数字空间，涵盖技术博客、碎碎念、创作与项目展示，支持中英双语切换与 Pagefind 全文搜索。",
       "techStack": ["Astro", "TypeScript", "Tailwind CSS"],
       "tags": ["Astro", "个人网站", "TypeScript", "复盘"],
       "github": "https://github.com/shulanXS/personal-website",

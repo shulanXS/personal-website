@@ -309,7 +309,7 @@ content:
   # `series`, `chapterNumber` and `status` are reserved for chapters.
   # ---------------------------------------------------------------------------
   - name: writing
-    label: 文学创作
+    label: 创作
     type: collection
     path: src/content/writing
     filename:
@@ -345,9 +345,11 @@ content:
         options:
           values:
             - name: novel
-              label: 小说
+              label: 原创小说
             - name: essay
-              label: 散文
+              label: 随笔
+            - name: review
+              label: 观后感
             - name: short
               label: 短篇
       - name: description

@@ -164,6 +164,7 @@ export default {
     all: "All",
     novel: "Novel",
     essay: "Essay",
+    review: "Review",
     short: "Short Story",
     series: "Series",
     standalone: "Standalone Works",
@@ -192,6 +193,14 @@ export default {
     byWork: "By work",
     /** The option that clears one level of the writing filter. */
     allWorks: "All works",
+    /**
+     * The button that opens the rest of the works of the writing filter.
+     *
+     * The list of works is long — every stand-alone piece carries its
+     * whole title — so the second level shows the series first and keeps
+     * the rest behind a button that says how many are waiting.
+     */
+    moreWorks: "More works ({{0}})",
     /** The floating button that returns from a chapter to the list. */
     backToList: "Back",
   },

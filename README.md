@@ -147,7 +147,7 @@ export default defineAstroPaperConfig({
 ### 发布流程
 
 1. 打开 <https://app.pagescms.org/>，用 GitHub 账号登录并授权本站仓库。
-2. 在左侧选择内容类型：`Blog`（技术文章）、`Notes`（碎碎念）、`Writing`（文学创作）、`Projects`（项目）。
+2. 在左侧选择内容类型：`Blog`（技术文章）、`Notes`（碎碎念）、`Writing`（创作）、`Projects`（项目）。
 3. 编辑内容 → 点击 **Save / Publish**。Pages CMS 会把改动提交到 GitHub。
 4. GitHub 的提交触发 Cloudflare Pages 重新构建，站点随即更新。
 

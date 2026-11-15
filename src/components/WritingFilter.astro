@@ -31,16 +31,51 @@ type WorkOption = {
 type Props = {
   /** The kinds of work that occur, with the kinds that do not occur left out. */
   types: TypeOption[];
-  /** The works and the series. */
-  works: WorkOption[];
+  /** The series — few, and always on screen. */
+  series: WorkOption[];
+  /**
+   * The stand-alone works — many, and each one carries its whole title.
+   *
+   * They are kept behind a button rather than spread over the width of
+   * the page: a row of twelve full titles is a wall of text that says
+   * less than the list of works below it does.
+   */
+  standalone: WorkOption[];
   /**
    * The tags that are neither a kind nor a work — the free-form ones.
    */
   tags: { slug: string; name: string; count: number }[];
 };
-const { types, works, tags } = Astro.props;
+const { types, series, standalone, tags } = Astro.props;
 
 const t = useTranslations(config.site.uiLang);
+
+/**
+ * The label of the button that opens the rest of the works.
+ *
+ * The count is part of the label, because a button that hides twelve
+ * things should say so: the reader knows what is behind it before
+ * pressing it.
+ */
+const moreWorksLabel = t.writing.moreWorks.replace(
+  "{{0}}",
+  String(standalone.length)
+);
+
+/**
+ * The dictionary key of each kind of work.
+ *
+ * The label of a kind is part of the interface rather than part of the
+ * content, so it has to be marked for translation: the button says
+ * "随笔" in Chinese and "Essay" in English, and the kind is the same
+ * either way.
+ */
+const TYPE_I18N_KEYS: Record<string, string> = {
+  novel: "writing.novel",
+  essay: "writing.essay",
+  review: "writing.review",
+  short: "writing.short",
+};
 ---
 
 {
@@ -48,17 +83,17 @@ const t = useTranslations(config.site.uiLang);
   The filter of the writing page.
 
   The writing collection is not a bag of tagged items like the rest of the
-  site: a piece of writing is a novel, an essay or a short story, and it
-  belongs to a series or it stands on its own. So the filter is built the
-  way the collection actually is — in levels — rather than as one flat row
-  of tags.
+  site: a piece of writing is a novel, an essay, a review or a short
+  story, and it belongs to a series or it stands on its own. So the filter
+  is built the way the collection actually is — in levels — rather than as
+  one flat row of tags.
 
   The three levels are:
 
-    1. the kind of the work — 小说 / 散文 / 短篇;
+    1. the kind of the work — 原创小说 / 随笔 / 观后感 / 短篇;
     2. the work itself — a series by name, or a stand-alone piece;
     3. the free-form tags — the ones that cut across kinds ("玄幻",
-       "读后感").
+       "恐怖片").
 
   The levels narrow each other: choosing a kind narrows the works below it
   to that kind, and choosing a work narrows the tags to the ones that
@@ -77,6 +112,7 @@ const t = useTranslations(config.site.uiLang);
         class="app-writing-filter-option"
         data-writing-facet="type"
         data-writing-value=""
+        data-i18n="writing.all"
         aria-pressed="true"
       >
         {t.writing.all}
@@ -85,9 +121,20 @@ const t = useTranslations(config.site.uiLang);
         types.map(option => (
           <button
             type="button"
-            class="app-writing-filter-option"
+            class:list={[
+              "app-writing-filter-option",
+              /*
+                The novel is the kind of work that carries a series, and
+                a series is what a reader most often comes for. It is
+                set in bold so that the eye finds it first — the filter
+                is a row of chips of the same weight, and the one that
+                leads somewhere deserves to be seen at once.
+              */
+              option.value === "novel" && "app-writing-filter-option-strong",
+            ]}
             data-writing-facet="type"
             data-writing-value={option.value}
+            data-i18n={TYPE_I18N_KEYS[option.value]}
             aria-pressed="false"
           >
             {option.label}
@@ -99,7 +146,24 @@ const t = useTranslations(config.site.uiLang);
   </div>
 
   {
-    works.length > 0 && (
+    /*
+      The works.
+
+      The series and the stand-alone works are one level, not two: they
+      are both "a work", and two levels that carry the same label are
+      two labels that say the same thing.
+
+      The series are always on screen — a series is a thing with
+      chapters, and it is what a reader most often comes for. The
+      stand-alone works are a dozen full titles, and a row of them is a
+      wall of text that says less than the list of works below the filter
+      does. So they sit behind a button that says how many are waiting.
+
+      The works are in the markup either way — the button only folds them
+      away — so that the filter can still match on a work whose name the
+      reader has not seen yet.
+    */
+    (series.length > 0 || standalone.length > 0) && (
       <div class="app-writing-filter-level">
         <span class="app-writing-filter-label" data-i18n="writing.byWork">
           {t.writing.byWork}
@@ -110,11 +174,12 @@ const t = useTranslations(config.site.uiLang);
             class="app-writing-filter-option"
             data-writing-facet="work"
             data-writing-value=""
+            data-i18n="writing.allWorks"
             aria-pressed="true"
           >
             {t.writing.allWorks}
           </button>
-          {works.map(work => (
+          {series.map(work => (
             <button
               type="button"
               class="app-writing-filter-option"
@@ -129,7 +194,41 @@ const t = useTranslations(config.site.uiLang);
               )}
             </button>
           ))}
+          {standalone.length > 0 && (
+            <button
+              type="button"
+              class="app-writing-filter-more"
+              data-writing-more
+              aria-expanded="false"
+              aria-controls="writing-standalone-works"
+              data-i18n="writing.moreWorks"
+              data-i18n-args={String(standalone.length)}
+            >
+              {moreWorksLabel}
+            </button>
+          )}
         </div>
+        {standalone.length > 0 && (
+          <div
+            class="app-writing-filter-folded"
+            id="writing-standalone-works"
+            data-writing-folded
+            hidden
+          >
+            {standalone.map(work => (
+              <button
+                type="button"
+                class="app-writing-filter-option"
+                data-writing-facet="work"
+                data-writing-value={work.value}
+                data-writing-work-type={work.type}
+                aria-pressed="false"
+              >
+                {work.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     )
   }

@@ -160,7 +160,7 @@ async function withPage(ctx, fn) {
   // 10. no console errors across key pages
   {
     const errs = [];
-    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/chapter-one/", "/projects/", "/search/"]) {
+    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/xue-luo-jiang-chuan-1/", "/projects/", "/search/"]) {
       const page = await ctx.newPage();
       const e = [];
       page.on("pageerror", err => e.push(`${p} PAGEERROR ${err.message}`));
@@ -179,7 +179,7 @@ async function withPage(ctx, fn) {
     for (const [name, path, sel] of [
       ["首页碎碎念", "/", 'ul[data-list-layout="notes"] > li > article'],
       ["技术文章", "/posts/", ".app-post-row"],
-      ["文学创作", "/writing/", 'ul[data-list-layout="series"] > li > article'],
+      ["创作", "/writing/", 'ul[data-list-layout="series"] > li > article'],
       ["项目", "/projects/", ".app-card"],
     ]) {
       await page.goto(BASE + path, { waitUntil: "networkidle" });
@@ -305,7 +305,7 @@ async function withPage(ctx, fn) {
   // 12. no horizontal overflow on any page
   await withPage(ctx, async (page) => {
     const bad = [];
-    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/chapter-one/", "/projects/", "/about/", "/search/", "/404/"]) {
+    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/xue-luo-jiang-chuan-1/", "/projects/", "/about/", "/search/", "/404/"]) {
       await page.goto(BASE + p, { waitUntil: "networkidle" });
       await page.waitForTimeout(300);
       const o = await page.evaluate(() => ({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth }));

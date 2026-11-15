@@ -218,6 +218,8 @@ export interface UIStrings {
     all: string;
     novel: string;
     essay: string;
+    /** A review — a piece written about a film, a series or a game. */
+    review: string;
     short: string;
     series: string;
     standalone: string;
@@ -274,6 +276,14 @@ export interface UIStrings {
      * The option that clears one level of the writing filter, e.g. "全部作品".
      */
     allWorks: string;
+    /**
+     * The button that opens the rest of the works of the writing filter,
+     * e.g. "更多作品 12".
+     *
+     * The count is supplied by the page as `{{0}}`, so that the button
+     * says how many works are waiting behind it.
+     */
+    moreWorks: string;
     /**
      * The label of the floating button that returns from a chapter to the
      * list of works, e.g. "返回".

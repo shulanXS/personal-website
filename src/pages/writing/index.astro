@@ -8,7 +8,11 @@ import WritingFilter from "@/components/WritingFilter.astro";
 import WritingContents from "@/components/WritingContents.astro";
 import TagEmpty from "@/components/TagEmpty.astro";
 import { getPublishedWriting } from "@/utils/content";
-import { buildWritingFacets, groupWriting } from "@/utils/writingMeta";
+import {
+  buildWritingFacets,
+  groupWriting,
+  WRITING_TYPE_TAGS,
+} from "@/utils/writingMeta";
 import { getTagIndex } from "@/utils/tagIndex";
 import { tagDisplayName } from "@/utils/tagIndex";
 import { useTranslations } from "@/i18n";
@@ -22,8 +26,12 @@ const works = await getPublishedWriting();
  * The works are grouped into series first and standalone works second, so
  * that a novel is read as one thing with chapters rather than as a list of
  * chapters that happen to share a tag.
+ *
+ * The two halves are blocks of the page, and they are ordered by the day
+ * the newest work in them appeared — so the block that was written last
+ * comes first, whatever kind of work it holds.
  */
-const { series, standalone } = groupWriting(works);
+const { series, standalone, blocks } = groupWriting(works);
 
 /*
  * The filter of the page.
@@ -38,27 +46,35 @@ const facets = buildWritingFacets(
   {
     novel: t.writing.novel,
     essay: t.writing.essay,
+    review: t.writing.review,
     short: t.writing.short,
   }
 );
 
-const workNames = new Set(facets.works.map(work => work.value));
+const workNames = new Set(
+  [...facets.series, ...facets.standalone].map(work => work.value)
+);
 
 /*
- * The names of the kinds of work, in the interface language.
+ * The tags that name a kind of work.
  *
- * A tag that repeats a kind ("小说") is left out of the tag level: the
- * first level of the filter already says it, and offering it twice would
- * say the same thing in two places.
+ * A work carries its kind twice: in the `type` field, and often in a tag
+ * as well ("小说" on every chapter of a novel). The tag level of the
+ * filter leaves these out — the first level already says which kind a
+ * work is, and offering it twice would say the same thing in two places.
+ *
+ * The list is the tags the author writes, not the labels of the
+ * interface: the dictionary says "原创小说", the content says "小说",
+ * and only the second one is a tag.
  */
-const typeNames = new Set(facets.types.map(type => type.label));
+const typeTags = new Set<string>(WRITING_TYPE_TAGS);
 
 const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
 
 const freeTags = tags
   .filter(tag => tag.counts.writing > 0)
   .filter(tag => !workNames.has(tag.name))
-  .filter(tag => !typeNames.has(tag.name))
+  .filter(tag => !typeTags.has(tag.name))
   .map(tag => ({
     slug: tag.slug,
     name: tagDisplayName(tag.name),
@@ -91,10 +107,11 @@ const freeTags = tags
           <>
             <WritingFilter
               types={facets.types}
-              works={facets.works}
+              series={facets.series}
+              standalone={facets.standalone}
               tags={freeTags}
             />
-            <WritingContents series={series} standalone={standalone} />
+            <WritingContents blocks={blocks} />
           </>
         )
       }

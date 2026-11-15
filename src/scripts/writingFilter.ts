@@ -2,9 +2,9 @@
  * The filter of the writing page.
  *
  * The writing collection is filtered in levels rather than by one flat row
- * of tags: a piece of writing is a novel, an essay or a short story, and
- * it either belongs to a series or stands on its own. The levels are the
- * shape of the collection itself.
+ * of tags: a piece of writing is a novel, an essay, a review or a short
+ * story, and it either belongs to a series or stands on its own. The
+ * levels are the shape of the collection itself.
  *
  * Two of the three levels are handled here — the kind of the work and the
  * work itself. The third level, the free-form tags, is handled by the
@@ -209,6 +209,80 @@ function syncWorkLevel(): void {
 }
 
 /**
+ * Opens or closes the folded part of the work level.
+ *
+ * The stand-alone works are folded away behind a button, because a row
+ * of a dozen full titles is a wall of text. The fold is only a fold:
+ * the works stay in the markup, so the filter can still match on one of
+ * them whether the reader has opened the fold or not.
+ */
+function setFold(open: boolean): void {
+  const folded = document.querySelector<HTMLElement>("[data-writing-folded]");
+  if (folded) folded.hidden = !open;
+
+  const button = document.querySelector<HTMLElement>("[data-writing-more]");
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+/**
+ * Opens the fold when the chosen work is inside it.
+ *
+ * A work chosen from the URL — or a work that is still chosen after the
+ * page was reloaded — may be one of the folded ones. If the fold stayed
+ * closed, the reader would see a filter that says a work is chosen and a
+ * listing that does not show it.
+ */
+function revealChosenWork(): void {
+  if (!state.work) return;
+
+  const option = document.querySelector<HTMLElement>(
+    `[data-writing-facet="work"][data-writing-value="${CSS.escape(state.work)}"]`
+  );
+  if (!option) return;
+
+  if (option.closest("[data-writing-folded]")) setFold(true);
+}
+
+/**
+ * Handles a click on the button that opens the folded works.
+ */
+function handleMoreClick(event: Event): void {
+  const target = event.target as HTMLElement | null;
+  const button = target?.closest<HTMLElement>("[data-writing-more]");
+  if (!button) return;
+
+  const folded = document.querySelector<HTMLElement>("[data-writing-folded]");
+  if (!folded) return;
+
+  setFold(folded.hasAttribute("hidden"));
+}
+
+/**
+ * Scrolls the listing to the work that was just chosen.
+ *
+ * Choosing a work in the filter is not the same as opening it: the
+ * filter narrows the listing, and the listing is below the filter. On a
+ * phone the two are a screen apart, so without this the reader would
+ * press a title and see nothing happen.
+ *
+ * The scroll lands on the row of the chosen work itself, so that the
+ * reader can go on to open it.
+ */
+function scrollToChosenWork(): void {
+  if (!state.work) return;
+
+  const row = document.querySelector<HTMLElement>(
+    `.app-writing-row[data-writing-work="${CSS.escape(state.work)}"]`
+  );
+  if (!row) return;
+
+  row.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+}
+
+/**
  * Handles a click on one of the options of the filter.
  */
 function handleClick(event: Event): void {
@@ -240,11 +314,28 @@ function handleClick(event: Event): void {
     }
   } else if (facet === "work") {
     state.work = state.work === value ? "" : value;
+
+    /*
+     * Choosing "All works" closes the fold.
+     *
+     * The fold is a way of reaching the stand-alone works, and it is
+     * only worth being open while one of them is in play. Once the
+     * reader has gone back to the whole list, the fold has done its
+     * work: leaving it open would keep a wall of titles on the page for
+     * a filter that is not narrowing anything.
+     */
+    if (!state.work) setFold(false);
   }
 
   syncUrl(state);
   syncWorkLevel();
   applyFilter();
+
+  /*
+   * A work chosen from the fold is scrolled to, because the fold is
+   * long and the work it names is below the fold.
+   */
+  if (facet === "work" && state.work) scrollToChosenWork();
 }
 
 /**
@@ -253,6 +344,7 @@ function handleClick(event: Event): void {
 function applyFromUrl(): void {
   state = readState();
   syncWorkLevel();
+  revealChosenWork();
   applyFilter();
 }
 
@@ -276,11 +368,13 @@ function handleEmptyResetClick(event: Event): void {
 
   syncUrl(state);
   syncWorkLevel();
+  setFold(false);
   applyFilter();
 }
 
 document.addEventListener("click", handleClick);
 document.addEventListener("click", handleEmptyResetClick);
+document.addEventListener("click", handleMoreClick);
 
 document.addEventListener("astro:page-load", applyFromUrl);
 document.addEventListener("astro:after-swap", applyFromUrl);

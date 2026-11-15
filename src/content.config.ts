@@ -110,7 +110,7 @@ const writing = defineCollection({
     z.object({
       title: z.string(),
       slug: z.string(),
-      type: z.enum(["novel", "essay", "short"]).default("essay"),
+      type: z.enum(["novel", "essay", "review", "short"]).default("essay"),
       description: z.string().optional(),
       series: z.string().optional(),
       chapterNumber: z.number().optional(),
@@ -120,8 +120,8 @@ const writing = defineCollection({
       modDatetime: z.date().optional().nullable(),
       draft: z.boolean().optional(),
       /**
-       * Tags attached to the work — e.g. a genre ("玄幻"), a theme
-       * ("读后感") or a series name.
+       * Tags attached to the work — e.g. a genre ("玄幻"), a medium
+       * ("影视") or a series name.
        */
       tags: z.array(z.string()).default([]),
       canonicalURL: z.string().optional(),

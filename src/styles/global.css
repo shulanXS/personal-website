@@ -1908,6 +1908,31 @@
     align-items: baseline;
   }
 
+  /*
+   * The folded part of the work level.
+   *
+   * The stand-alone works are a dozen full titles, and a row of them is a
+   * wall of text. They are folded away behind a button and, when they
+   * are shown, they are set apart from the row above them: the fold
+   * spans the whole width of the level and hangs under the works, so
+   * that the reader can see that what is open is a continuation of the
+   * row and not another level of its own.
+   */
+  .app-writing-filter-folded {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-space-2);
+    align-items: center;
+    margin-top: var(--app-space-1);
+    padding-left: var(--app-space-3);
+    border-left: 2px solid var(--border);
+  }
+
+  .app-writing-filter-folded[hidden] {
+    display: none;
+  }
+
   .app-writing-filter-label {
     font-size: 0.8125rem;
     color: var(--muted-foreground);
@@ -1920,6 +1945,71 @@
     flex-wrap: wrap;
     gap: var(--app-space-2);
     align-items: center;
+  }
+
+  /*
+   * The button that opens the fold.
+   *
+   * It is not a chip like the works around it: it is dashed rather than
+   * solid, so that a reader can tell it apart from the options of the
+   * level. Otherwise the fold would be one more work that happens to be
+   * a button.
+   */
+  .app-writing-filter-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border: 1px dashed var(--border);
+    border-radius: 999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color var(--app-transition) ease,
+      color var(--app-transition) ease;
+  }
+
+  .app-writing-filter-more:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /*
+   * The arrow of the button.
+   *
+   * It says which way the fold will move: down while the fold is
+   * closed, up while it is open. It is drawn as a rotated square rather
+   * than as an image, so that it takes the colour of the button and
+   * needs nothing of its own.
+   */
+  .app-writing-filter-more::after {
+    content: "";
+    width: 0.375rem;
+    height: 0.375rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(-0.0625rem, -0.0625rem);
+    transition: transform var(--app-transition) ease;
+  }
+
+  .app-writing-filter-more[aria-expanded="true"]::after {
+    transform: rotate(225deg) translate(-0.0625rem, -0.0625rem);
+  }
+
+  /*
+   * The fold is open.
+   *
+   * The button keeps its dashed border — that is what tells it apart
+   * from the works around it — and gains a wash of colour instead, so
+   * that the reader can see at a glance that the works below are open.
+   */
+  .app-writing-filter-more[aria-expanded="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
   }
 
   /*
@@ -1950,6 +2040,23 @@
   .app-writing-filter-option:hover:not(:disabled) {
     border-color: var(--accent);
     color: var(--accent);
+  }
+
+  /*
+   * The kind that leads somewhere.
+   *
+   * The novel is the kind of work that carries a series, and a series is
+   * what a reader most often comes for. The chips of the filter all
+   * carry the same weight, so the one that leads somewhere is set in
+   * bold: the eye finds it first.
+   */
+  .app-writing-filter-option-strong {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .app-writing-filter-option-strong:hover:not(:disabled) {
+    font-weight: 600;
   }
 
   .app-writing-filter-option-active {
@@ -1994,6 +2101,20 @@
 
     .app-writing-filter-label {
       padding-top: 0;
+    }
+
+    /*
+     * The fold goes back into the single column of the phone.
+     *
+     * On a wide screen the fold hangs under the options, in the second
+     * column of the grid. With one column there is no second column to
+     * hang in, and asking for one would have the grid make an implicit
+     * column for it — which would squeeze the label of the level to
+     * nothing.
+     */
+    .app-writing-filter-folded {
+      grid-column: auto;
+      padding-left: var(--app-space-2);
     }
   }
 
