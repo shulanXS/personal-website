@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 2
 status: completed
 description: "两颗发酸的青柠檬，一本翻旧的《唐诗三百首》，和一句“进门先看我眼睛的人”。"
-pubDatetime: 2026-10-27T08:00:00.000Z
+pubDatetime: 2026-06-08T14:26:15.000Z
 draft: false
 tags:
   - 雪落江川

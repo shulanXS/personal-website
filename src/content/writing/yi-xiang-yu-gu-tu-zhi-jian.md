@@ -3,7 +3,7 @@ title: 异乡与故土之间：一个赴美留学生的文化认同漫谈
 slug: yi-xiang-yu-gu-tu-zhi-jian
 type: essay
 description: 从文化休克、两套坐标系到边缘人式的悬浮感，谈一个赴美留学生如何在异乡与故土之间重构自己的文化认同
-pubDatetime: 2026-11-14T22:02:23.000Z
+pubDatetime: 2025-04-26T08:08:37.000Z
 draft: false
 tags:
   - 随笔

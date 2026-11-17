@@ -1,13 +1,14 @@
 ---
-title: 动画《命运石之门》：前十一集的闷罐子，和后面让人喘不过气的宿命感
+title: 动漫《命运石之门》：慢热日常如何织成时间困局
 slug: ming-yun-shi-zhi-men
 type: review
 description: 从秋叶原的日常流水账到第十二集的枪声，看《命运石之门》如何把时间穿越剥皮抽筋，变成一场针对普通人的精神凌迟。
 rating: 5
-pubDatetime: 2026-11-17T00:54:00.000Z
+pubDatetime: 2026-05-22T06:47:59.000Z
 draft: false
 tags:
   - 动漫
+  - 科幻
 ---
 《命运石之门》这番，劝退率高得离谱。
 

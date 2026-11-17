@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 3
 status: completed
 description: "凌晨的爆发痛、吗啡起效前的二十分钟空窗，以及一碗没送出去的酸梅汤。"
-pubDatetime: 2026-10-28T08:00:00.000Z
+pubDatetime: 2025-06-11T13:32:33.000Z
 draft: false
 tags:
   - 雪落江川

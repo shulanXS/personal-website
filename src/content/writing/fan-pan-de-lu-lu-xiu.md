@@ -1,13 +1,14 @@
 ---
-title: 动画《反叛的鲁路修》：中二外壳下的残酷现实主义，与一场蓄谋已久的自我献祭
+title: 动漫《反叛的鲁路修》：零之镇魂曲的政治代价
 slug: fan-pan-de-lu-lu-xiu
 type: review
 description: 剥掉Zero的中二外壳，看大河内一楼埋下的政治与人性命题：理想与手段从不全两全，革命从来没有不流血的代价。
 rating: 5
-pubDatetime: 2026-11-17T01:09:00.000Z
+pubDatetime: 2026-05-17T21:29:11.000Z
 draft: false
 tags:
   - 动漫
+  - 科幻
 ---
 第一次看《反叛的鲁路修》时，很容易被它那层极其华丽的“中二外壳”唬住。
 

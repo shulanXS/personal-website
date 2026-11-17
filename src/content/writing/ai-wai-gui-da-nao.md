@@ -3,7 +3,7 @@ title: 从“工具”到“外挂大脑”：AI是如何一步步接管我的�
 slug: ai-wai-gui-da-nao
 type: essay
 description: 从效率工具到全天候智囊，记录AI如何渗透学习、决策与情绪，也记录随之而来的独立思考耐受力下降与那些不舒服的犹豫
-pubDatetime: 2026-11-15T01:10:41.000Z
+pubDatetime: 2025-09-12T05:31:49.000Z
 draft: false
 tags:
   - 随笔

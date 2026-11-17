@@ -204,6 +204,26 @@ export default {
      * the rest behind a button that says how many are waiting.
      */
     moreWorks: "More works ({{0}})",
+    /**
+     * The label of the level of the filter that says how the works are
+     * put in order.
+     */
+    bySort: "Sort by",
+    /**
+     * The order that puts the newest work first.
+     *
+     * It is the order the page is written in, so choosing it is the
+     * same as choosing not to sort at all.
+     */
+    sortNewest: "Newest",
+    /**
+     * The order that puts the best-scored work first.
+     */
+    sortHighest: "Highest rated",
+    /**
+     * The order that puts the worst-scored work first.
+     */
+    sortLowest: "Lowest rated",
     /** The floating button that returns from a chapter to the list. */
     backToList: "Back",
     /**

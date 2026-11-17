@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 6
 status: completed
 description: "《沈明雪还想做的五件事》，一条永远锁不上的窗缝，和关于遗忘的恐惧。"
-pubDatetime: 2026-10-31T08:00:00.000Z
+pubDatetime: 2025-08-21T18:22:37.000Z
 draft: false
 tags:
   - 雪落江川

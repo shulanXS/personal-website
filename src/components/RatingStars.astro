@@ -1,0 +1,165 @@
+---
+import IconStarFilled from "@/assets/icons/IconStarFilled.svg";
+import { flatRuntimeTranslations, useTranslations } from "@/i18n";
+import { formatTemplate } from "@/i18n/format";
+import config from "@/config";
+
+type Props = {
+  /**
+   * The score, from one to five stars.
+   *
+   * The scale is continuous: a score of 4.3 is four stars and three tenths
+   * of the fifth, and it is drawn that way. The number is the score itself
+   * — a `4.3` is four and three tenths of a star, not four stars and a
+   * third of a star of its own — and the fraction is worked out here
+   * rather than stored, so that the drawing and the number can never
+   * disagree.
+   */
+  value: number;
+  /**
+   * The size of the stars.
+   *
+   * The small one is for a listing, where the score is a fact about the
+   * work among other facts; the large one is for the page of the work
+   * itself, where the score is the thing the reader came for.
+   */
+  size?: "xs" | "sm" | "md";
+  /**
+   * Show the number.
+   *
+   * The stars alone say "good"; the number says how good.
+   */
+  showValue?: boolean;
+  /**
+   * How the score is laid out.
+   *
+   * `inline` sets the stars and the number side by side — the score sits
+   * in a line of other facts, beside the date.
+   *
+   * `stacked` sets the number above the stars, in a narrow column — the
+   * score sits in the margin of a listing, where the number is read first
+   * and the stars are the confirmation of it.
+   */
+  variant?: "inline" | "stacked";
+  class?: string;
+};
+
+const {
+  value,
+  size = "sm",
+  showValue = false,
+  variant = "inline",
+  class: className = "",
+} = Astro.props;
+
+const t = useTranslations(config.site.uiLang);
+
+/*
+ * The score is clamped rather than trusted: a score that is out of range
+ * would draw a number of stars that is not the number of stars, and the
+ * drawing would be wrong in a way nobody would notice.
+ */
+const score = Math.min(5, Math.max(0, value));
+
+/*
+ * The score as it is written.
+ *
+ * Keep one decimal place, including the trailing zero of a whole score.
+ */
+const written = score.toFixed(1);
+
+/*
+ * The stars, and how much of each one is filled.
+ *
+ * The whole stars come first, then the partial one, and the rest are
+ * empty. A score of 4.3 therefore fills four stars and three tenths of
+ * the fifth.
+ */
+const whole = Math.floor(score);
+const fraction = score - whole;
+
+const stars = Array.from({ length: 5 }, (_, index) => {
+  const fill = index < whole ? 1 : index === whole ? fraction : 0;
+  return { fill };
+});
+
+const starSizeClasses = {
+  xs: "size-2",
+  sm: "size-2.5",
+  md: "size-4",
+};
+/*
+ * The accessible name of the group of stars.
+ *
+ * It is composed out of the flattened dictionary rather than out of the
+ * strings of the built language, so that the word for "rating" is the
+ * word of the language the visitor is reading — and so that the name
+ * the runtime switcher rebuilds is the same name the server wrote.
+ */
+const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
+const ariaLabel = formatTemplate(t.writing.ratingAccessible, dict, [written]);
+---
+
+<span
+  class:list={[
+    "app-rating",
+    `app-rating-${variant}`,
+    `app-rating-size-${size}`,
+    className,
+  ]}
+  role="img"
+  aria-label={ariaLabel}
+  data-i18n="writing.ratingAccessible"
+  data-i18n-attr="aria-label"
+  data-i18n-args={written}
+>
+  {
+    showValue && variant === "stacked" && (
+      <span
+        class="app-rating-number"
+        data-i18n="writing.ratingNumber"
+        data-i18n-args={written}
+      >
+        {written}
+      </span>
+    )
+  }
+  <span class="app-rating-stars">
+    {
+      stars.map(({ fill }) => (
+        <span class="app-rating-star">
+          <span class="app-rating-star-empty">
+            <IconStarFilled
+              class:list={["app-rating-icon", starSizeClasses[size]]}
+            />
+          </span>
+          {/*
+            The filled star is laid over the empty one and clipped to the
+            width of the fill, so that half a star is half a star rather
+            than a star of its own — and so that two tenths of a star is
+            two tenths of a star.
+          */}
+          <span
+            class="app-rating-star-fill"
+            style={`--app-rating-fill: ${fill * 100}%`}
+          >
+            <IconStarFilled
+              class:list={["app-rating-icon", starSizeClasses[size]]}
+            />
+          </span>
+        </span>
+      ))
+    }
+  </span>
+  {
+    showValue && variant === "inline" && (
+      <span
+        class="app-rating-value"
+        data-i18n="writing.ratingNumber"
+        data-i18n-args={written}
+      >
+        {written}
+      </span>
+    )
+  }
+</span>

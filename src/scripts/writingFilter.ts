@@ -142,8 +142,15 @@ function applyFilter(): void {
     }
   }
 
+  for (const controls of document.querySelectorAll<HTMLElement>(
+    "[data-writing-sort]"
+  )) {
+    controls.hidden = state.type !== "review";
+  }
+
   syncEmptyState(rows);
   syncOptions();
+  document.dispatchEvent(new Event("writing:filtered"));
 }
 
 /**

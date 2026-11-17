@@ -109,7 +109,7 @@ const TYPE_I18N_KEYS: Record<string, string> = {
     <div class="app-writing-filter-options">
       <button
         type="button"
-        class="app-writing-filter-option"
+        class="app-writing-filter-option app-writing-filter-option-strong"
         data-writing-facet="type"
         data-writing-value=""
         data-i18n="writing.all"
@@ -121,17 +121,7 @@ const TYPE_I18N_KEYS: Record<string, string> = {
         types.map(option => (
           <button
             type="button"
-            class:list={[
-              "app-writing-filter-option",
-              /*
-                The novel is the kind of work that carries a series, and
-                a series is what a reader most often comes for. It is
-                set in bold so that the eye finds it first — the filter
-                is a row of chips of the same weight, and the one that
-                leads somewhere deserves to be seen at once.
-              */
-              option.value === "novel" && "app-writing-filter-option-strong",
-            ]}
+            class="app-writing-filter-option app-writing-filter-option-strong"
             data-writing-facet="type"
             data-writing-value={option.value}
             data-i18n={TYPE_I18N_KEYS[option.value]}

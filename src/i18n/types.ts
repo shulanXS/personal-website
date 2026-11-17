@@ -285,6 +285,23 @@ export interface UIStrings {
      */
     moreWorks: string;
     /**
+     * The label of the level of the writing filter that says how the
+     * works are put in order, e.g. "排序".
+     */
+    bySort: string;
+    /**
+     * The order that puts the newest work first, e.g. "最新".
+     */
+    sortNewest: string;
+    /**
+     * The order that puts the best-scored work first, e.g. "评分最高".
+     */
+    sortHighest: string;
+    /**
+     * The order that puts the worst-scored work first, e.g. "评分最低".
+     */
+    sortLowest: string;
+    /**
      * The label of the floating button that returns from a chapter to the
      * list of works, e.g. "返回".
      */

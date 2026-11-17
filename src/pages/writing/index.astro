@@ -27,9 +27,7 @@ const works = await getPublishedWriting();
  * that a novel is read as one thing with chapters rather than as a list of
  * chapters that happen to share a tag.
  *
- * The two halves are blocks of the page, and they are ordered by the day
- * the newest work in them appeared — so the block that was written last
- * comes first, whatever kind of work it holds.
+ * Standalone articles appear newest first, followed by the novels.
  */
 const { series, standalone, blocks } = groupWriting(works);
 

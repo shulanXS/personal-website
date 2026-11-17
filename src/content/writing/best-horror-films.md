@@ -1,12 +1,14 @@
 ---
-title: 我心目中的最佳恐怖片
+title: 电影《遗传厄运》《异教徒》：心理恐怖的长板与裂缝
 slug: best-horror-films
 type: review
 description: 为什么《遗传厄运》和《异教徒》并列第一，以及重隐喻恐怖片那种难以根治的通病。
-pubDatetime: 2026-11-14T19:44:26.000Z
+rating: 4.4
+pubDatetime: 2025-12-09T00:55:43.000Z
 draft: false
 tags:
-  - 恐怖片
+  - 电影
+  - 恐怖
 ---
 
 恐怖片这东西，看多了是会产生耐药性的。

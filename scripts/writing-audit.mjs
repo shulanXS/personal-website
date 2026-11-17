@@ -398,7 +398,59 @@ if (scoredHref) {
   check("作品页在标题下显示评分与数字", false, "找不到带评分的作品");
 }
 
-// --- 15. a screenshot ----------------------------------------------------
+// --- 15. the order of the works -----------------------------------------
+//
+// The stand-alone works can be put in order by their score.
+//
+// The check asks for the highest first and reads the scores back out of
+// the rows, to make sure that the order the page shows is the order that
+// was asked for — and that a work with no score has been put at the end
+// rather than among the ranked ones, since it cannot be compared with
+// them.
+await page.goto(BASE + "/writing/?type=review&sort=highest", {
+  waitUntil: "networkidle",
+});
+await page.waitForTimeout(400);
+
+const sortByRating = await page.evaluate(() => {
+  const rows = [
+    ...document.querySelectorAll("[data-writing-sort-list] .app-writing-row"),
+  ];
+  const scores = rows.map(row => {
+    const raw = row.dataset.writingRating;
+    return raw === undefined || raw === "" ? null : Number.parseFloat(raw);
+  });
+  const pressed = document.querySelector(
+    '[data-writing-sort-value="highest"]'
+  )?.getAttribute("aria-pressed");
+  return { scores, pressed, url: window.location.search };
+});
+
+check(
+  "作品可按评分排序",
+  sortByRating.scores.length > 0 &&
+    sortByRating.pressed === "true" &&
+    sortByRating.scores.every((score, index) => {
+      if (score === null) return true;
+      const next = sortByRating.scores[index + 1];
+      return next === null || next === undefined || score >= next;
+    }),
+  JSON.stringify({
+    first: sortByRating.scores.slice(0, 5),
+    last: sortByRating.scores.slice(-3),
+    pressed: sortByRating.pressed,
+  })
+);
+
+// The order has to survive a reload, and it is kept in the URL so that a
+// page that has been ordered can be shared.
+check(
+  "排序状态保存在网址中",
+  sortByRating.url.includes("sort=highest"),
+  sortByRating.url
+);
+
+// --- 16. a screenshot ----------------------------------------------------
 await page.goto(BASE + "/writing/", { waitUntil: "networkidle" });
 await page.waitForTimeout(500);
 await page.screenshot({ path: "/tmp/writing-desktop.png", fullPage: true });

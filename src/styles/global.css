@@ -1533,6 +1533,77 @@
   }
 
   /*
+   * The order of the stand-alone works.
+   *
+   * It sits at the right of the head of the block, because that is where
+   * a thing that governs the block belongs: the name of the block is
+   * what the block is, and the order is how it is arranged.
+   *
+   * The label is set in the margin rather than above the options, so
+   * that the head stays one line on a wide page.
+   */
+  .app-writing-sort {
+    display: flex;
+    align-items: baseline;
+    gap: var(--app-space-3);
+    margin-left: auto;
+  }
+
+  .app-writing-sort[hidden] {
+    display: none;
+  }
+
+  .app-writing-sort-label {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+  }
+
+  .app-writing-sort-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-space-2);
+    align-items: center;
+  }
+
+  /*
+   * An order.
+   *
+   * It is a chip like the options of the filter, so that the reader
+   * recognises the kind of control — but it is set apart from them by
+   * the rule that the chosen one is the only one that is filled in. The
+   * orders are alternatives to each other, and only one of them is in
+   * force.
+   */
+  .app-writing-sort-option {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color var(--app-transition) ease,
+      color var(--app-transition) ease,
+      background-color var(--app-transition) ease;
+  }
+
+  .app-writing-sort-option:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .app-writing-sort-option-active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
+  }
+
+  /*
    * The stars of a score.
    *
    * Each star is two layers laid on top of each other: an empty star, and
@@ -1624,16 +1695,16 @@
    * The number on its own, e.g. "4.3".
    *
    * In the margin of a listing the number is the score — the stars under
-   * it are the picture of it — so it is set large, in the serif face of
-   * the works themselves, and the denominator is left out.
+   * it are the picture of it — so it is set large with lining numerals
+   * and a baseline decimal point, and the denominator is left out.
    */
   .app-rating-number {
-    font-family: var(--font-serif);
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 1.375rem;
     font-weight: 700;
     line-height: 1;
     color: var(--rating);
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: lining-nums tabular-nums;
   }
 
   .app-writing-group-meta {
@@ -2174,20 +2245,15 @@
   }
 
   /*
-   * The kind that leads somewhere.
-   *
-   * The novel is the kind of work that carries a series, and a series is
-   * what a reader most often comes for. The chips of the filter all
-   * carry the same weight, so the one that leads somewhere is set in
-   * bold: the eye finds it first.
+   * Give every type option the same bold weight.
    */
   .app-writing-filter-option-strong {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--foreground);
   }
 
   .app-writing-filter-option-strong:hover:not(:disabled) {
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .app-writing-filter-option-active {
@@ -2246,6 +2312,27 @@
     .app-writing-filter-folded {
       grid-column: auto;
       padding-left: var(--app-space-2);
+    }
+
+    /*
+     * The order of the works goes under the name of the block.
+     *
+     * There is no room for it in the margin on a phone: the name of the
+     * block is a line of text, and the orders are three chips beside it.
+     * So the label of the order goes above its chips, the way the label
+     * of a level of the filter does on a phone.
+     */
+    .app-writing-sort {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--app-space-2);
+      margin-left: 0;
+      width: 100%;
+    }
+
+    .app-writing-sort-label {
+      margin-bottom: 0;
     }
   }
 

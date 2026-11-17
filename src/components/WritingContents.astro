@@ -17,8 +17,7 @@ import config from "@/config";
 
 type Props = {
   /**
-   * The blocks of the page, ordered by the day the newest work in them
-   * appeared.
+   * The blocks of the page: standalone articles first, novels last.
    *
    * The blocks are passed in rather than built here, so that the order
    * of the page and the order of the filter are decided in one place.
@@ -314,8 +313,59 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
           <div class="app-writing-group-main">
             <div class="app-writing-group-head">
               <h2 class="app-writing-group-name">{t.writing.standalone}</h2>
+              {/*
+                The order of the works.
+
+                It sits in the head of the block because that is what the
+                head is for: it says what the block is and how it is
+                arranged. The series have their own head each, and they
+                are not sorted — a series is read in the order it was
+                written, and a different order would be a different
+                book.
+
+                The works that stand on their own have no such order of
+                their own, so the reader is offered one. The newest
+                first is the order the page is written in, and it is the
+                one chosen by default; the other two put the works by
+                their score, for a reader who wants the best of them
+                first.
+              */}
+              <div class="app-writing-sort" data-writing-sort hidden>
+                <span class="app-writing-sort-label" data-i18n="writing.bySort">
+                  {t.writing.bySort}
+                </span>
+                <div class="app-writing-sort-options">
+                  <button
+                    type="button"
+                    class="app-writing-sort-option"
+                    data-writing-sort-value="newest"
+                    data-i18n="writing.sortNewest"
+                    aria-pressed="true"
+                  >
+                    {t.writing.sortNewest}
+                  </button>
+                  <button
+                    type="button"
+                    class="app-writing-sort-option"
+                    data-writing-sort-value="highest"
+                    data-i18n="writing.sortHighest"
+                    aria-pressed="false"
+                  >
+                    {t.writing.sortHighest}
+                  </button>
+                  <button
+                    type="button"
+                    class="app-writing-sort-option"
+                    data-writing-sort-value="lowest"
+                    data-i18n="writing.sortLowest"
+                    aria-pressed="false"
+                  >
+                    {t.writing.sortLowest}
+                  </button>
+                </div>
+              </div>
             </div>
-            <ol class="app-writing-toc">
+            <ol class="app-writing-toc" data-writing-sort-list>
               {block.groups.map(group =>
                 group.works.map(work => (
                   <li
@@ -324,6 +374,11 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                     data-tags={work.data.tags.map(tagSlug).join(",")}
                     data-writing-type={group.type}
                     data-writing-work={work.data.title}
+                    data-writing-rating={
+                      work.data.rating !== undefined
+                        ? String(work.data.rating)
+                        : undefined
+                    }
                   >
                     <a
                       class="app-writing-row-link"
@@ -393,6 +448,7 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
     hideEmptyWritingGroups,
     refreshWritingMeta,
   } from "@/scripts/writingMeta";
+  import { setupWritingSort } from "@/scripts/writingSort";
 
   document.addEventListener("astro:page-load", () => refreshWritingMeta());
 
@@ -403,4 +459,6 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
   // The tag filter hides the entries that do not carry the tag; a group
   // whose entries have all been hidden has to go with them.
   document.addEventListener("tags:filtered", () => hideEmptyWritingGroups());
+
+  setupWritingSort();
 </script>

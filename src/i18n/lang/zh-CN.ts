@@ -213,6 +213,26 @@ export default {
      * the rest behind a button that says how many are waiting.
      */
     moreWorks: "更多作品 {{0}}",
+    /**
+     * The label of the level of the filter that says how the works are
+     * put in order.
+     */
+    bySort: "排序",
+    /**
+     * The order that puts the newest work first.
+     *
+     * It is the order the page is written in, so choosing it is the
+     * same as choosing not to sort at all.
+     */
+    sortNewest: "最新",
+    /**
+     * The order that puts the best-scored work first.
+     */
+    sortHighest: "评分最高",
+    /**
+     * The order that puts the worst-scored work first.
+     */
+    sortLowest: "评分最低",
     /** The floating button that returns from a chapter to the list. */
     backToList: "返回",
     /**

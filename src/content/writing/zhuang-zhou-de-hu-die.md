@@ -3,7 +3,7 @@ title: 庄周的蝴蝶，与醒来后的荒原
 slug: zhuang-zhou-de-hu-die
 type: essay
 description: 记梦的人、梦里的她们、以及每一次醒来后的被掏空感——从荣格的潜意识补偿写到庄周梦蝶
-pubDatetime: 2026-11-15T01:35:03.000Z
+pubDatetime: 2026-05-17T05:44:09.000Z
 draft: false
 tags:
   - 随笔

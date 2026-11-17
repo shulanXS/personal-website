@@ -57,15 +57,7 @@ export type WritingIndex = {
   series: WritingGroup[];
   /** The stand-alone works, newest first. */
   standalone: WritingGroup[];
-  /**
-   * The blocks of the page, ordered by the day the newest work in them
-   * appeared.
-   *
-   * The series and the stand-alone works are two blocks of the page, and
-   * they are not in a fixed order: whichever of them was written last
-   * comes first. A reader who arrives at the page wants the newest
-   * thing on it, whichever kind it is.
-   */
+  /** Standalone articles first, followed by novels; each block is newest first. */
   blocks: WritingBlock[];
 };
 
@@ -265,14 +257,7 @@ export function groupWriting(
   const sortedSeries = series.sort(byDate);
   const sortedStandalone = standalone.sort(byDate);
 
-  /*
-   * The two halves become two blocks of the page, and the blocks are
-   * ordered by the newest work in them.
-   *
-   * A block is placed by its *newest* work rather than its oldest: a
-   * series that began long ago and was written up to yesterday is still
-   * the newest thing on the page.
-   */
+  // Keep novels in the final block, with standalone articles above them.
   const blocks: WritingBlock[] = [];
 
   if (sortedSeries.length > 0) {
@@ -291,7 +276,10 @@ export function groupWriting(
     });
   }
 
-  blocks.sort((a, b) => b.date.getTime() - a.date.getTime());
+  // Standalone articles stay above novels, regardless of publication dates.
+  blocks.sort(
+    (a, b) => Number(a.kind === "series") - Number(b.kind === "series")
+  );
 
   return {
     series: sortedSeries,

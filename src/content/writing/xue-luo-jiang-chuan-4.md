@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 4
 status: completed
 description: "深蓝布面笔记本，一句没说出口的“不公平”，和病房里久违的笑声。"
-pubDatetime: 2026-10-29T08:00:00.000Z
+pubDatetime: 2025-11-21T09:13:10.000Z
 draft: false
 tags:
   - 雪落江川
