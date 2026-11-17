@@ -58,18 +58,6 @@ export interface UIStrings {
   post: {
     publishedAt: string;
     updatedAt: string;
-    sharePostIntro: string;
-    sharePostOn: string;
-    sharePostViaEmail: string;
-    /**
-     * The label of each sharing button, keyed by platform.
-     *
-     * One entry per platform rather than one template plus a parameter,
-     * because the platform's own name differs between the languages —
-     * 微信 in Chinese, WeChat in English — and a parameter would freeze
-     * whichever one the page was rendered with.
-     */
-    sharePlatforms: Record<string, string>;
     tagLabel: string;
     backToTop: string;
     goBack: string;

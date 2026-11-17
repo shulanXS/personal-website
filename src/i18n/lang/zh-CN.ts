@@ -42,18 +42,6 @@ export default {
   post: {
     publishedAt: "发布于",
     updatedAt: "更新于",
-    sharePostIntro: "分享这篇文章：",
-    sharePostOn: "分享到 {{0}}",
-    sharePostViaEmail: "通过邮件分享",
-    sharePlatforms: {
-      wechat: "分享到微信",
-      weibo: "分享到微博",
-      whatsapp: "分享到 WhatsApp",
-      facebook: "分享到 Facebook",
-      x: "分享到 X",
-      telegram: "分享到 Telegram",
-      pinterest: "分享到 Pinterest",
-    },
     tagLabel: "标签",
     backToTop: "回到顶部",
     goBack: "返回",

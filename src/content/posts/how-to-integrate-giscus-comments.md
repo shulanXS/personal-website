@@ -75,12 +75,11 @@ You should now have a script tag that looks like this:
 ></script>
 ```
 
-Simply add that to the source code of the site. Most likely, if you're using _AstroPaper_ and want to enable comments on posts, navigate to `PostDetails.astro` and paste it into the desired location where you want the comments to appear, perhaps underneath the `Share this post on:` buttons.
+Simply add that to the source code of the site. Most likely, if you're using _AstroPaper_ and want to enable comments on posts, navigate to `PostDetails.astro` and paste it into the desired location where you want the comments to appear, for example, after the article tags.
 
 ```astro file=src/layouts/PostDetails.astro
 <Layout {...layoutProps}>
   <main>
-    <ShareLinks />
 
     <!-- [!code ++:6] -->
     <script
@@ -192,8 +191,6 @@ To complete the process, add the new Comments component to `PostDetails.astro` (
 ```jsx file=src/layouts/PostDetails.astro
 // [!code ++:1]
 import Comments from "@/components/Comments";
-
-<ShareLinks />
 
 // [!code ++:1]
 <Comments client:only="react" />

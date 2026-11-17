@@ -57,13 +57,6 @@ export default defineAstroPaperConfig({
     { name: "linkedin", url: "https://www.linkedin.com/in/username/" },
     { name: "mail", url: "mailto:yourmail@gmail.com" },
   ],
-  shareLinks: [
-    { name: "whatsapp", url: "https://wa.me/?text=" },
-    { name: "facebook", url: "https://www.facebook.com/sharer.php?u=" },
-    { name: "x", url: "https://x.com/intent/post?url=" },
-    { name: "telegram", url: "https://t.me/share/url?url=" },
-    { name: "mail", url: "mailto:?subject=See%20this%20post&body=" },
-  ],
 });
 ```
 
@@ -213,25 +206,6 @@ export default defineAstroPaperConfig({
 ```
 
 To add a social not in the defaults, add its SVG icon to `src/assets/icons/socials/` and add an entry to the array. The `name` must match the SVG filename without the `.svg` extension.
-
-## Configuring share links
-
-![An arrow pointing at share link icons](https://github.com/user-attachments/assets/4f930b68-b625-45df-8c41-e076dd2b838e)
-
-Share links are configured in the `shareLinks` array. Each entry requires a `name` (matching an SVG in `src/assets/icons/socials/`) and a base `url` to which the post URL is appended:
-
-```ts file="astro-paper.config.ts"
-export default defineAstroPaperConfig({
-  // ...
-  shareLinks: [
-    { name: "whatsapp", url: "https://wa.me/?text=" },
-    { name: "facebook", url: "https://www.facebook.com/sharer.php?u=" },
-    { name: "x", url: "https://x.com/intent/post?url=" },
-    { name: "telegram", url: "https://t.me/share/url?url=" },
-    { name: "mail", url: "mailto:?subject=See%20this%20post&body=" },
-  ],
-});
-```
 
 ## Configuring fonts
 

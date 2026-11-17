@@ -130,16 +130,6 @@ interface SocialLink {
   linkTitle?: string;
 }
 
-interface ShareLink {
-  /**
-   * Must match an SVG filename in src/assets/icons/socials/.
-   * e.g. "facebook" → src/assets/icons/socials/facebook.svg
-   */
-  name: string;
-  /** Base share URL. The post URL will be appended as a query param. */
-  url: string;
-}
-
 interface AstroPaperConfig {
   site: SiteConfig;
   posts?: PostsConfig;
@@ -155,8 +145,6 @@ interface AstroPaperConfig {
   cms?: CmsConfig;
   /** Social profile links shown in header/footer */
   socials?: SocialLink[];
-  /** Share links shown on post detail pages */
-  shareLinks?: ShareLink[];
 }
 
 interface CmsConfig {
@@ -189,7 +177,6 @@ export interface ResolvedAstroPaperConfig {
   features: Required<FeaturesConfig>;
   cms: Required<CmsConfig>;
   socials: SocialLink[];
-  shareLinks: ShareLink[];
 }
 
 /**

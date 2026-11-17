@@ -32,18 +32,6 @@ export default {
   post: {
     publishedAt: "Published at",
     updatedAt: "Updated",
-    sharePostIntro: "Share this post:",
-    sharePostOn: "Share this post on {{0}}",
-    sharePostViaEmail: "Share this post via email",
-    sharePlatforms: {
-      wechat: "Share this post on WeChat",
-      weibo: "Share this post on Weibo",
-      whatsapp: "Share this post on WhatsApp",
-      facebook: "Share this post on Facebook",
-      x: "Share this post on X",
-      telegram: "Share this post on Telegram",
-      pinterest: "Share this post on Pinterest",
-    },
     tagLabel: "Tags",
     backToTop: "Back to top",
     goBack: "Go back",
