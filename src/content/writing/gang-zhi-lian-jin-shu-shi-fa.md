@@ -3,6 +3,7 @@ title: 动画《钢之炼金术师FA》：不靠说教，把“等价交换”�
 slug: gang-zhi-lian-jin-shu-shi-fa
 type: review
 description: 从等价交换的残酷底色、伊修瓦尔歼灭战的冷峻态度到结局的真理之门，看荒川弘如何用64集讲透“人性的重量”。
+rating: 5
 pubDatetime: 2026-11-17T00:39:00.000Z
 draft: false
 tags:
