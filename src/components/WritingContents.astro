@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import Datetime from "./Datetime.astro";
 import TagChip from "./TagChip.astro";
+import RatingStars from "./RatingStars.astro";
 import {
   chapterDescription,
   chapterName,
@@ -328,11 +329,31 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                       class="app-writing-row-link"
                       href={getWritingUrl(work.data.slug, locale)}
                     >
-                      <span
-                        class="app-writing-row-label"
-                        data-i18n={TYPE_LABEL_KEYS[group.type]}
-                      >
-                        {TYPE_LABELS[group.type]}
+                      <span class="app-writing-row-label app-writing-row-label-stack">
+                        <span data-i18n={TYPE_LABEL_KEYS[group.type]}>
+                          {TYPE_LABELS[group.type]}
+                        </span>
+                        {/*
+                          The score of the work, if it has one.
+
+                          It sits under the kind of the work because the
+                          left column of a row holds the facts about the
+                          work rather than the work itself — and because
+                          a fourth column would break the two-column
+                          layout of a phone.
+
+                          The number is above the stars, not beside them:
+                          the column is too narrow for the two to sit side
+                          by side, and the number is the part that is read.
+                        */}
+                        {work.data.rating && (
+                          <RatingStars
+                            value={work.data.rating}
+                            size="xs"
+                            variant="stacked"
+                            showValue
+                          />
+                        )}
                       </span>
                       <span class="app-writing-row-body">
                         <span class="app-writing-row-title">

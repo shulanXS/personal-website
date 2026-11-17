@@ -356,6 +356,15 @@ content:
         type: text
         required: false
         label: 简介
+      - name: rating
+        type: number
+        required: false
+        label: 评分
+        options:
+          min: 1
+          max: 5
+          step: 0.1
+        description: 1 到 5 星，可取小数（4.5、4.3）。留空表示不评分。
       - name: series
         type: string
         required: false

@@ -289,6 +289,21 @@ export interface UIStrings {
      * list of works, e.g. "返回".
      */
     backToList: string;
+    /**
+     * The score itself, with nothing around it, e.g. "4.3".
+     *
+     * The score is supplied by the page as `{{0}}`, so that the same label
+     * serves a score of any value.
+     */
+    ratingNumber: string;
+    /**
+     * The accessible name of the group of stars, e.g. "评分 4.5 / 5".
+     *
+     * The stars are a picture, so without a name a reader who cannot see
+     * them would be told nothing at all. The name repeats the number, so
+     * that the score is said as well as drawn.
+     */
+    ratingAccessible: string;
   };
   projects: {
     github: string;

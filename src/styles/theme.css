@@ -66,6 +66,21 @@
   --border: #e4e1e1;
 
   /*
+   * The colour of a score.
+   *
+   * A score is a judgement, not a link, so it must not wear the accent
+   * colour: the accent means "clickable" throughout the site, and a row
+   * of golden stars next to a blue hyperlink says something the site does
+   * not mean.
+   *
+   * Amber is the colour scores have everywhere else — the bookseller's
+   * stars, the film's rating — and it separates the score from the link
+   * without adding a new piece of vocabulary.
+   */
+  --rating: #b45309;
+  --rating-empty: #ddd8d2;
+
+  /*
    * Surface levels.
    *
    * The page itself is a warm paper tone, not pure white — a pure white
@@ -123,6 +138,15 @@
   --muted: #343f60;
   --muted-foreground: #b6c0cf;
   --border: #3a4157;
+
+  /*
+   * The score on a dark ground.
+   *
+   * The light-theme amber is too dark to read against the deep page, so
+   * the dark theme takes a brighter one — the same gold, lifted.
+   */
+  --rating: #fbbf24;
+  --rating-empty: #454d64;
 
   /*
    * The dark surfaces are *lighter* than the page, not darker — a card that

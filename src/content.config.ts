@@ -112,6 +112,25 @@ const writing = defineCollection({
       slug: z.string(),
       type: z.enum(["novel", "essay", "review", "short"]).default("essay"),
       description: z.string().optional(),
+      /**
+       * The score the author gives the work — a review of a film, a series
+       * or a game.
+       *
+       * It is a number rather than a string: a string would make `4.5` and
+       * `4.50` two different values, and it would have to be parsed again
+       * by anything that wants to compare or average the scores.
+       *
+       * The scale is five stars, and the scale is continuous: a score of
+       * 4.3 is allowed, and is drawn as four stars and three tenths of the
+       * fifth. The scale is deliberately not tied to the kind of the work:
+       * a work that carries no score simply leaves the field out, and a
+       * work that is not a review may still be scored.
+       *
+       * The lower bound is one rather than zero, because zero would mean
+       * the same thing as "not scored" — and "not scored" is what the
+       * absence of the field already says.
+       */
+      rating: z.number().min(1).max(5).optional(),
       series: z.string().optional(),
       chapterNumber: z.number().optional(),
       status: z.enum(["ongoing", "completed"]).optional(),

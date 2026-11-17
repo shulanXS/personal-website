@@ -7,6 +7,7 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import Footer from "@/components/Footer.astro";
 import Datetime from "@/components/Datetime.astro";
 import TagChip from "@/components/TagChip.astro";
+import RatingStars from "@/components/RatingStars.astro";
 import WritingBackButton from "@/components/WritingBackButton.astro";
 import { getPublishedWriting } from "@/utils/content";
 import { getWritingUrl } from "@/utils/getPostPaths";
@@ -99,8 +100,17 @@ const tags = data.tags ?? [];
     <h1 class="app-writing-title text-2xl font-semibold sm:text-3xl">
       {data.title}
     </h1>
-    <div class="mt-2 mb-6">
+    <div class="mt-2 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2">
       <Datetime pubDatetime={data.pubDatetime} modDatetime={data.modDatetime} />
+      {/*
+        The score of the work, if it has one.
+
+        It sits beside the date rather than inside the title: the score is
+        a fact about the work, and the title is a piece of writing by the
+        author. A work that carries no score simply shows nothing — the
+        stars are not a decoration that every work wears.
+      */}
+      {data.rating && <RatingStars value={data.rating} size="md" showValue />}
     </div>
 
     {/*

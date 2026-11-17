@@ -282,7 +282,123 @@ if (await novelTag.count()) {
   check("类型与标签可叠加", false, "没有标签可选");
 }
 
-// --- 13. a screenshot ----------------------------------------------------
+// --- 13. the score of the works ----------------------------------------
+//
+// A work that carries a score shows it in the left column of its row.
+// The score is a fact about the work, so it sits with the kind of the
+// work rather than with the title.
+await page.goto(BASE + "/writing/", { waitUntil: "networkidle" });
+await page.waitForTimeout(400);
+const ratings = await page.evaluate(() => {
+  const rows = [...document.querySelectorAll(".app-writing-row")];
+  const scored = rows.filter(row => row.querySelector(".app-rating"));
+  return {
+    scored: scored.length,
+    total: rows.length,
+    inLabel: scored.every(row =>
+      row.querySelector(".app-writing-row-label .app-rating")
+    ),
+    labels: scored.map(row =>
+      row.querySelector(".app-rating")?.getAttribute("aria-label") ?? ""
+    ),
+  };
+});
+check(
+  "带评分的作品在左列显示星星",
+  ratings.scored > 0 && ratings.inLabel,
+  JSON.stringify(ratings)
+);
+
+// The number of the stars is five for every work, and the filled ones
+// follow the score exactly: a score of 4.5 fills four stars and half of
+// the fifth, and a score of 4.3 fills four stars and three tenths of it.
+//
+// The check reads the score out of the accessible name and works out
+// what the fills ought to be, rather than looking for a particular
+// fraction — the scale is continuous, so any fraction may show up.
+const starShapes = await page.evaluate(() => {
+  const group = document.querySelector(".app-rating");
+  if (!group) return null;
+  const stars = [...group.querySelectorAll(".app-rating-star")];
+  const fills = stars.map(star => {
+    const fill = star.querySelector(".app-rating-star-fill");
+    return fill?.style.getPropertyValue("--app-rating-fill") ?? "";
+  });
+  return {
+    count: stars.length,
+    fills,
+    aria: group.getAttribute("aria-label") ?? "",
+    number: group.querySelector(".app-rating-number, .app-rating-value")
+      ?.textContent?.trim() ?? "",
+  };
+});
+
+// The fills have to add up to the score, in stars.
+const expectedFills = starShapes
+  ? (() => {
+      const score = Number.parseFloat(starShapes.number);
+      if (Number.isNaN(score)) return null;
+      const total = starShapes.fills.reduce(
+        (sum, f) => sum + (Number.parseFloat(f) || 0) / 100,
+        0
+      );
+      return { score, total, delta: Math.abs(total - score) };
+    })()
+  : null;
+
+check(
+  "星星的填充与分数一致",
+  !!starShapes &&
+    starShapes.count === 5 &&
+    !!expectedFills &&
+    expectedFills.delta < 0.02,
+  JSON.stringify({ ...starShapes, expectedFills })
+);
+
+// --- 14. the page of a scored work --------------------------------------
+//
+// The page of the work shows the score under the title, with the number
+// beside the stars.
+const scoredHref = await page.evaluate(() => {
+  const row = [...document.querySelectorAll(".app-writing-row")].find(row =>
+    row.querySelector(".app-rating")
+  );
+  const link = row?.querySelector(".app-writing-row-link");
+  return link ? link.getAttribute("href") : null;
+});
+
+if (scoredHref) {
+  await page.goto(new URL(scoredHref, BASE).toString(), {
+    waitUntil: "networkidle",
+  });
+  await page.waitForTimeout(400);
+  const detail = await page.evaluate(() => {
+    const group = document.querySelector(".app-rating");
+    if (!group) return null;
+    const value = group.querySelector(".app-rating-value");
+    const title = document.querySelector(".app-writing-title");
+    const rect = group.getBoundingClientRect();
+    const titleRect = title?.getBoundingClientRect();
+    return {
+      aria: group.getAttribute("aria-label") ?? "",
+      value: value?.textContent?.trim() ?? "",
+      belowTitle: !!titleRect && rect.top >= titleRect.bottom - 2,
+      width: Math.round(rect.width),
+    };
+  });
+  check(
+    "作品页在标题下显示评分与数字",
+    !!detail &&
+      Number.parseFloat(detail.value) > 0 &&
+      detail.belowTitle &&
+      detail.width > 0,
+    JSON.stringify(detail)
+  );
+} else {
+  check("作品页在标题下显示评分与数字", false, "找不到带评分的作品");
+}
+
+// --- 15. a screenshot ----------------------------------------------------
 await page.goto(BASE + "/writing/", { waitUntil: "networkidle" });
 await page.waitForTimeout(500);
 await page.screenshot({ path: "/tmp/writing-desktop.png", fullPage: true });

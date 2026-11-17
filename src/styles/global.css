@@ -1532,6 +1532,110 @@
     background: var(--surface);
   }
 
+  /*
+   * The stars of a score.
+   *
+   * Each star is two layers laid on top of each other: an empty star, and
+   * a filled one that is clipped to the width of the fill. A half a star
+   * is therefore half a star, rather than a star of its own — and so is
+   * three tenths of a star, which is what a score of 4.3 has to look like.
+   */
+  .app-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+  }
+
+  /*
+   * The stacked variant.
+   *
+   * The number is read first and the stars confirm it, so the number sits
+   * above. This is the shape of the score in the margin of a listing,
+   * where the column is narrow and the two cannot sit side by side.
+   */
+  .app-rating-stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .app-rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    line-height: 0;
+  }
+
+  .app-rating-star {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+  }
+
+  .app-rating-star-empty,
+  .app-rating-star-fill {
+    display: inline-block;
+    line-height: 0;
+  }
+
+  /*
+   * The empty star is the one underneath: it shows through the empty part.
+   *
+   * It is a shade of the paper rather than the border colour, so that the
+   * five stars read as five stars rather than as four and a smudge.
+   */
+  .app-rating-star-empty {
+    color: var(--rating-empty);
+  }
+
+  /*
+   * The filled star is clipped to the width of the fill, so that only
+   * that much of it shows. The width is written by the component as
+   * `--app-rating-fill`.
+   *
+   * The clipping is done with `clip-path` rather than with a narrow box
+   * that hides what does not fit: the narrow box would have to cut the
+   * star off with `overflow: hidden`, and the star inside it would then
+   * be wider than the box that holds it — a shape that overflows its
+   * own frame.
+   */
+  .app-rating-star-fill {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 calc(100% - var(--app-rating-fill, 0%)) 0 0);
+    color: var(--rating);
+  }
+
+  /*
+   * The number beside the stars, e.g. "4.3 / 5".
+   *
+   * It wears the colour of the score, so that the eye is pulled to the
+   * mark rather than to the date next to it.
+   */
+  .app-rating-value {
+    margin-left: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--rating);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * The number on its own, e.g. "4.3".
+   *
+   * In the margin of a listing the number is the score — the stars under
+   * it are the picture of it — so it is set large, in the serif face of
+   * the works themselves, and the denominator is left out.
+   */
+  .app-rating-number {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--rating);
+    font-variant-numeric: tabular-nums;
+  }
+
   .app-writing-group-meta {
     font-size: 0.8125rem;
     color: var(--muted-foreground);
@@ -1589,7 +1693,14 @@
   .app-writing-row-link {
     position: relative;
     display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    /*
+     * The label column is wider than the chapter numbers need, because it
+     * may also carry the score of a work: the number of the score is set
+     * in the serif face and the five stars under it need about 3.4rem, so
+     * the column is a little wider than that. The kind of a work needs
+     * about 3rem.
+     */
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
     gap: var(--app-space-4);
     align-items: baseline;
     padding: var(--app-space-3) 0;
@@ -1635,6 +1746,21 @@
     color: var(--muted-foreground);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+
+  /*
+   * The label of a row that holds more than one fact — the kind of the
+   * work, and the score of the work.
+   *
+   * The facts are stacked rather than set side by side: the column is
+   * narrow, and a row of two things in it would wrap in the middle of a
+   * word.
+   */
+  .app-writing-row-label-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
   }
 
   .app-writing-row-body {
@@ -1864,7 +1990,12 @@
    */
   @media (max-width: 30rem) {
     .app-writing-row-link {
-      grid-template-columns: 3.5rem minmax(0, 1fr);
+      /*
+       * The label column is a little wider than the chapter numbers need,
+       * because it may also carry the score of a work: the number of the
+       * score and the five stars under it need about 4.5rem.
+       */
+      grid-template-columns: 4.5rem minmax(0, 1fr);
       gap: var(--app-space-3);
     }
 
