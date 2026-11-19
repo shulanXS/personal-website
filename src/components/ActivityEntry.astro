@@ -60,39 +60,18 @@ const KIND_ICON = {
 const KindIcon = KIND_ICON[entry.kind];
 
 const project = entry.project;
-const writingType = entry.writing?.data.type;
-const isGameReview = writingType === "review" && entry.tags.includes("游戏");
-const labelKey =
-  entry.kind === "writing" && writingType
-    ? isGameReview
-      ? "writing.playReview"
-      : "writing." + writingType
-    : KIND_I18N[entry.kind];
-const writingLabels: Record<string, string> = {
-  novel: t.writing.novel,
-  essay: t.writing.essay,
-  review: isGameReview ? t.writing.playReview : t.writing.review,
-  character: t.writing.character,
-  short: t.writing.short,
-};
-const kindLabel =
-  entry.kind === "writing" && writingType
-    ? writingLabels[writingType]
-    : KIND_LABEL[entry.kind];
 ---
 
 <li
   data-tagged-item
   data-tags={entry.tagSlugs.join(",")}
   data-activity-kind={entry.kind}
+  data-activity-date={entry.date.toISOString()}
 >
   {
     /*
-    The date lives in a narrow column on the left, so the moment a thing
-    happened is readable at a glance without reading the entry itself.
-
-    That column only exists from `sm` upwards. Below it the date is
-    rendered *inside* the entry instead.
+    Each entry follows the same timeline axis and keeps its full timestamp
+    beside the collection label.
   */
   }
   {
@@ -105,10 +84,6 @@ const kindLabel =
     )
   }
 
-  <div class="app-timeline-date hidden sm:block" data-pagefind-ignore>
-    <Datetime pubDatetime={entry.date} bare stacked />
-  </div>
-
   <div class="app-activity-entry">
     {
       /*
@@ -120,19 +95,18 @@ const kindLabel =
     */
     }
     <div class="app-activity-head">
-      <span class="app-activity-kind" data-i18n={labelKey}>
+      <span class="app-activity-kind" data-i18n={KIND_I18N[entry.kind]}>
         <KindIcon class="app-activity-kind-icon" />
-        {kindLabel}
+        {KIND_LABEL[entry.kind]}
       </span>
 
       {
         /*
-        The date, for the narrow screens where there is no column for it.
-        It sits in the header, so that the entry keeps its own clean shape.
+        The full publication date and time, using the site timezone.
         */
       }
-      <div class="app-timeline-date sm:hidden" data-pagefind-ignore>
-        <Datetime pubDatetime={entry.date} bare stacked />
+      <div class="app-timeline-date" data-pagefind-ignore>
+        <Datetime pubDatetime={entry.date} bare />
       </div>
     </div>
 
