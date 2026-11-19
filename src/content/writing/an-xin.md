@@ -1,8 +1,10 @@
 ---
-title: 安欣：一个在泥淖里死磕的“不合时宜者”
+title: 《狂飙》安欣角色分析
 slug: an-xin
 type: character
-description: 从年夜饭的一份善意到二十年的孤独坚守，安欣在《狂飙》中以自己的选择守住底线。
+description: 看安欣受委屈时，我也替他着急。可比起谁赢了，我更在意他熬过那么多年，为什么还是不肯退那一步。
+rating: 4.6
+ratingNote: 他的坚持有具体的代价，一头白发和错过的生活，让这个理想主义者有了分量。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

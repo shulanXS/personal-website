@@ -1,8 +1,10 @@
 ---
-title: 露西（Lucy）：夜之城霓虹深处，一只飞向月球的孤独飞蛾
+title: 《赛博朋克：边缘行者》露西角色分析
 slug: lu-xi-lucy
-type: review
-description: 从荒坂的童年创伤到月球上的孤独，露西在夜之城逃亡、爱人与失去的悲剧。
+type: character
+description: 最初只觉得她神秘，后来才看懂她为什么不敢信人。她终于站上月球的那一幕，我到现在想起来还是难受。
+rating: 4.7
+ratingNote: 从想逃离一切到想保护一个人，她的戒备和爱都有来处，结尾也让我一直放不下。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

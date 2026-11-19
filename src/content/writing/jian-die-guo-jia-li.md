@@ -1,9 +1,10 @@
 ---
-title: 动漫《间谍过家家》：虚构的家人，真实的归属
+title: 《间谍过家家》观后感
 slug: jian-die-guo-jia-li
 type: review
-description: 西国间谍、东国杀手与读心少女凑成的假家庭，看远藤达哉如何借一个“假壳子”写出三种边缘人的孤独与温情。
+description: 比起特工任务，我更爱看这一家三口买菜、上学、吃饭，慢慢把假家庭过成真的。
 rating: 4.5
+ratingNote: 家庭日常最打动我，比起动作和主线，我更喜欢三个人相处的部分。
 pubDatetime: 2025-03-16T04:41:09.000Z
 draft: false
 tags:

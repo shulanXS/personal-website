@@ -1,9 +1,10 @@
 ---
-title: 动漫《堀与宫村》：卸下人设之后的亲密日常
+title: 《堀与宫村》观后感
 slug: hori-miyamura
 type: review
-description: 它把重心全放在“在一起之后”的琐碎日常里，拍出了亲密关系里最难得的一种状态——松弛感。
+description: 我喜欢他们在一起以后的日常。不用一直表现得完美，也有人愿意留在身边，这点最让我羡慕。
 rating: 4.5
+ratingNote: 相处时的松弛感很打动我，是我愿意反复回看的恋爱日常。
 pubDatetime: 2025-03-31T21:56:47.000Z
 draft: false
 tags:

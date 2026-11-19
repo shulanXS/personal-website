@@ -1,8 +1,10 @@
 ---
-title: 《人民的名义》：褪去“反腐爽剧”的外衣，看懂中国式人情与权力的运转逻辑
+title: 《人民的名义》观后感
 slug: ren-min-de-ming-yi
 type: review
-description: 从汉东的关系网与腐败异化，到大风厂工人的生存处境，重看《人民的名义》对权力、人情与规则的审视。
+description: 比起搜出多少现金，我更记得那些客客气气的饭局和会议。话说得越体面，背后的关系越让我觉得透不过气。
+rating: 4.5
+ratingNote: 老戏骨的交锋和关系网很有看头，部分支线偏慢，正面人物也有些理想化。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

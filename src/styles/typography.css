@@ -159,9 +159,10 @@
    */
   .app-prose-serif {
     font-family: var(--font-reading-serif);
-    line-height: 2;
+    font-weight: 500;
+    line-height: 1.95;
     letter-spacing: 0.01em;
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
   }
 
   .app-prose-serif h1,

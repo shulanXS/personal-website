@@ -1,9 +1,10 @@
 ---
-title: 电视剧《甄嬛传》：后宫秩序如何重塑一个人
+title: 《甄嬛传》观后感
 slug: zhen-huan-zhuan-re-shou-ji
 type: review
-description: 隔了多年重刷《甄嬛传》，看的不再是后宫争宠，而是每一个人被权力与阶层碾过之后剩下的东西。
+description: 以前只盼着甄嬛赢，重刷反而更难替任何人的结局高兴。眉庄和安陵容尤其让我惦记。
 rating: 4.7
+ratingNote: 人物经得起反复琢磨，每次重看，对她们的理解都会有些变化。
 pubDatetime: 2025-03-14T05:51:07.000Z
 draft: false
 tags:

@@ -1,8 +1,10 @@
 ---
-title: 《仙剑奇侠传三》：小时候看的是降妖除魔，长大后才看懂那碗没有喝下去的忘情水
+title: 《仙剑奇侠传三》观后感
 slug: xian-jian-qi-xia-zhuan-san
 type: review
-description: 重看《仙剑奇侠传三》，从少年江湖梦读懂长卿与紫萱的告别，以及景天、茂茂为守护他人付出的代价。
+description: 小时候盼着景天打赢，重看却一直惦记长卿和紫萱没喝下去的那碗水。以前嫌慢的戏，如今最难忘。
+rating: 4.6
+ratingNote: 特效和一些台词已有年代感，但人物的责任、牺牲和告别依然很能打动我。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

@@ -53,6 +53,11 @@ function readState(): FilterState {
 function syncUrl(next: FilterState): void {
   const url = new URL(window.location.href);
 
+  // Switching article types starts in publication order.
+  if ((url.searchParams.get("type") ?? "") !== next.type) {
+    url.searchParams.delete("sort");
+  }
+
   if (next.type) url.searchParams.set("type", next.type);
   else url.searchParams.delete("type");
 

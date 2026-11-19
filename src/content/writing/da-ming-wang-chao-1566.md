@@ -1,8 +1,10 @@
 ---
-title: 《大明王朝1566》：那不是权谋剧，是让人看完半天缓不过劲来的冷脊梁
+title: 《大明王朝1566》观后感
 slug: da-ming-wang-chao-1566
 type: review
-description: 从改稻为桑到海瑞上疏，权谋背后是国库、官场与百姓命运构成的冰冷账本。
+description: 本来想看权谋过招，最后最让我缓不过来的，却是那些连上牌桌的资格都没有的百姓。
+rating: 4.9
+ratingNote: 台词、人物和利益关系都经得起琢磨，尤其没有用一个轻巧的结局安慰我。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

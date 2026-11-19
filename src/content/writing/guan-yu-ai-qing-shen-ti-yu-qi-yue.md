@@ -2,7 +2,7 @@
 title: 关于爱情、身体与契约：我的“非主流”底线，以及我为何绝不妥协
 slug: guan-yu-ai-qing-shen-ti-yu-qi-yue
 type: essay
-description: 在快餐式恋爱成为常态的年代，谈我的两条感情铁律：以结婚为目的的恋爱，以及情感与身体的对等洁癖
+description: 我对恋爱有些不太合时宜的坚持，尤其在承诺和亲密关系上。这篇把自己的想法说清楚。
 pubDatetime: 2025-11-10T02:07:25.000Z
 draft: false
 tags:

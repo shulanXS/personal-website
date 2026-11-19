@@ -1,9 +1,10 @@
 ---
-title: 《好想告诉你》黑沼爽子：笨拙之中的善良与真诚
+title: 《好想告诉你》黑沼爽子角色分析
 slug: hao-xiang-gao-shi-ni
 type: character
-description: 一个自认对少女漫免疫的男生，为什么会被黑沼爽子的笨拙与真诚打动。
-rating: 4.4
+description: 爽子说话慢，也总怕给别人添麻烦。我却很喜欢她那种不计较的真诚，看着她慢慢敢开口就很开心。
+rating: 4.6
+ratingNote: 她的笨拙和真诚一直很打动我，慢慢学会表达的过程也让我觉得踏实。
 pubDatetime: 2025-10-06T17:46:46.000Z
 draft: false
 tags:

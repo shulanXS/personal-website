@@ -1,9 +1,10 @@
 ---
-title: 动漫《死亡笔记》：审判欲如何吞噬夜神月
+title: 《死亡笔记》观后感
 slug: si-wang-bi-ji
 type: review
-description: 从大场鸫与小畑健的底牌直摊，到夜神月顺理成章的堕落、L的镜像与第25话的死亡，重看这部悬疑智斗孤峰。
-rating: 5
+description: 月和L的交锋看得很过瘾，但重刷时最让我发冷的，是月一步步越过底线竟然那么自然。
+rating: 4.8
+ratingNote: 前半段的智斗和两位主角的对照非常出色，L的离场也是我最难忘的部分。
 pubDatetime: 2026-05-04T16:34:36.000Z
 draft: false
 tags:

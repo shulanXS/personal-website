@@ -1,8 +1,10 @@
 ---
-title: 《碧蓝之海》毒岛樱子：世俗清醒与主动追爱的生命力
+title: 《碧蓝之海》毒岛樱子角色分析
 slug: du-dao-ying-zi
 type: character
-description: 从世俗清醒到主动追爱，毒岛樱子的真实与主体性，让她成为《碧蓝之海》中最具生命力的角色。
+description: 她现实、毒舌，也会嫉妒，但喜欢上一个人就认真去争取。比起完美的女主，我更想看这样的她。
+rating: 4.6
+ratingNote: 从挑剔到主动追爱的转变让我信服，强势之下的紧张也让她更像一个真实的人。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

@@ -1,9 +1,10 @@
 ---
-title: 动漫《钢之炼金术师FA》：等价交换之外，人该如何承担代价
+title: 《钢之炼金术师FA》观后感
 slug: gang-zhi-lian-jin-shu-shi-fa
 type: review
-description: 从等价交换的残酷底色、伊修瓦尔歼灭战的冷峻态度到结局的真理之门，看荒川弘如何用64集讲透“人性的重量”。
-rating: 5
+description: 等价交换的设定让我入了戏，真正让我记住它的，是每个人都得为自己的选择负责。
+rating: 4.9
+ratingNote: 从开头到结尾都很扎实，人物、伏笔和结局几乎没有让我失望的地方。
 pubDatetime: 2025-10-14T00:42:52.000Z
 draft: false
 tags:

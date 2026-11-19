@@ -257,13 +257,15 @@ export function groupWriting(
    * grouping that reversed that would put the oldest work at the top of
    * the page.
    *
-   * The tie-break is the title, so that two works written on the same day
+   * The tie-break is the slug, so that works with the same timestamp
    * keep a stable order from one build to the next.
    */
   const byDate = (a: WritingGroup, b: WritingGroup) => {
     const diff = b.endDate.getTime() - a.endDate.getTime();
     if (diff !== 0) return diff;
-    return titleOf(a).localeCompare(titleOf(b), "zh-CN");
+    return (a.works[0]?.data.slug ?? "").localeCompare(
+      b.works[0]?.data.slug ?? ""
+    );
   };
 
   const sortedSeries = series.sort(byDate);
@@ -375,17 +377,6 @@ function unionTags(works: CollectionEntry<"writing">[]): string[] {
     for (const tag of work.data.tags ?? []) tags.add(tag);
   }
   return [...tags];
-}
-
-/**
- * The name a group is known by.
- *
- * A series is known by its name; a stand-alone work by its title. It is
- * the same string the filter matches on, so the order of two works of the
- * same day is decided by the name the reader sees.
- */
-function titleOf(group: WritingGroup): string {
-  return group.name ?? group.works[0]?.data.title ?? "";
 }
 
 /**

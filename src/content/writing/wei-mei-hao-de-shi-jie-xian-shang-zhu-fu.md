@@ -1,9 +1,10 @@
 ---
-title: 动漫《为美好的世界献上祝福！》：失败冒险者的荒诞日常
+title: 《为美好的世界献上祝福！》观后感
 slug: wei-mei-hao-de-shi-jie-xian-shang-zhu-fu
 type: review
-description: 一群在异世界底层互相拖后腿的草台班子，用最荒诞最不体面的方式祛魅了英雄冒险，也治好了成年人的精神内耗。
-rating: 4
+description: 这群人总在闯祸、还债、互相拖后腿，我却看得很放松。有时候就是想看他们一起犯傻。
+rating: 4.0
+ratingNote: 不着调的冒险让我很放松，比起主线，我更喜欢小队互相拆台的日常。
 pubDatetime: 2025-01-29T23:10:04.000Z
 draft: false
 tags:

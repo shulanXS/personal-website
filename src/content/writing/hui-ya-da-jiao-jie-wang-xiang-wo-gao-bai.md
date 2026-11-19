@@ -1,9 +1,10 @@
 ---
-title: 动漫《辉夜大小姐想让我告白》：恋爱博弈背后的不安全感
+title: 《辉夜大小姐想让我告白》观后感
 slug: hui-ya-da-jiao-jie-wang-xiang-wo-gao-bai
 type: review
-description: 从“恋爱头脑战”的喜剧外壳，到两个缺乏安全感的少年最笨拙的自我保护，看《辉夜大小姐》如何拍出青春里最体面的双向奔赴
+description: 前面看他们互相试探笑得很开心，后来才发现，两个人都只是怕自己不够好。
 rating: 4.5
+ratingNote: 笑点和感情推进都让我满意，奉心祭让前面的别扭有了很好的回应。
 pubDatetime: 2025-09-13T07:21:13.000Z
 draft: false
 tags:

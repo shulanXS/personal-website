@@ -110,6 +110,17 @@ const freeTags = tags
               standalone={facets.standalone}
               tags={freeTags}
             />
+            <details class="text-muted-foreground mb-6 text-sm">
+              <summary
+                class="cursor-pointer"
+                data-i18n="writing.personalRating"
+              >
+                {t.writing.personalRating}
+              </summary>
+              <p class="mt-2 leading-relaxed" data-i18n="writing.ratingGuide">
+                {t.writing.ratingGuide}
+              </p>
+            </details>
             <WritingContents blocks={blocks} />
           </>
         )

@@ -1,9 +1,10 @@
 ---
-title: 动漫《擅长捉弄的高木同学》：日常捉弄里的明牌偏爱
+title: 《擅长捉弄的高木同学》观后感
 slug: shan-chang-zhuo-nong-de-gao-mu-tong-xue
 type: review
-description: 一部全靠零碎小段子拼起来的初中生日常番，靠“明牌局”的双向试探，拍出了少年时代最干净、最微妙的悸动。
+description: 没什么大起大落，我还是爱看他们每天那点小试探。明明谁都看得出来，却偏要装作不知道。
 rating: 4.5
+ratingNote: 简单的日常也能让我一直看下去，喜欢它对少年心事的分寸。
 pubDatetime: 2025-11-13T13:42:41.000Z
 draft: false
 tags:

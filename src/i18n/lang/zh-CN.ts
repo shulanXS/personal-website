@@ -239,6 +239,10 @@ export default {
      * that the score is said as well as drawn.
      */
     ratingAccessible: "评分 {{0}} / 5",
+    personalRating: "个人评分",
+    characterRating: "角色塑造评分",
+    ratingGuide:
+      "五分制，按 0.1 分记录。观后感评我的整体体验，角色分析评人物塑造。5 分是我的最爱，4 分很喜欢，3 分有得有失，2 分比较失望，1 分及以下不推荐；中间分数表示倾向。",
   },
   projects: {
     github: "源码",

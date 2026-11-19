@@ -1,9 +1,10 @@
 ---
-title: 动漫《异世界归来的舅舅》：第一季的世嘉执念与情感错位
+title: 《异世界归来的舅舅》观后感
 slug: yi-shi-jie-gui-lai-de-shu-shu
 type: review
-description: 十七年昏迷留下的心智断层、来自恶意里的情感雷达生锈，以及一个顶级魔法师回到现实后依然斤斤计较的世嘉死忠粉。
-rating: 4
+description: 舅舅的世嘉梗很好笑，可他总把别人的好意当成恶意，又让我笑着笑着有点心酸。
+rating: 4.0
+ratingNote: 反差和吐槽很有趣，最留得住我的还是舅舅身上那点孤独。
 pubDatetime: 2025-05-23T21:25:00.000Z
 draft: false
 tags:

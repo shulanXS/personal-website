@@ -1,9 +1,10 @@
 ---
-title: 动漫《斩·赤红之瞳》：革命叙事中的牺牲与理想
+title: 《斩·赤红之瞳》观后感
 slug: zhan-chi-hong-zhi-tong
 type: review
-description: 它写的不是为虐而虐的恶趣味，而是革命最残酷的真实底色——旧秩序的崩塌从来都要用一代人的血肉去填平。
-rating: 5
+description: 看着熟悉的人一个个离开，我很难受。但也正是这些牺牲，让我记住了他们想改变的世界。
+rating: 4.7
+ratingNote: 牺牲带来的痛感和人物的理想一直留在我心里，是我很偏爱的作品。
 pubDatetime: 2025-12-12T16:13:49.000Z
 draft: false
 tags:

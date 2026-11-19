@@ -1,9 +1,10 @@
 ---
-title: 游戏《上古卷轴5：天际》：自由探索与第二故乡
+title: 《上古卷轴5：天际》观后感
 slug: shang-gu-juan-ax-5-tian-jie
 type: review
-description: 从存在主义自由、史诗底色下的孤独、碎片化叙事到 Mod 生态，看《上古卷轴5：天际》为什么是我心里断档的第一，甚至是可以玩一辈子的游戏
+description: 玩过很多游戏，还是最想回天际省。哪怕不做任务，只在雪漫城外走走，我也觉得舒服。
 rating: 5.0
+ratingNote: 这是我最愿意反复回去的游戏，自由探索和陪伴感到现在都无可替代。
 pubDatetime: 2025-11-16T08:11:45.000Z
 draft: false
 tags:

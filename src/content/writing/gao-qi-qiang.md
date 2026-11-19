@@ -1,8 +1,10 @@
 ---
-title: 高启强：一个老实人的异化史，与“体面”背后的沉沦
+title: 《狂飙》高启强角色分析
 slug: gao-qi-qiang
 type: character
-description: 从旧厂街卖鱼佬到强盛集团掌门人，高启强在讨好、权力与体面的层层变化中走向沉沦。
+description: 早期那个赔笑的卖鱼人让我心酸，后来他越体面，我反而越觉得发冷。张颂文把这段变化演得很有说服力。
+rating: 4.8
+ratingNote: 从局促讨好到习惯操控别人，表演和人物变化都很有层次，反派也没有因此被洗白。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

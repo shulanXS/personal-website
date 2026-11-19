@@ -61,27 +61,14 @@ function ratingOf(element: HTMLElement): number | undefined {
   return Number.isNaN(value) ? undefined : value;
 }
 
-/**
- * The order the rows are in when nothing is chosen.
- *
- * It is the order the server wrote them in, which is the newest first.
- * The rows are marked with their place so that the order survives the
- * rows being moved around: without it, a work that has no score would
- * have nowhere to go back to.
- */
-function markOriginalOrder(rows: HTMLElement[]): void {
-  for (const [index, row] of rows.entries()) {
-    if (!row.dataset.writingOrder) row.dataset.writingOrder = String(index);
-  }
-}
-
-/**
- * The place a row had when the page was written.
- */
-function originalIndex(row: HTMLElement): number {
-  const raw = row.dataset.writingOrder;
-  const value = raw === undefined ? 0 : Number.parseInt(raw, 10);
-  return Number.isNaN(value) ? 0 : value;
+/** Compare the stored publication timestamps, even after DOM reordering. */
+function byDate(a: HTMLElement, b: HTMLElement): number {
+  const dateA = Date.parse(a.dataset.writingPublished ?? "") || 0;
+  const dateB = Date.parse(b.dataset.writingPublished ?? "") || 0;
+  return (
+    dateB - dateA ||
+    (a.dataset.writingSlug ?? "").localeCompare(b.dataset.writingSlug ?? "")
+  );
 }
 
 /**
@@ -91,8 +78,7 @@ function originalIndex(row: HTMLElement): number {
  * the end of the list rather than to the top or the bottom of it: it is
  * neither the best nor the worst, it is simply not ranked.
  *
- * The tie-break is the original order, so that two works with the same
- * score keep the order the page was written in.
+ * Equal scores are ordered by publication date, newest first.
  */
 function byRating(rows: HTMLElement[], descending: boolean): HTMLElement[] {
   return [...rows].sort((a, b) => {
@@ -100,7 +86,7 @@ function byRating(rows: HTMLElement[], descending: boolean): HTMLElement[] {
     const ratingB = ratingOf(b);
 
     if (ratingA === undefined && ratingB === undefined) {
-      return originalIndex(a) - originalIndex(b);
+      return byDate(a, b);
     }
 
     // A work with no score is not ranked: it goes after the ranked ones.
@@ -111,7 +97,7 @@ function byRating(rows: HTMLElement[], descending: boolean): HTMLElement[] {
       return descending ? ratingB - ratingA : ratingA - ratingB;
     }
 
-    return originalIndex(a) - originalIndex(b);
+    return byDate(a, b);
   });
 }
 
@@ -123,7 +109,8 @@ function applySort(): void {
   if (!list) return;
 
   const rows = [...list.querySelectorAll<HTMLElement>(".app-writing-row")];
-  markOriginalOrder(rows);
+  // Read the URL on every filter event; module state can outlive a page visit.
+  order = readOrder();
 
   const activeOrder = ["review", "character"].includes(
     new URL(window.location.href).searchParams.get("type") ?? ""
@@ -134,9 +121,10 @@ function applySort(): void {
   let sorted: HTMLElement[];
   if (activeOrder === "highest") sorted = byRating(rows, true);
   else if (activeOrder === "lowest") sorted = byRating(rows, false);
-  else sorted = [...rows].sort((a, b) => originalIndex(a) - originalIndex(b));
+  else sorted = [...rows].sort(byDate);
 
   for (const row of sorted) list.appendChild(row);
+  syncSortOptions();
 }
 
 /**

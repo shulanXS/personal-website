@@ -1,9 +1,10 @@
 ---
-title: 动漫《JOJO的奇妙冒险》：规则智斗与黄金精神
+title: 《JOJO的奇妙冒险》观后感
 slug: jojo-qi-miao-hua-yue
 type: review
-description: 荒木重构了热血漫的底层逻辑：摒弃数值碾压、把智斗玩成心理博弈、在残酷命运上开出黄金精神，再用三十年的先锋艺术展做审美暴力。
-rating: 5
+description: 我最爱看那些能力不一定更强、却靠想明白规则翻盘的战斗，还有绝境里不肯认输的人。
+rating: 4.8
+ratingNote: 规则智斗和人物的韧劲让我着迷，鲜明的风格也一直很合我的胃口。
 pubDatetime: 2025-03-29T19:39:21.000Z
 draft: false
 tags:

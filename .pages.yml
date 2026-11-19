@@ -363,10 +363,14 @@ content:
         required: false
         label: 评分
         options:
-          min: 1
+          min: 0.5
           max: 5
           step: 0.1
-        description: 1 到 5 星，可取小数（4.5、4.3）。留空表示不评分。
+        description: 0.5 到 5 星，按 0.1 分递增。观后感评整体体验，角色分析评角色塑造；5 分留给最偏爱的作品。
+      - name: ratingNote
+        type: text
+        label: 评分理由
+        description: 用自己的话说明喜欢什么、遗憾在哪里，分数应与正文一致。
       - name: series
         type: string
         required: false

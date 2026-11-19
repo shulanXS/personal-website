@@ -1,9 +1,10 @@
 ---
-title: 电视剧《雍正王朝》：改革者与帝国机器的相互消耗
+title: 《雍正王朝》观后感
 slug: yong-zheng-wang-chao-re-shou-ji
 type: review
-description: 铁血江山下的血肉、宿命与意难平。
+description: 小时候看夺嫡和权谋，重刷时更放不下的，却是那些能干、重情，却没能好好活下来的人。
 rating: 4.8
+ratingNote: 权谋和人物都经得起重看，越长大越能体会到他们的难处。
 pubDatetime: 2026-04-26T20:40:22.000Z
 draft: false
 tags:

@@ -1,9 +1,10 @@
 ---
-title: 电影《遗传厄运》《异教徒》：心理恐怖的长板与裂缝
+title: 《遗传厄运》《异教徒》观后感
 slug: best-horror-films
 type: review
-description: 为什么《遗传厄运》和《异教徒》并列第一，以及重隐喻恐怖片那种难以根治的通病。
+description: 这两部最让我害怕的都不是突然吓人的镜头。不过，隐喻太满的时候，我也会有点出戏。
 rating: 4.4
+ratingNote: 心理压迫感和视听都很强，部分过重的象征表达影响了我的投入。
 pubDatetime: 2025-12-09T00:55:43.000Z
 draft: false
 tags:

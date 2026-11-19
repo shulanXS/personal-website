@@ -143,6 +143,25 @@ const tags = data.tags ?? [];
       )
     }
 
+    {
+      data.rating && data.ratingNote && (
+        <p class="text-muted-foreground mb-6 text-sm leading-relaxed">
+          <span
+            data-i18n={
+              data.type === "character"
+                ? "writing.characterRating"
+                : "writing.personalRating"
+            }
+          >
+            {data.type === "character"
+              ? t.writing.characterRating
+              : t.writing.personalRating}
+          </span>{" "}
+          · {data.rating.toFixed(1)} / 5：{data.ratingNote}
+        </p>
+      )
+    }
+
     <article id="article" class="app-prose app-prose-serif max-w-app-reading">
       <Content />
     </article>

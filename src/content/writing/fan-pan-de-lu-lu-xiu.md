@@ -1,9 +1,10 @@
 ---
-title: 动漫《反叛的鲁路修》：零之镇魂曲的政治代价
+title: 《反叛的鲁路修》观后感
 slug: fan-pan-de-lu-lu-xiu
 type: review
-description: 剥掉Zero的中二外壳，看大河内一楼埋下的政治与人性命题：理想与手段从不全两全，革命从来没有不流血的代价。
-rating: 5
+description: 当年觉得Zero很帅，重看才更在意鲁路修每走一步失去了什么。结尾还是让我缓了很久。
+rating: 4.8
+ratingNote: 主角的选择和结尾让我印象极深，零之镇魂曲也让整段故事有了完整的落点。
 pubDatetime: 2026-05-17T21:29:11.000Z
 draft: false
 tags:

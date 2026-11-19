@@ -1,9 +1,10 @@
 ---
-title: 动漫《夏日重现》：共享轮回记忆的攻防战
+title: 《夏日重现》观后感
 slug: xia-ri-huan-xian
 type: review
-description: 当反派也能保留轮回记忆、靠复盘反推布下杀局，《夏日重现》把时间循环写成了硬核智斗，也写出了少年血性与克制的深情。
+description: 反派也会记住上一轮发生的事，这一下让我紧张起来。每次重来，都不敢再把它当作保险。
 rating: 4.5
+ratingNote: 循环里的攻防很有压力，感情线也让我愿意跟着角色一路走到结尾。
 pubDatetime: 2025-09-16T20:02:28.000Z
 draft: false
 tags:

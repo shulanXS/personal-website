@@ -1,8 +1,10 @@
 ---
-title: 《赛博朋克：边缘行者》：在没有明天的城市里，一场注定坠落的绚烂烟火
+title: 《赛博朋克：边缘行者》观后感
 slug: sai-bo-peng-ke-bian-yuan-xing-zhe
 type: review
-description: 在夜之城的阶层壁垒与义体狂潮中，大卫背负他人的梦想，以短暂而炽热的一生守护心中的温情。
+description: 十集看完，最放不下的还是大卫和露西。后来再听到那首歌，就会想起他们第一次一起看见月球。
+rating: 4.8
+ratingNote: 短短十集的情绪冲击很强，音乐、画面和最后的告别都让我记了很久。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

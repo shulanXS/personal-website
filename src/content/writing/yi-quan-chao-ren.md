@@ -1,9 +1,10 @@
 ---
-title: 动漫《一拳超人》：无敌者的空虚与凡人的英雄主义
+title: 《一拳超人》观后感
 slug: yi-quan-chao-ren
 type: review
-description: 埼玉强大的不是力量而是“无敌者的孤独”，而真正撑起燃与悲壮的，是明知己是炮灰依然冲上去的无证骑士们。
-rating: 5
+description: 埼玉一拳结束战斗当然爽，但真正让我记住的，还是雨里那个明知打不过也不退的无证骑士。
+rating: 4.8
+ratingNote: 对强大和英雄的两种写法都打动我，无证骑士那场战斗尤其让我服气。
 pubDatetime: 2025-04-12T09:56:16.000Z
 draft: false
 tags:

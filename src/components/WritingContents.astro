@@ -376,6 +376,8 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                     data-tags={work.data.tags.map(tagSlug).join(",")}
                     data-writing-type={group.type}
                     data-writing-work={work.data.title}
+                    data-writing-published={work.data.pubDatetime.toISOString()}
+                    data-writing-slug={work.data.slug}
                     data-writing-rating={
                       work.data.rating !== undefined
                         ? String(work.data.rating)

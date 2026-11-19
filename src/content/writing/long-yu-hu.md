@@ -1,9 +1,10 @@
 ---
-title: 动漫《龙与虎》：逞强的少年如何学会相爱
+title: 《龙与虎》观后感
 slug: long-yu-hu
 type: review
-description: 笑声褪去之后露出的是一层冷而残酷的青春底色——它诚实地拍出了两个残缺的人如何学会去爱一个人。
+description: 刚开始只当校园喜剧看，后来才发现，他们那些别扭和逞强，其实都是因为太怕失去。
 rating: 4.5
+ratingNote: 人物的缺点和感情的转变都让我信服，圣诞夜那一段尤其难忘。
 pubDatetime: 2025-10-14T18:21:46.000Z
 draft: false
 tags:

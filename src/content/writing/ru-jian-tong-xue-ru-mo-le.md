@@ -1,9 +1,10 @@
 ---
-title: 动漫《入间同学入魔了》：问题儿童班的成长与合奏
+title: 《入间同学入魔了》观后感
 slug: ru-jian-tong-xue-ru-mo-le
 type: review
-description: 从前三季动漫到原作音乐祭篇，看西修如何用恶周期、收获祭与群像合奏写出魔界少年的成长。
+description: 前三季越看越喜欢，接着读到漫画音乐祭篇，最开心的是问题儿童班终于一个都没落下。
 rating: 4.3
+ratingNote: 制作偶尔一般，但成长和群像写得讨喜，音乐祭尤其让我满足。
 pubDatetime: 2025-04-21T08:21:33.000Z
 draft: false
 tags:

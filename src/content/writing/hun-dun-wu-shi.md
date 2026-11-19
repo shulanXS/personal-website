@@ -1,9 +1,10 @@
 ---
-title: 动漫《混沌武士》：嘻哈节拍里的江户漫游
+title: 《混沌武士》观后感
 slug: hun-dun-wu-shi
 type: review
-description: 把嘻哈、涂鸦与街舞塞进幕府末期的乡野泥地，用二十六集无目的的旅途，拍出一场注定散场的青春。
-rating: 5
+description: 最喜欢三个人漫无目的地赶路。片尾曲响起来的时候，我舍不得他们就这么散了。
+rating: 4.8
+ratingNote: 音乐、旅途和告别都很合我的口味，看完后的怅然比情节本身留得更久。
 pubDatetime: 2026-02-28T16:51:44.000Z
 draft: false
 tags:

@@ -1,9 +1,10 @@
 ---
-title: 动漫《寒蝉鸣泣之时》：以信任打破疑惧的轮回
+title: 《寒蝉鸣泣之时》观后感
 slug: han-chan-ming-qi-shi-ke
 type: review
-description: 它不是靠血浆和猎奇博眼球的恐怖片，而是一部硬核的“反宿命”群像剧——打破绝望轮回的从来是人与人的相信与托付。
-rating: 5
+description: 一开始被那些恐怖场面吓到，看到后面，真正让我放不下的反而是他们终于愿意相信彼此。
+rating: 4.8
+ratingNote: 悬疑和情绪层层推进，最后对信任的回应让我觉得前面的痛苦没有白受。
 pubDatetime: 2025-09-20T01:16:06.000Z
 draft: false
 tags:

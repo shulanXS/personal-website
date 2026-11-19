@@ -1,9 +1,10 @@
 ---
-title: 动漫《欢迎来到实力至上主义的教室》：积分制度下的竞争实验
+title: 《欢迎来到实力至上主义的教室》观后感
 slug: huan-ying-lai-dao-shi-li-zhi-shang-de-jiao-shi
 type: review
-description: 高度育成高校把资源、信息差与阶级壁垒全摆到明面上——看绫小路清隆的绝对理性与“渴望被赋予意义”之间的张力。
-rating: 4.5
+description: 比起看路哥赢，我更在意他为什么总把别人当工具，又为什么还是想过普通人的生活。
+rating: 4.4
+ratingNote: 制度博弈和人物的矛盾都吸引我，动画与原著放在一起看更有意思。
 pubDatetime: 2026-01-10T11:07:55.000Z
 draft: false
 tags:

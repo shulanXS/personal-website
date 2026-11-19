@@ -1,9 +1,10 @@
 ---
-title: 《碧蓝之海》：在酒局与颜艺的狂欢之外，那些让我觉得“还差一口气”的地方
+title: 《碧蓝之海》观后感
 slug: bi-lan-zhi-hai
 type: review
-description: 喜剧张力十足，却也有重复的荤段子与偏少的潜水戏份；真正留住我的，是喧闹背后人与人的真实联结。
-rating: 4
+description: 酒局和颜艺确实好笑，但荤段子看多了会腻。我更想看潜水，也想看他们认真面对彼此。
+rating: 4.0
+ratingNote: 能让我笑出来，但重复的荤段子和偏少的潜水内容，都是实在的遗憾。
 pubDatetime: 2026-06-03T01:43:31.000Z
 modDatetime: 2026-11-19T12:00:00.000Z
 draft: false

@@ -1,9 +1,10 @@
 ---
-title: 《雍正王朝》年秋月：皇权夹缝里的温柔
+title: 《雍正王朝》年秋月角色分析
 slug: nian-qiu-yue
 type: character
-description: 从《雍正王朝》的年秋月到《甄嬛传》的华妃年世兰，再到正史里的敦肃皇贵妃年氏，解析这个夹在皇权与亲情之间的女性
+description: 她明明看得清自己的处境，却还是想把每个人都顾好。重看时，我最心疼的就是这份温柔。
 rating: 4.7
+ratingNote: 戏份不多，克制的感情和两难的处境却让我一直记得她。
 pubDatetime: 2026-05-19T10:03:26.000Z
 draft: false
 tags:

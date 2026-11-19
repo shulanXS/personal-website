@@ -1,9 +1,10 @@
 ---
-title: 电视剧《纸牌屋》：程序博弈与帝王心术的距离
+title: 《纸牌屋》观后感
 slug: zhi-pai-wu-guan-hou-shi
 type: review
-description: 把《纸牌屋》放进人类政治叙事的坐标系，与《雍正王朝》《大明王朝1566》等中式权谋戏对照，看两种权谋智慧的落差
+description: 前两季看得挺上头，但和我喜欢的中式权谋剧放在一起，总觉得它对权力和人心写得还不够深。
 rating: 3.6
+ratingNote: 节奏和表演很抓人，但后面的权谋处理和人物动机让我越来越难信服。
 pubDatetime: 2025-10-21T12:59:39.000Z
 draft: false
 tags:
