@@ -115,7 +115,7 @@ const tags = data.tags ?? [];
       */
       }
       {
-        data.rating && (
+        data.rating !== undefined && (
           <RatingStars
             value={data.rating}
             tone={data.type === "character" ? "character" : "default"}

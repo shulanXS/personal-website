@@ -128,10 +128,10 @@ const writing = defineCollection({
        * a work that carries no score simply leaves the field out, and a
        * work that is not a review may still be scored.
        *
-       * The lower bound is half a star. An absent score means
+       * Zero is a valid score. An absent score means
        * the work has not been rated; scores use increments of 0.1.
        */
-      rating: z.number().min(0.5).max(5).multipleOf(0.1).optional(),
+      rating: z.number().min(0).max(5).multipleOf(0.1).optional(),
       series: z.string().optional(),
       chapterNumber: z.number().optional(),
       status: z.enum(["ongoing", "completed"]).optional(),

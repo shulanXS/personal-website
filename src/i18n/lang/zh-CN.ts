@@ -25,7 +25,7 @@ export default {
     home: "首页",
     posts: "技术文章",
     notes: "碎碎念",
-    writing: "创作",
+    writing: "个人创作",
     projects: "项目",
     about: "关于我",
     search: "搜索",
@@ -125,7 +125,7 @@ export default {
     /** A technical article. */
     post: "文章",
     /** A piece of literary work. */
-    writing: "创作",
+    writing: "个人创作",
     /** A project. */
     project: "项目",
   },
@@ -273,7 +273,7 @@ export default {
     notesDesc: "随手记录的想法、日常与片段。",
     notesEmpty: "还没有发布任何动态。",
 
-    writingTitle: "创作",
+    writingTitle: "个人创作",
     writingDesc:
       "在这里写故事，也记录阅读与观看后的思考。原创小说承载长篇故事，短篇捕捉片刻想象，随笔记录日常感触，观后感聊作品的整体体验，角色分析细读影视、小说与游戏中的人物。",
     writingEmpty: "还没有发布任何作品。",
@@ -325,7 +325,7 @@ export default {
         route: "notes",
       },
       {
-        label: "创作",
+        label: "个人创作",
         desc: "小说、随笔与短篇故事。",
         route: "writing",
       },

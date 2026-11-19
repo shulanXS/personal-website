@@ -405,7 +405,7 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                           the column is too narrow for the two to sit side
                           by side, and the number is the part that is read.
                         */}
-                        {work.data.rating && (
+                        {work.data.rating !== undefined && (
                           <RatingStars
                             value={work.data.rating}
                             tone={

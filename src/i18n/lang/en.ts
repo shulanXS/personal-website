@@ -15,7 +15,7 @@ export default {
     home: "Home",
     posts: "Blog",
     notes: "Notes",
-    writing: "Writing",
+    writing: "Personal Writing",
     projects: "Projects",
     about: "About",
     search: "Search",
@@ -116,7 +116,7 @@ export default {
     /** A technical article. */
     post: "Post",
     /** A piece of literary work. */
-    writing: "Writing",
+    writing: "Personal Writing",
     /** A project. */
     project: "Project",
   },
@@ -264,7 +264,7 @@ export default {
     notesDesc: "Short thoughts, daily records and quick notes.",
     notesEmpty: "No notes yet.",
 
-    writingTitle: "Writing",
+    writingTitle: "Personal Writing",
     writingDesc:
       "Stories and reflections on what I read, watch, and play. Original novels tell longer stories; short stories capture brief flights of imagination; essays explore everyday thoughts; reviews reflect on works as a whole; character analyses take a closer look at people in film, television, fiction, and games.",
     writingEmpty: "No writing published yet.",
@@ -316,7 +316,7 @@ export default {
         route: "notes",
       },
       {
-        label: "Writing",
+        label: "Personal Writing",
         desc: "Novels, essays and short stories.",
         route: "writing",
       },

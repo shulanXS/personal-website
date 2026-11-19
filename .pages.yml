@@ -309,7 +309,7 @@ content:
   # `series`, `chapterNumber` and `status` are reserved for chapters.
   # ---------------------------------------------------------------------------
   - name: writing
-    label: 创作
+    label: 个人创作
     type: collection
     path: src/content/writing
     filename:
@@ -365,10 +365,10 @@ content:
         required: false
         label: 作品评分 / 角色喜爱度
         options:
-          min: 0.5
+          min: 0
           max: 5
           step: 0.1
-        description: 0.5 到 5 分，按 0.1 分递增。观后感用星级表示作品评价；角色分析用粉色心形表示我有多喜欢这个角色，不是人物塑造质量或道德评价。留空不显示。
+        description: 0 到 5 分，按 0.1 分递增。观后感用星级表示作品评价；角色分析用粉色心形表示我有多喜欢这个角色，不是人物塑造质量或道德评价。填写 0 显示 0.0，只有留空才不显示。
       - name: series
         type: string
         required: false

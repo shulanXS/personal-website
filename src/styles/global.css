@@ -1666,15 +1666,15 @@
    * where the column is narrow and the two cannot sit side by side.
    */
   .app-rating-character {
-    --rating: #db2777;
-    --rating-heart: #f472b6;
-    --rating-empty: #fce7f3;
+    --rating: #c026a3;
+    --rating-heart: #ff5cce;
+    --rating-empty: #fce6f8;
   }
 
   [data-theme="dark"] .app-rating-character {
-    --rating: #f9a8d4;
-    --rating-heart: #f9a8d4;
-    --rating-empty: #70334e;
+    --rating: #ff9cde;
+    --rating-heart: #ff9cde;
+    --rating-empty: #683459;
   }
 
   .app-rating-character .app-rating-star-fill {
