@@ -1,10 +1,9 @@
 ---
-title: 《人民的名义》高育良角色分析
+title: 《人民的名义》角色分析：高育良
 slug: gao-yu-liang
 type: character
 description: 他说话越有道理，我越在意他究竟在替什么辩护。看着他一点点把自己说服，比直接作恶还让我发冷。
 rating: 4.7
-ratingNote: 儒雅、自欺和对体面的执念连在一起，让他的变化既细微又让人信服。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

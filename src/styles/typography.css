@@ -142,34 +142,25 @@
     }
   }
 
-  /*
-   * Literary work reads better in a serif face — on Chinese systems that is
-   * 宋体/思源宋体, which gives long-form fiction a distinctly different
-   * texture from the sans-serif used by the technical blog.
-   *
-   * This is a sibling of `.app-prose` rather than a nested modifier, because
-   * the class is applied to the same element that carries `.app-prose`.
-   *
-   * The Chinese serif is a *webfont* (see `reading-font.css`), so the
-   * reading pages carry a heavier font stack than the rest of the site.
-   * The line height is generous — a Chinese serif has finer strokes than
-   * the sans face and needs the air to stay legible — and the tracking is
-   * trimmed, because full-width glyphs already carry generous side
-   * bearing and a little extra spacing makes the column look loose.
-   */
-  .app-prose-serif {
-    font-family: var(--font-reading-serif);
-    font-weight: 500;
+  /* A sans-serif reading face keeps Chinese strokes clear at normal weight. */
+  .app-prose-reading {
+    font-family: var(--font-app);
+    font-weight: 400;
     line-height: 1.95;
     letter-spacing: 0.01em;
     font-size: 1.125rem;
   }
 
-  .app-prose-serif h1,
-  .app-prose-serif h2,
-  .app-prose-serif h3,
-  .app-prose-serif h4 {
-    font-family: var(--font-reading-serif);
+  .app-prose-reading strong,
+  .app-prose-reading b {
+    font-weight: 700;
+  }
+
+  .app-prose-reading h1,
+  .app-prose-reading h2,
+  .app-prose-reading h3,
+  .app-prose-reading h4 {
+    font-family: var(--font-app);
     letter-spacing: 0.03em;
     font-weight: 600;
   }
@@ -192,7 +183,7 @@
    * smaller — a block that is narrower than the column around it reads
    * as a quotation rather than as a continuation of the story.
    */
-  .app-prose-serif blockquote {
+  .app-prose-reading blockquote {
     border-inline-start: 2px solid var(--border);
     margin-inline: 0;
     padding-inline-start: 1.25em;
@@ -202,11 +193,11 @@
     color: color-mix(in oklab, var(--foreground) 88%, var(--background));
   }
 
-  .app-prose-serif blockquote p {
+  .app-prose-reading blockquote p {
     margin-bottom: var(--app-space-3);
   }
 
-  .app-prose-serif blockquote p:last-child {
+  .app-prose-reading blockquote p:last-child {
     margin-bottom: 0;
   }
 
@@ -219,8 +210,8 @@
    * the font failed to load. The emphasis is shown as a colour change
    * instead, which works in Chinese the way italics do not.
    */
-  .app-prose-serif em,
-  .app-prose-serif i {
+  .app-prose-reading em,
+  .app-prose-reading i {
     font-style: normal;
     color: color-mix(in oklab, var(--accent) 72%, var(--foreground));
   }

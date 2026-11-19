@@ -4,7 +4,6 @@ slug: si-yue-shi-ni-de-lie-yin
 type: review
 description: 原以为又是熟悉的催泪套路，最后那封信还是把我看难受了。再想起前面的热闹，感觉全变了。
 rating: 4.5
-ratingNote: 音乐和告别带来的后劲很足，结尾也改变了我对前面许多片段的理解。
 pubDatetime: 2025-11-26T08:46:41.000Z
 draft: false
 tags:

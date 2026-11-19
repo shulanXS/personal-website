@@ -4,7 +4,6 @@ slug: sai-bo-peng-ke-bian-yuan-xing-zhe
 type: review
 description: 十集看完，最放不下的还是大卫和露西。后来再听到那首歌，就会想起他们第一次一起看见月球。
 rating: 4.8
-ratingNote: 短短十集的情绪冲击很强，音乐、画面和最后的告别都让我记了很久。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

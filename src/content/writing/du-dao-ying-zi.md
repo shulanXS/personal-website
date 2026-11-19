@@ -1,10 +1,9 @@
 ---
-title: 《碧蓝之海》毒岛樱子角色分析
+title: 《碧蓝之海》角色分析：毒岛樱子
 slug: du-dao-ying-zi
 type: character
 description: 她现实、毒舌，也会嫉妒，但喜欢上一个人就认真去争取。比起完美的女主，我更想看这样的她。
 rating: 4.6
-ratingNote: 从挑剔到主动追爱的转变让我信服，强势之下的紧张也让她更像一个真实的人。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

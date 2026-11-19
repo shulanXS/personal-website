@@ -4,7 +4,6 @@ slug: shan-chang-zhuo-nong-de-gao-mu-tong-xue
 type: review
 description: 没什么大起大落，我还是爱看他们每天那点小试探。明明谁都看得出来，却偏要装作不知道。
 rating: 4.5
-ratingNote: 简单的日常也能让我一直看下去，喜欢它对少年心事的分寸。
 pubDatetime: 2025-11-13T13:42:41.000Z
 draft: false
 tags:

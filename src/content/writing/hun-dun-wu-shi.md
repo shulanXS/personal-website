@@ -4,7 +4,6 @@ slug: hun-dun-wu-shi
 type: review
 description: 最喜欢三个人漫无目的地赶路。片尾曲响起来的时候，我舍不得他们就这么散了。
 rating: 4.8
-ratingNote: 音乐、旅途和告别都很合我的口味，看完后的怅然比情节本身留得更久。
 pubDatetime: 2026-02-28T16:51:44.000Z
 draft: false
 tags:

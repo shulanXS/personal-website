@@ -4,7 +4,6 @@ slug: qi-mu-nan-xiong-de-zai-nan
 type: review
 description: 心情差的时候很想随手点一集。齐木嘴上嫌大家麻烦，最后却总会伸手帮忙，我就喜欢这点。
 rating: 4.5
-ratingNote: 吐槽的节奏和嘴硬心软的主角都很对我的口味，重看也轻松。
 pubDatetime: 2026-03-06T02:17:53.000Z
 draft: false
 tags:

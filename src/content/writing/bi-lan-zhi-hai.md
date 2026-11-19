@@ -4,7 +4,6 @@ slug: bi-lan-zhi-hai
 type: review
 description: 酒局和颜艺确实好笑，但荤段子看多了会腻。我更想看潜水，也想看他们认真面对彼此。
 rating: 4.0
-ratingNote: 能让我笑出来，但重复的荤段子和偏少的潜水内容，都是实在的遗憾。
 pubDatetime: 2026-06-03T01:43:31.000Z
 modDatetime: 2026-11-19T12:00:00.000Z
 draft: false

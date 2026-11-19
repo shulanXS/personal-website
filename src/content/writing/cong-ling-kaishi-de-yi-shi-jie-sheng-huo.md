@@ -1,10 +1,9 @@
 ---
-title: 《Re：从零开始的异世界生活》菜月昴角色分析
+title: 《Re：从零开始的异世界生活》角色分析：菜月昴
 slug: cong-ling-kaishi-de-yi-shi-jie-sheng-huo
 type: character
 description: 一开始真的受不了他的自我感动，后来再看那些失态，才慢慢理解他为什么那么怕自己没有价值。
 rating: 4.5
-ratingNote: 从逞强、崩溃到承认弱小，这条成长线让我从反感走到了理解。
 pubDatetime: 2025-07-12T12:31:54.000Z
 modDatetime: 2026-11-19T12:00:00.000Z
 draft: false

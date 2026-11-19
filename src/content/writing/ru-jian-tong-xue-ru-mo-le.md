@@ -4,7 +4,6 @@ slug: ru-jian-tong-xue-ru-mo-le
 type: review
 description: 前三季越看越喜欢，接着读到漫画音乐祭篇，最开心的是问题儿童班终于一个都没落下。
 rating: 4.3
-ratingNote: 制作偶尔一般，但成长和群像写得讨喜，音乐祭尤其让我满足。
 pubDatetime: 2025-04-21T08:21:33.000Z
 draft: false
 tags:

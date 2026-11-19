@@ -4,7 +4,6 @@ slug: fan-pan-de-lu-lu-xiu
 type: review
 description: 当年觉得Zero很帅，重看才更在意鲁路修每走一步失去了什么。结尾还是让我缓了很久。
 rating: 4.8
-ratingNote: 主角的选择和结尾让我印象极深，零之镇魂曲也让整段故事有了完整的落点。
 pubDatetime: 2026-05-17T21:29:11.000Z
 draft: false
 tags:

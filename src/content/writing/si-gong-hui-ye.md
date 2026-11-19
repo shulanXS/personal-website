@@ -1,10 +1,9 @@
 ---
-title: 《辉夜大小姐想让我告白》四宫辉夜角色分析
+title: 《辉夜大小姐想让我告白》角色分析：四宫辉夜
 slug: si-gong-hui-ye
 type: character
 description: 比起大小姐的聪明，我更喜欢辉夜终于肯承认自己害怕、会嫉妒，也想被人好好喜欢的那些时候。
 rating: 4.5
-ratingNote: 喜剧里的别扭有家庭经历作支撑，慢慢学会信任和示弱的变化很打动我。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

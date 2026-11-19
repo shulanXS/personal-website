@@ -4,7 +4,6 @@ slug: best-horror-films
 type: review
 description: 这两部最让我害怕的都不是突然吓人的镜头。不过，隐喻太满的时候，我也会有点出戏。
 rating: 4.4
-ratingNote: 心理压迫感和视听都很强，部分过重的象征表达影响了我的投入。
 pubDatetime: 2025-12-09T00:55:43.000Z
 draft: false
 tags:

@@ -4,7 +4,6 @@ slug: yi-quan-chao-ren
 type: review
 description: 埼玉一拳结束战斗当然爽，但真正让我记住的，还是雨里那个明知打不过也不退的无证骑士。
 rating: 4.8
-ratingNote: 对强大和英雄的两种写法都打动我，无证骑士那场战斗尤其让我服气。
 pubDatetime: 2025-04-12T09:56:16.000Z
 draft: false
 tags:

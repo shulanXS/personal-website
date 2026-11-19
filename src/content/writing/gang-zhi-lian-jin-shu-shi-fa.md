@@ -4,7 +4,6 @@ slug: gang-zhi-lian-jin-shu-shi-fa
 type: review
 description: 等价交换的设定让我入了戏，真正让我记住它的，是每个人都得为自己的选择负责。
 rating: 4.9
-ratingNote: 从开头到结尾都很扎实，人物、伏笔和结局几乎没有让我失望的地方。
 pubDatetime: 2025-10-14T00:42:52.000Z
 draft: false
 tags:

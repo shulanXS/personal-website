@@ -230,10 +230,6 @@ export default {
      * that the score is said as well as drawn.
      */
     ratingAccessible: "Rating {{0}} / 5",
-    personalRating: "Personal rating",
-    characterRating: "Character portrayal rating",
-    ratingGuide:
-      "Rated out of five in 0.1 increments. Reviews reflect my overall experience; character analyses rate the portrayal. 5: a personal favorite; 4: really enjoyed it; 3: mixed; 2: disappointing; 1 or below: not recommended. Scores in between express a preference.",
   },
   projects: {
     github: "GitHub",

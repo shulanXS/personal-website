@@ -4,7 +4,6 @@ slug: hui-ya-da-jiao-jie-wang-xiang-wo-gao-bai
 type: review
 description: 前面看他们互相试探笑得很开心，后来才发现，两个人都只是怕自己不够好。
 rating: 4.5
-ratingNote: 笑点和感情推进都让我满意，奉心祭让前面的别扭有了很好的回应。
 pubDatetime: 2025-09-13T07:21:13.000Z
 draft: false
 tags:

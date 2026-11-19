@@ -4,7 +4,6 @@ slug: mo-wang-2099
 type: review
 description: 魔王也得交房租、开直播，这个反差让我看下去了。他认真护着自己人的样子，我还挺喜欢。
 rating: 4.0
-ratingNote: 设定有趣，主角也讨喜，最喜欢的是几个人一起想办法过日子的段落。
 pubDatetime: 2025-07-24T14:15:21.000Z
 draft: false
 tags:

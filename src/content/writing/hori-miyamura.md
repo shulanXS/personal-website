@@ -4,7 +4,6 @@ slug: hori-miyamura
 type: review
 description: 我喜欢他们在一起以后的日常。不用一直表现得完美，也有人愿意留在身边，这点最让我羡慕。
 rating: 4.5
-ratingNote: 相处时的松弛感很打动我，是我愿意反复回看的恋爱日常。
 pubDatetime: 2025-03-31T21:56:47.000Z
 draft: false
 tags:

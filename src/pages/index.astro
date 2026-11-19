@@ -290,9 +290,36 @@ const homeVersion = await getHomeFingerprint();
       </div>
 
       <!--
-      The right column: the articles, and the literary works below them.
+      The right column: recent writing, followed by recent posts.
       -->
       <div class="min-w-0">
+        <!-- Recent writing -->
+        {
+          writing.length > 0 && (
+            <HomeSection
+              name="writing"
+              id="recent-writing"
+              title={t.home.recentWriting}
+              titleKey="home.recentWriting"
+              href={routeUrl(locale, "writing")}
+              moreLabel={t.home.allWriting}
+              moreKey="home.allWriting"
+            >
+              {/*
+              The works are a list of titles. There is no summary beside
+              them: a chapter's own line about itself is on its page, and
+              the section is a reference to the works rather than an
+              introduction to them.
+              */}
+              <ul class="mt-5" data-list-layout="writing">
+                {writing.slice(0, config.home.recentWriting).map(work => (
+                  <WritingCard work={work} variant="compact" />
+                ))}
+              </ul>
+            </HomeSection>
+          )
+        }
+
         <!-- Recent posts -->
         {
           posts.length > 0 && (
@@ -315,33 +342,6 @@ const homeVersion = await getHomeFingerprint();
               <ul class="mt-5" data-list-layout="vertical">
                 {posts.slice(0, config.home.recentPosts).map(post => (
                   <PostCard post={post} variant="compact" />
-                ))}
-              </ul>
-            </HomeSection>
-          )
-        }
-
-        <!-- Recent writing -->
-        {
-          writing.length > 0 && (
-            <HomeSection
-              name="writing"
-              id="recent-writing"
-              title={t.home.recentWriting}
-              titleKey="home.recentWriting"
-              href={routeUrl(locale, "writing")}
-              moreLabel={t.home.allWriting}
-              moreKey="home.allWriting"
-            >
-              {/*
-              The works are a list of titles. There is no summary beside
-              them: a chapter's own line about itself is on its page, and
-              the section is a reference to the works rather than an
-              introduction to them.
-              */}
-              <ul class="mt-5" data-list-layout="writing">
-                {writing.slice(0, config.home.recentWriting).map(work => (
-                  <WritingCard work={work} variant="compact" />
                 ))}
               </ul>
             </HomeSection>

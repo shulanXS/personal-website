@@ -4,7 +4,6 @@ slug: jojo-qi-miao-hua-yue
 type: review
 description: 我最爱看那些能力不一定更强、却靠想明白规则翻盘的战斗，还有绝境里不肯认输的人。
 rating: 4.8
-ratingNote: 规则智斗和人物的韧劲让我着迷，鲜明的风格也一直很合我的胃口。
 pubDatetime: 2025-03-29T19:39:21.000Z
 draft: false
 tags:

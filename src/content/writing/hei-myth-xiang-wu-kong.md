@@ -4,7 +4,6 @@ slug: hei-myth-xiang-wu-kong
 type: review
 description: 美术和音乐让我很激动，真正玩下来，地图和叙事又让我有不少遗憾。
 rating: 4.3
-ratingNote: 美术、音乐和文化表达很突出，地图引导与叙事衔接拖低了整体体验。
 pubDatetime: 2025-06-16T16:18:07.000Z
 draft: false
 tags:

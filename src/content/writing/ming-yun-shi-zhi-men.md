@@ -4,7 +4,6 @@ slug: ming-yun-shi-zhi-men
 type: review
 description: 前面那些看似琐碎的日常，到后面全都变了味。看完再想起来，连轻松的片段都让我难受。
 rating: 4.9
-ratingNote: 慢热后的铺垫回收和情绪冲击都很强，是我心里最出色的时间循环故事之一。
 pubDatetime: 2026-05-22T06:47:59.000Z
 draft: false
 tags:

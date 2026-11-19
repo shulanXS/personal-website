@@ -4,7 +4,6 @@ slug: re-cong-ling-kai-shi-guan-hou-gan
 type: review
 description: 从第一季看到水门都市篇，我常常看得喘不过气。可每次大家终于一起找到出路，又让我觉得前面没白熬。
 rating: 4.5
-ratingNote: 高压后的情绪释放很有力量，群像破局也精彩，只是部分文戏确实需要耐心。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

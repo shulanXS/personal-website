@@ -132,7 +132,6 @@ const writing = defineCollection({
        * the work has not been rated; scores use increments of 0.1.
        */
       rating: z.number().min(0.5).max(5).multipleOf(0.1).optional(),
-      ratingNote: z.string().optional(),
       series: z.string().optional(),
       chapterNumber: z.number().optional(),
       status: z.enum(["ongoing", "completed"]).optional(),

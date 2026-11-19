@@ -4,7 +4,6 @@ slug: zhi-pai-wu-guan-hou-shi
 type: review
 description: 前两季看得挺上头，但和我喜欢的中式权谋剧放在一起，总觉得它对权力和人心写得还不够深。
 rating: 3.6
-ratingNote: 节奏和表演很抓人，但后面的权谋处理和人物动机让我越来越难信服。
 pubDatetime: 2025-10-21T12:59:39.000Z
 draft: false
 tags:

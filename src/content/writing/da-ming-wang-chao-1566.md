@@ -4,7 +4,6 @@ slug: da-ming-wang-chao-1566
 type: review
 description: 本来想看权谋过招，最后最让我缓不过来的，却是那些连上牌桌的资格都没有的百姓。
 rating: 4.9
-ratingNote: 台词、人物和利益关系都经得起琢磨，尤其没有用一个轻巧的结局安慰我。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

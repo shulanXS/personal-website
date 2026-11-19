@@ -4,7 +4,6 @@ slug: xian-jian-qi-xia-zhuan-san
 type: review
 description: 小时候盼着景天打赢，重看却一直惦记长卿和紫萱没喝下去的那碗水。以前嫌慢的戏，如今最难忘。
 rating: 4.6
-ratingNote: 特效和一些台词已有年代感，但人物的责任、牺牲和告别依然很能打动我。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:

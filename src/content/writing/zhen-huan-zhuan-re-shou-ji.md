@@ -4,7 +4,6 @@ slug: zhen-huan-zhuan-re-shou-ji
 type: review
 description: 以前只盼着甄嬛赢，重刷反而更难替任何人的结局高兴。眉庄和安陵容尤其让我惦记。
 rating: 4.7
-ratingNote: 人物经得起反复琢磨，每次重看，对她们的理解都会有些变化。
 pubDatetime: 2025-03-14T05:51:07.000Z
 draft: false
 tags:

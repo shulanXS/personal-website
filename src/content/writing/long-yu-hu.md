@@ -4,7 +4,6 @@ slug: long-yu-hu
 type: review
 description: 刚开始只当校园喜剧看，后来才发现，他们那些别扭和逞强，其实都是因为太怕失去。
 rating: 4.5
-ratingNote: 人物的缺点和感情的转变都让我信服，圣诞夜那一段尤其难忘。
 pubDatetime: 2025-10-14T18:21:46.000Z
 draft: false
 tags:

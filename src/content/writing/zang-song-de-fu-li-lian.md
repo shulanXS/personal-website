@@ -4,7 +4,6 @@ slug: zang-song-de-fu-li-lian
 type: review
 description: 我知道它拍得好，可那种来不及告别、回头只剩回忆的感觉，让我看得很难受。
 rating: 3.5
-ratingNote: 制作和叙事值得肯定，但它的离别感让我很难把观看过程当作享受。
 pubDatetime: 2025-07-22T22:26:58.000Z
 draft: false
 tags:

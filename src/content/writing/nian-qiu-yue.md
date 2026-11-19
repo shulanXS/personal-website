@@ -1,10 +1,9 @@
 ---
-title: 《雍正王朝》年秋月角色分析
+title: 《雍正王朝》角色分析：年秋月
 slug: nian-qiu-yue
 type: character
 description: 她明明看得清自己的处境，却还是想把每个人都顾好。重看时，我最心疼的就是这份温柔。
 rating: 4.7
-ratingNote: 戏份不多，克制的感情和两难的处境却让我一直记得她。
 pubDatetime: 2026-05-19T10:03:26.000Z
 draft: false
 tags:

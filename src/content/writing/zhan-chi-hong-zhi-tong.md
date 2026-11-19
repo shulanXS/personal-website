@@ -4,7 +4,6 @@ slug: zhan-chi-hong-zhi-tong
 type: review
 description: 看着熟悉的人一个个离开，我很难受。但也正是这些牺牲，让我记住了他们想改变的世界。
 rating: 4.7
-ratingNote: 牺牲带来的痛感和人物的理想一直留在我心里，是我很偏爱的作品。
 pubDatetime: 2025-12-12T16:13:49.000Z
 draft: false
 tags:

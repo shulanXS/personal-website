@@ -4,7 +4,6 @@ slug: xia-ri-huan-xian
 type: review
 description: 反派也会记住上一轮发生的事，这一下让我紧张起来。每次重来，都不敢再把它当作保险。
 rating: 4.5
-ratingNote: 循环里的攻防很有压力，感情线也让我愿意跟着角色一路走到结尾。
 pubDatetime: 2025-09-16T20:02:28.000Z
 draft: false
 tags:

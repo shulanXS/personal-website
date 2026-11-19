@@ -4,7 +4,6 @@ slug: wei-mei-hao-de-shi-jie-xian-shang-zhu-fu
 type: review
 description: 这群人总在闯祸、还债、互相拖后腿，我却看得很放松。有时候就是想看他们一起犯傻。
 rating: 4.0
-ratingNote: 不着调的冒险让我很放松，比起主线，我更喜欢小队互相拆台的日常。
 pubDatetime: 2025-01-29T23:10:04.000Z
 draft: false
 tags:
