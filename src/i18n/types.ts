@@ -310,6 +310,7 @@ export interface UIStrings {
      * that the score is said as well as drawn.
      */
     ratingAccessible: string;
+    characterAffinityAccessible: string;
   };
   projects: {
     github: string;

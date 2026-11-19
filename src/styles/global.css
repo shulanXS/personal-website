@@ -1625,13 +1625,13 @@
    * where the column is narrow and the two cannot sit side by side.
    */
   .app-rating-character {
-    --rating: #7c3aed;
-    --rating-empty: #ddd6fe;
+    --rating: #be185d;
+    --rating-empty: #fbcfe8;
   }
 
   [data-theme="dark"] .app-rating-character {
-    --rating: #c4b5fd;
-    --rating-empty: #4c3a70;
+    --rating: #f9a8d4;
+    --rating-empty: #70334e;
   }
 
   .app-rating-stacked {

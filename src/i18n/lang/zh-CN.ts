@@ -239,6 +239,7 @@ export default {
      * that the score is said as well as drawn.
      */
     ratingAccessible: "评分 {{0}} / 5",
+    characterAffinityAccessible: "角色喜爱程度 {{0}} / 5",
   },
   projects: {
     github: "源码",

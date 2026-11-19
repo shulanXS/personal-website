@@ -230,6 +230,7 @@ export default {
      * that the score is said as well as drawn.
      */
     ratingAccessible: "Rating {{0}} / 5",
+    characterAffinityAccessible: "Character affection {{0}} / 5",
   },
   projects: {
     github: "GitHub",

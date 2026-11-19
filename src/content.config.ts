@@ -115,8 +115,8 @@ const writing = defineCollection({
         .default("essay"),
       description: z.string().optional(),
       /**
-       * The score the author gives the work — a review of a film, a series
-       * or a game.
+       * For reviews, the score evaluates the work. For character analyses,
+       * it expresses how much the author likes the character.
        *
        * It is a number rather than a string: a string would make `4.5` and
        * `4.50` two different values, and it would have to be parsed again

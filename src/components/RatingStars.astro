@@ -1,5 +1,6 @@
 ---
 import IconStarFilled from "@/assets/icons/IconStarFilled.svg";
+import IconHeartFilled from "@/assets/icons/IconHeartFilled.svg";
 import { flatRuntimeTranslations, useTranslations } from "@/i18n";
 import { formatTemplate } from "@/i18n/format";
 import config from "@/config";
@@ -86,7 +87,7 @@ const stars = Array.from({ length: 5 }, (_, index) => {
 });
 
 const starSizeClasses = {
-  xs: "size-2",
+  xs: tone === "character" ? "size-2.5" : "size-2",
   sm: "size-2.5",
   md: "size-4",
 };
@@ -99,7 +100,16 @@ const starSizeClasses = {
  * the runtime switcher rebuilds is the same name the server wrote.
  */
 const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
-const ariaLabel = formatTemplate(t.writing.ratingAccessible, dict, [written]);
+const RatingIcon = tone === "character" ? IconHeartFilled : IconStarFilled;
+const ratingKey =
+  tone === "character"
+    ? "writing.characterAffinityAccessible"
+    : "writing.ratingAccessible";
+const ratingLabel =
+  tone === "character"
+    ? t.writing.characterAffinityAccessible
+    : t.writing.ratingAccessible;
+const ariaLabel = formatTemplate(ratingLabel, dict, [written]);
 ---
 
 <span
@@ -110,9 +120,10 @@ const ariaLabel = formatTemplate(t.writing.ratingAccessible, dict, [written]);
     `app-rating-size-${size}`,
     className,
   ]}
+  data-rating-symbol={tone === "character" ? "heart" : "star"}
   role="img"
   aria-label={ariaLabel}
-  data-i18n="writing.ratingAccessible"
+  data-i18n={ratingKey}
   data-i18n-attr="aria-label"
   data-i18n-args={written}
 >
@@ -132,7 +143,7 @@ const ariaLabel = formatTemplate(t.writing.ratingAccessible, dict, [written]);
       stars.map(({ fill }) => (
         <span class="app-rating-star">
           <span class="app-rating-star-empty">
-            <IconStarFilled
+            <RatingIcon
               class:list={["app-rating-icon", starSizeClasses[size]]}
             />
           </span>
@@ -146,7 +157,7 @@ const ariaLabel = formatTemplate(t.writing.ratingAccessible, dict, [written]);
             class="app-rating-star-fill"
             style={`--app-rating-fill: ${fill * 100}%`}
           >
-            <IconStarFilled
+            <RatingIcon
               class:list={["app-rating-icon", starSizeClasses[size]]}
             />
           </span>

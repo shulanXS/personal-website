@@ -331,6 +331,7 @@ content:
         type: string
         required: true
         label: 标题
+        description: 观后感使用「《作品名》观后感」；角色分析使用「《作品名》角色分析：人名」。
       - name: slug
         type: string
         required: true
@@ -358,15 +359,16 @@ content:
         type: text
         required: false
         label: 简介
+        description: 用一两句自己的话写个人感受，避免套话或复述剧情。
       - name: rating
         type: number
         required: false
-        label: 评分
+        label: 作品评分 / 角色喜爱度
         options:
           min: 0.5
           max: 5
           step: 0.1
-        description: 0.5 到 5 星，按 0.1 分递增。观后感评整体体验，角色分析评角色塑造；5 分留给最偏爱的作品。
+        description: 0.5 到 5 分，按 0.1 分递增。观后感用星级表示作品评价；角色分析用粉色心形表示我有多喜欢这个角色，不是人物塑造质量或道德评价。留空不显示。
       - name: series
         type: string
         required: false
