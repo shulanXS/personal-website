@@ -1624,6 +1624,16 @@
    * above. This is the shape of the score in the margin of a listing,
    * where the column is narrow and the two cannot sit side by side.
    */
+  .app-rating-character {
+    --rating: #7c3aed;
+    --rating-empty: #ddd6fe;
+  }
+
+  [data-theme="dark"] .app-rating-character {
+    --rating: #c4b5fd;
+    --rating-empty: #4c3a70;
+  }
+
   .app-rating-stacked {
     flex-direction: column;
     align-items: flex-start;

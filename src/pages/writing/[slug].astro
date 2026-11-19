@@ -76,7 +76,8 @@ const tags = data.tags ?? [];
     data-pagefind-body
     data-pagefind-meta="type:writing"
   >
-    {/*
+    {
+      /*
       The header of a chapter.
 
       The series name sits *above* the title rather than inside it: the
@@ -91,7 +92,8 @@ const tags = data.tags ?? [];
       re-numbered. The status badge was dropped for the same reason:
       it is a fact about the whole series, and it is already stated once
       in the series heading on the list page.
-    */}
+    */
+    }
     {
       data.series && (
         <p class="app-writing-series mb-1 text-sm">{data.series}</p>
@@ -102,18 +104,30 @@ const tags = data.tags ?? [];
     </h1>
     <div class="mt-2 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2">
       <Datetime pubDatetime={data.pubDatetime} modDatetime={data.modDatetime} />
-      {/*
+      {
+        /*
         The score of the work, if it has one.
 
         It sits beside the date rather than inside the title: the score is
         a fact about the work, and the title is a piece of writing by the
         author. A work that carries no score simply shows nothing — the
         stars are not a decoration that every work wears.
-      */}
-      {data.rating && <RatingStars value={data.rating} size="md" showValue />}
+      */
+      }
+      {
+        data.rating && (
+          <RatingStars
+            value={data.rating}
+            tone={data.type === "character" ? "character" : "default"}
+            size="md"
+            showValue
+          />
+        )
+      }
     </div>
 
-    {/*
+    {
+      /*
       The one-line summary of the chapter.
 
       It is set in the serif face, like the chapter itself, and it is not
@@ -121,10 +135,13 @@ const tags = data.tags ?? [];
       oblique that looks like a mistake rather than like emphasis. It is
       separated from the body by a rule instead, so that it reads as a
       standfirst rather than as a paragraph of the story.
-    */}
-    {data.description && (
-      <p class="app-writing-standfirst">{data.description}</p>
-    )}
+    */
+    }
+    {
+      data.description && (
+        <p class="app-writing-standfirst">{data.description}</p>
+      )
+    }
 
     <article id="article" class="app-prose app-prose-serif max-w-app-reading">
       <Content />
@@ -156,10 +173,7 @@ const tags = data.tags ?? [];
           data-i18n="writing.tableOfContents"
           data-i18n-attr="aria-label"
         >
-          <h2
-            class="text-lg font-semibold"
-            data-i18n="writing.tableOfContents"
-          >
+          <h2 class="text-lg font-semibold" data-i18n="writing.tableOfContents">
             {t.writing.tableOfContents}
           </h2>
           {/*
@@ -220,13 +234,15 @@ const tags = data.tags ?? [];
     }
   </main>
 
-  {/*
+  {
+    /*
     The floating button that returns to the list of works.
 
     It lives outside the main column, because it is anchored to the
     viewport rather than to the text: it stays in the same corner of the
     screen while the chapter scrolls underneath it.
-  */}
+  */
+  }
   <WritingBackButton />
 
   <Footer />

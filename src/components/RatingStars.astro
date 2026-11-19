@@ -41,6 +41,7 @@ type Props = {
    * and the stars are the confirmation of it.
    */
   variant?: "inline" | "stacked";
+  tone?: "default" | "character";
   class?: string;
 };
 
@@ -49,6 +50,7 @@ const {
   size = "sm",
   showValue = false,
   variant = "inline",
+  tone = "default",
   class: className = "",
 } = Astro.props;
 
@@ -103,6 +105,7 @@ const ariaLabel = formatTemplate(t.writing.ratingAccessible, dict, [written]);
 <span
   class:list={[
     "app-rating",
+    tone === "character" && "app-rating-character",
     `app-rating-${variant}`,
     `app-rating-size-${size}`,
     className,

@@ -165,6 +165,7 @@ export default {
     novel: "原创小说",
     essay: "随笔",
     review: "观后感",
+    character: "角色分析",
     short: "短篇",
     series: "系列作品",
     standalone: "独立作品",
@@ -272,7 +273,8 @@ export default {
     notesEmpty: "还没有发布任何动态。",
 
     writingTitle: "创作",
-    writingDesc: "原创小说与随笔，每周更新。",
+    writingDesc:
+      "在这里写故事，也记录阅读与观看后的思考。原创小说承载长篇故事，短篇捕捉片刻想象，随笔记录日常感触，观后感聊作品的整体体验，角色分析细读影视、小说与游戏中的人物。",
     writingEmpty: "还没有发布任何作品。",
 
     projectsTitle: "项目",

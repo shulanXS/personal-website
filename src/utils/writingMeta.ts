@@ -21,7 +21,7 @@ export type WritingGroup = {
   /**
    * The kind of the work — a novel, an essay, a review or a short story.
    */
-  type: "novel" | "essay" | "review" | "short";
+  type: "novel" | "essay" | "review" | "character" | "short";
   /**
    * The number of characters of the whole group.
    */
@@ -83,7 +83,13 @@ export type WritingBlock = {
  * filter does not rearrange itself as works are published: a novel is
  * always the first kind, because it is the one that carries a series.
  */
-export const WRITING_TYPES = ["novel", "essay", "review", "short"] as const;
+export const WRITING_TYPES = [
+  "novel",
+  "essay",
+  "review",
+  "character",
+  "short",
+] as const;
 
 /**
  * The tags that name a kind of work.
@@ -99,7 +105,13 @@ export const WRITING_TYPES = ["novel", "essay", "review", "short"] as const;
  * the author actually wrote ("小说"). The two are different strings, and
  * the tag is the one that has to be recognised.
  */
-export const WRITING_TYPE_TAGS = ["小说", "随笔", "观后感", "短篇"] as const;
+export const WRITING_TYPE_TAGS = [
+  "小说",
+  "随笔",
+  "观后感",
+  "角色分析",
+  "短篇",
+] as const;
 
 /**
  * One level of the filter of the writing page.

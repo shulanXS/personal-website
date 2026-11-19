@@ -125,10 +125,11 @@ function applySort(): void {
   const rows = [...list.querySelectorAll<HTMLElement>(".app-writing-row")];
   markOriginalOrder(rows);
 
-  const activeOrder =
-    new URL(window.location.href).searchParams.get("type") === "review"
-      ? order
-      : "newest";
+  const activeOrder = ["review", "character"].includes(
+    new URL(window.location.href).searchParams.get("type") ?? ""
+  )
+    ? order
+    : "newest";
 
   let sorted: HTMLElement[];
   if (activeOrder === "highest") sorted = byRating(rows, true);

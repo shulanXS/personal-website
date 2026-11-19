@@ -156,6 +156,7 @@ export default {
     novel: "Novel",
     essay: "Essay",
     review: "Review",
+    character: "Character Analysis",
     short: "Short Story",
     series: "Series",
     standalone: "Standalone Works",
@@ -263,7 +264,8 @@ export default {
     notesEmpty: "No notes yet.",
 
     writingTitle: "Writing",
-    writingDesc: "Original novels and essays, updated weekly.",
+    writingDesc:
+      "Stories and reflections on what I read, watch, and play. Original novels tell longer stories; short stories capture brief flights of imagination; essays explore everyday thoughts; reviews reflect on works as a whole; character analyses take a closer look at people in film, television, fiction, and games.",
     writingEmpty: "No writing published yet.",
 
     projectsTitle: "Projects",

@@ -350,6 +350,8 @@ content:
               label: 随笔
             - name: review
               label: 观后感
+            - name: character
+              label: 角色分析
             - name: short
               label: 短篇
       - name: description

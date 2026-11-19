@@ -110,7 +110,9 @@ const writing = defineCollection({
     z.object({
       title: z.string(),
       slug: z.string(),
-      type: z.enum(["novel", "essay", "review", "short"]).default("essay"),
+      type: z
+        .enum(["novel", "essay", "review", "character", "short"])
+        .default("essay"),
       description: z.string().optional(),
       /**
        * The score the author gives the work — a review of a film, a series

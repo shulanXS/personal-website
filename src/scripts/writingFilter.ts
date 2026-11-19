@@ -145,7 +145,7 @@ function applyFilter(): void {
   for (const controls of document.querySelectorAll<HTMLElement>(
     "[data-writing-sort]"
   )) {
-    controls.hidden = state.type !== "review";
+    controls.hidden = !["review", "character"].includes(state.type);
   }
 
   syncEmptyState(rows);
