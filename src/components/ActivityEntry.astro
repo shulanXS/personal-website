@@ -60,6 +60,25 @@ const KIND_ICON = {
 const KindIcon = KIND_ICON[entry.kind];
 
 const project = entry.project;
+const writingType = entry.writing?.data.type;
+const isGameReview = writingType === "review" && entry.tags.includes("游戏");
+const labelKey =
+  entry.kind === "writing" && writingType
+    ? isGameReview
+      ? "writing.playReview"
+      : "writing." + writingType
+    : KIND_I18N[entry.kind];
+const writingLabels: Record<string, string> = {
+  novel: t.writing.novel,
+  essay: t.writing.essay,
+  review: isGameReview ? t.writing.playReview : t.writing.review,
+  character: t.writing.character,
+  short: t.writing.short,
+};
+const kindLabel =
+  entry.kind === "writing" && writingType
+    ? writingLabels[writingType]
+    : KIND_LABEL[entry.kind];
 ---
 
 <li
@@ -101,9 +120,9 @@ const project = entry.project;
     */
     }
     <div class="app-activity-head">
-      <span class="app-activity-kind" data-i18n={KIND_I18N[entry.kind]}>
+      <span class="app-activity-kind" data-i18n={labelKey}>
         <KindIcon class="app-activity-kind-icon" />
-        {KIND_LABEL[entry.kind]}
+        {kindLabel}
       </span>
 
       {

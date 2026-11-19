@@ -209,6 +209,7 @@ export interface UIStrings {
     /** A review — a piece written about a film, a series or a game. */
     review: string;
     character: string;
+    playReview: string;
     short: string;
     series: string;
     standalone: string;

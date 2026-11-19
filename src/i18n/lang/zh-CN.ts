@@ -166,6 +166,7 @@ export default {
     essay: "随笔",
     review: "观后感",
     character: "角色分析",
+    playReview: "玩后感",
     short: "短篇",
     series: "系列作品",
     standalone: "独立作品",

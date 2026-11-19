@@ -157,6 +157,7 @@ export default {
     essay: "Essay",
     review: "Review",
     character: "Character Analysis",
+    playReview: "Game Review",
     short: "Short Story",
     series: "Series",
     standalone: "Standalone Works",

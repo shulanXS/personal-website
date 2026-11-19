@@ -2,6 +2,7 @@
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import MonogramLogo from "@/assets/monogram-logo.svg";
 import Layout from "@/layouts/Layout.astro";
+import "@/styles/mobile-home.css";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
@@ -400,7 +401,9 @@ const homeVersion = await getHomeFingerprint();
       </div>
     </section>
 
-    <div class="my-8 flex flex-wrap justify-center gap-4 text-center">
+    <div
+      class="app-home-browse my-8 flex flex-wrap justify-center gap-4 text-center"
+    >
       <LinkButton href={routeUrl(locale, "notes")}>
         <span data-i18n="home.allNotes">{t.home.allNotes}</span>
         <IconArrowRight class="inline-block rtl:-rotate-180" />
