@@ -1,5 +1,5 @@
 ---
-title: 《上古卷轴5：天际》观后感
+title: 《上古卷轴5：天际》玩后感
 slug: shang-gu-juan-ax-5-tian-jie
 type: review
 description: 玩过很多游戏，还是最想回天际省。哪怕不做任务，只在雪漫城外走走，我也觉得舒服。

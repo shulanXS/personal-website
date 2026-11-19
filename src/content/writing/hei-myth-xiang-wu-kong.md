@@ -1,5 +1,5 @@
 ---
-title: 《黑神话：悟空》观后感
+title: 《黑神话：悟空》玩后感
 slug: hei-myth-xiang-wu-kong
 type: review
 description: 美术和音乐让我很激动，真正玩下来，地图和叙事又让我有不少遗憾。

@@ -331,7 +331,7 @@ content:
         type: string
         required: true
         label: 标题
-        description: 观后感使用「《作品名》观后感」；角色分析使用「《作品名》角色分析：人名」。
+        description: 影视文章使用「《作品名》观后感」；游戏文章使用「《游戏名》玩后感」；角色分析使用「《作品名》角色分析：人名」。
       - name: slug
         type: string
         required: true
