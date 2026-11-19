@@ -76,6 +76,16 @@ const project = entry.project;
     rendered *inside* the entry instead.
   */
   }
+  {
+    entry.kind === "note" && entry.note && (
+      <a
+        class="app-activity-note-link"
+        href={`${entry.url}#note-${entry.note.id}`}
+        aria-label={entry.title}
+      />
+    )
+  }
+
   <div class="app-timeline-date hidden sm:block" data-pagefind-ignore>
     <Datetime pubDatetime={entry.date} bare stacked />
   </div>
@@ -117,11 +127,7 @@ const project = entry.project;
       that column as plain text is a note that belongs to it.
     */
     }
-    {
-      entry.kind === "note" && entry.note && (
-        <NoteInline note={entry.note} />
-      )
-    }
+    {entry.kind === "note" && entry.note && <NoteInline note={entry.note} />}
 
     {
       /*
