@@ -1254,6 +1254,68 @@
     ul[data-list-layout="activity"] > li {
       position: relative;
       isolation: isolate;
+      transition:
+        background-color var(--app-transition) ease,
+        transform 120ms ease;
+    }
+
+    ul[data-list-layout="activity"] > li::before {
+      content: "";
+      position: absolute;
+      left: -0.5rem;
+      top: 50%;
+      width: 2px;
+      height: 0;
+      background: var(--accent);
+      transform: translateY(-50%);
+      transition: height var(--app-transition) ease;
+      pointer-events: none;
+    }
+
+    ul[data-list-layout="activity"] > li:focus-within {
+      background: var(--surface);
+    }
+
+    ul[data-list-layout="activity"]
+      > li:is(:active, [data-activity-pressed], :focus-within)::before {
+      height: 1.5rem;
+    }
+
+    ul[data-list-layout="activity"]
+      > li:is(:active, [data-activity-pressed], :focus-within)
+      .app-activity-link {
+      color: var(--accent);
+    }
+
+    ul[data-list-layout="activity"] > li:is(:active, [data-activity-pressed]) {
+      background: color-mix(in oklab, var(--accent) 9%, var(--background));
+      transform: scale(0.995);
+    }
+
+    @media (hover: hover) {
+      ul[data-list-layout="activity"] > li:hover {
+        background: var(--surface);
+      }
+
+      ul[data-list-layout="activity"] > li:hover::before {
+        height: 1.5rem;
+      }
+
+      ul[data-list-layout="activity"] > li:hover .app-activity-link {
+        color: var(--accent);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      ul[data-list-layout="activity"] > li,
+      ul[data-list-layout="activity"] > li::before {
+        transition: none;
+      }
+
+      ul[data-list-layout="activity"]
+        > li:is(:active, [data-activity-pressed]) {
+        transform: none;
+      }
     }
 
     ul[data-list-layout="activity"] .app-activity-link::after {
