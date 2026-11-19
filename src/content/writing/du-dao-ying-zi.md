@@ -1,7 +1,7 @@
 ---
-title: 毒岛樱子：世俗逻辑里的清醒者，与《碧蓝之海》中最具生命力的灵魂
+title: 《碧蓝之海》毒岛樱子：世俗清醒与主动追爱的生命力
 slug: du-dao-ying-zi
-type: review
+type: character
 description: 从世俗清醒到主动追爱，毒岛樱子的真实与主体性，让她成为《碧蓝之海》中最具生命力的角色。
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

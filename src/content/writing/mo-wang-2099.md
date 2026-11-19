@@ -1,7 +1,7 @@
 ---
-title: 动漫《魔王2099》：赛博都市里的旧王再就业
+title: 《魔王2099》贝尔托尔：赛博都市里的旧王与王道
 slug: mo-wang-2099
-type: review
+type: character
 description: 五百年前的传说魔王醒来要交房租、找工作、当游戏主播——用古典英雄主义暴打冰冷算法，也让“旧时代浪漫”变得珍贵。
 rating: 4
 pubDatetime: 2025-07-24T14:15:21.000Z

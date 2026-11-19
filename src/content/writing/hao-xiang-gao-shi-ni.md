@@ -1,7 +1,7 @@
 ---
-title: 动漫《好想告诉你》：黑沼爽子的笨拙与真诚
+title: 《好想告诉你》黑沼爽子：笨拙之中的善良与真诚
 slug: hao-xiang-gao-shi-ni
-type: review
+type: character
 description: 一个自认对少女漫免疫的男生，为什么会被黑沼爽子的笨拙与真诚打动。
 rating: 4.4
 pubDatetime: 2025-10-06T17:46:46.000Z

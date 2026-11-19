@@ -1,7 +1,7 @@
 ---
-title: 电视剧《雍正王朝》：改革者与帝国机器的相互消耗
+title: 《雍正王朝》角色群像：皇权齿轮下的血肉与宿命
 slug: yong-zheng-wang-chao-re-shou-ji
-type: review
+type: character
 description: 铁血江山下的血肉、宿命与意难平。
 rating: 4.8
 pubDatetime: 2026-04-26T20:40:22.000Z

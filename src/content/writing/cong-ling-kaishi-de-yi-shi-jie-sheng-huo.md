@@ -1,7 +1,7 @@
 ---
-title: 动漫《Re：从零开始的异世界生活》：死亡回归中的自我重建
+title: 《Re：从零开始的异世界生活》菜月昴：死亡回归中的自我重建
 slug: cong-ling-kaishi-de-yi-shi-jie-sheng-huo
-type: review
+type: character
 description: 菜月昴的歇斯底里不是讨人嫌的巨婴，而是“死亡回归”这道诅咒逼出的精神凌迟——看长月达平如何把穿越爽文砸碎重铸。
 rating: 4.5
 pubDatetime: 2025-07-12T12:31:54.000Z

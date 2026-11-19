@@ -1,7 +1,7 @@
 ---
-title: 动漫《反叛的鲁路修》：零之镇魂曲的政治代价
+title: 《反叛的鲁路修》鲁路修与朱雀：理想、手段与自我献祭
 slug: fan-pan-de-lu-lu-xiu
-type: review
+type: character
 description: 剥掉Zero的中二外壳，看大河内一楼埋下的政治与人性命题：理想与手段从不全两全，革命从来没有不流血的代价。
 rating: 5
 pubDatetime: 2026-05-17T21:29:11.000Z

@@ -1,7 +1,7 @@
 ---
-title: 动漫《辉夜大小姐想让我告白》：恋爱博弈背后的不安全感
+title: 《辉夜大小姐想让我告白》四宫辉夜与白银御行：恋爱博弈背后的不安全感
 slug: hui-ya-da-jiao-jie-wang-xiang-wo-gao-bai
-type: review
+type: character
 description: 从“恋爱头脑战”的喜剧外壳，到两个缺乏安全感的少年最笨拙的自我保护，看《辉夜大小姐》如何拍出青春里最体面的双向奔赴
 rating: 4.5
 pubDatetime: 2025-09-13T07:21:13.000Z

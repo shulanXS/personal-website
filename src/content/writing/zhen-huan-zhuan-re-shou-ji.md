@@ -1,7 +1,7 @@
 ---
-title: 电视剧《甄嬛传》：后宫秩序如何重塑一个人
+title: 《甄嬛传》角色群像：后宫秩序中的自我与异化
 slug: zhen-huan-zhuan-re-shou-ji
-type: review
+type: character
 description: 隔了多年重刷《甄嬛传》，看的不再是后宫争宠，而是每一个人被权力与阶层碾过之后剩下的东西。
 rating: 4.7
 pubDatetime: 2025-03-14T05:51:07.000Z
