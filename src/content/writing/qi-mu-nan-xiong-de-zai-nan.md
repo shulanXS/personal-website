@@ -1,7 +1,7 @@
 ---
-title: 《齐木楠雄的灾难》齐木楠雄：看穿荒唐之后的温柔守护
+title: 动漫《齐木楠雄的灾难》：超能力者的普通人愿望
 slug: qi-mu-nan-xiong-de-zai-nan
-type: character
+type: review
 description: 把一个创世神级别的满级账号扔进最普通的公立高中日常，看齐木如何绞尽脑汁“当个普通人”，以及看穿人间荒唐后依然笨拙守护的温柔。
 rating: 4.5
 pubDatetime: 2026-03-06T02:17:53.000Z

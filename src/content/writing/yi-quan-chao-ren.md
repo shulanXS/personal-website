@@ -1,7 +1,7 @@
 ---
-title: 《一拳超人》埼玉与无证骑士：无敌者的空虚与凡人的英雄主义
+title: 动漫《一拳超人》：无敌者的空虚与凡人的英雄主义
 slug: yi-quan-chao-ren
-type: character
+type: review
 description: 埼玉强大的不是力量而是“无敌者的孤独”，而真正撑起燃与悲壮的，是明知己是炮灰依然冲上去的无证骑士们。
 rating: 5
 pubDatetime: 2025-04-12T09:56:16.000Z

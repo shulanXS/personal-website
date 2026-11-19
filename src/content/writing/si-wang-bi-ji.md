@@ -1,7 +1,7 @@
 ---
-title: 《死亡笔记》夜神月与L：审判欲与镜像对手
+title: 动漫《死亡笔记》：审判欲如何吞噬夜神月
 slug: si-wang-bi-ji
-type: character
+type: review
 description: 从大场鸫与小畑健的底牌直摊，到夜神月顺理成章的堕落、L的镜像与第25话的死亡，重看这部悬疑智斗孤峰。
 rating: 5
 pubDatetime: 2026-05-04T16:34:36.000Z

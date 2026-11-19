@@ -1,7 +1,7 @@
 ---
-title: 《异世界归来的舅舅》舅舅：世嘉执念与情感错位
+title: 动漫《异世界归来的舅舅》：第一季的世嘉执念与情感错位
 slug: yi-shi-jie-gui-lai-de-shu-shu
-type: character
+type: review
 description: 十七年昏迷留下的心智断层、来自恶意里的情感雷达生锈，以及一个顶级魔法师回到现实后依然斤斤计较的世嘉死忠粉。
 rating: 4
 pubDatetime: 2025-05-23T21:25:00.000Z

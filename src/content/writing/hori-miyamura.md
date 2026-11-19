@@ -1,7 +1,7 @@
 ---
-title: 《堀与宫村》堀京子与宫村伊澄：卸下面具之后的亲密与接纳
+title: 动漫《堀与宫村》：卸下人设之后的亲密日常
 slug: hori-miyamura
-type: character
+type: review
 description: 它把重心全放在“在一起之后”的琐碎日常里，拍出了亲密关系里最难得的一种状态——松弛感。
 rating: 4.5
 pubDatetime: 2025-03-31T21:56:47.000Z

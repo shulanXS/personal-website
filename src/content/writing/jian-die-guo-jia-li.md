@@ -1,7 +1,7 @@
 ---
-title: 《间谍过家家》黄昏、约尔与阿尼亚：虚构家人之间的真实归属
+title: 动漫《间谍过家家》：虚构的家人，真实的归属
 slug: jian-die-guo-jia-li
-type: character
+type: review
 description: 西国间谍、东国杀手与读心少女凑成的假家庭，看远藤达哉如何借一个“假壳子”写出三种边缘人的孤独与温情。
 rating: 4.5
 pubDatetime: 2025-03-16T04:41:09.000Z

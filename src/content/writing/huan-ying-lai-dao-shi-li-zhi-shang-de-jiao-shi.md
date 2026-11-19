@@ -1,7 +1,7 @@
 ---
-title: 《欢迎来到实力至上主义的教室》绫小路清隆：绝对理性下的情感渴望
+title: 动漫《欢迎来到实力至上主义的教室》：积分制度下的竞争实验
 slug: huan-ying-lai-dao-shi-li-zhi-shang-de-jiao-shi
-type: character
+type: review
 description: 高度育成高校把资源、信息差与阶级壁垒全摆到明面上——看绫小路清隆的绝对理性与“渴望被赋予意义”之间的张力。
 rating: 4.5
 pubDatetime: 2026-01-10T11:07:55.000Z
