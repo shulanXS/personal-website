@@ -2,9 +2,9 @@
 title: 《好想告诉你》观后感
 slug: hao-xiang-gao-shi-ni-du-hou-gan
 type: review
-description: 从黑沼爽子的笨拙与真诚，到漫画后半段的成长和选择，这段青春故事始终让人觉得温暖。
-rating: 4.8
-pubDatetime: 2026-11-19T12:00:00.000Z
+description: 我爱上了一个只活在像素与墨迹里的女孩，自己却困在一个现实永远无法企及虚构之美的世界里——这是何等温柔又残酷的讽刺。
+rating: 5
+pubDatetime: 2025-01-16T23:04:00.000Z
 draft: false
 tags:
   - 动漫
