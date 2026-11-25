@@ -3,7 +3,7 @@ title: 《狂飙》角色分析：安欣
 slug: an-xin
 type: character
 description: 看安欣受委屈时，我也替他着急。可比起谁赢了，我更在意他熬过那么多年，为什么还是不肯退那一步。
-rating: 4.6
+rating: 4.4
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:
