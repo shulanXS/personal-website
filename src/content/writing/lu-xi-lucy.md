@@ -3,7 +3,7 @@ title: 《赛博朋克：边缘行者》角色分析：露西
 slug: lu-xi-lucy
 type: character
 description: 最初只觉得她神秘，后来才看懂她为什么不敢信人。她终于站上月球的那一幕，我到现在想起来还是难受。
-rating: 5
+rating: 4.9
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:
