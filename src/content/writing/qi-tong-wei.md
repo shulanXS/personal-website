@@ -3,7 +3,7 @@ title: 《人民的名义》角色分析：祁同伟
 slug: qi-tong-wei
 type: character
 description: 我不太接受把他的选择都说成被逼无奈。重看时，最让我在意的是他每次怎么替自己的投机找理由。
-rating: 4.4
+rating: 3.7
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false
 tags:
