@@ -7,7 +7,8 @@ rating: 4.7
 pubDatetime: 2025-03-16T04:41:00.000Z
 draft: false
 tags:
-  - 动漫
+  - 观后感
+  - 动画
   - 喜剧
   - 家庭
 ---

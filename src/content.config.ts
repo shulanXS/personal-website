@@ -104,48 +104,62 @@ const notes = defineCollection({
  * support so that adding it later does not require a schema migration of
  * already published content.
  */
+const writingTypeTags = {
+  review: "观后感",
+  game: "游戏测评",
+  character: "角色分析",
+  essay: "随笔",
+  novel: "小说",
+  short: "短篇",
+} as const;
+
 const writing = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${WRITING_PATH}` }),
   schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      slug: z.string(),
-      type: z
-        .enum(["novel", "essay", "review", "game", "character", "short"])
-        .default("essay"),
-      description: z.string().optional(),
-      /**
-       * For reviews, the score evaluates the work. For character analyses,
-       * it expresses how much the author likes the character.
-       *
-       * It is a number rather than a string: a string would make `4.5` and
-       * `4.50` two different values, and it would have to be parsed again
-       * by anything that wants to compare or average the scores.
-       *
-       * The scale is five stars, and the scale is continuous: a score of
-       * 4.3 is allowed, and is drawn as four stars and three tenths of the
-       * fifth. The scale is deliberately not tied to the kind of the work:
-       * a work that carries no score simply leaves the field out, and a
-       * work that is not a review may still be scored.
-       *
-       * Zero is a valid score. An absent score means
-       * the work has not been rated; scores use increments of 0.1.
-       */
-      rating: z.number().min(0).max(5).multipleOf(0.1).optional(),
-      series: z.string().optional(),
-      chapterNumber: z.number().optional(),
-      status: z.enum(["ongoing", "completed"]).optional(),
-      cover: contentImage(image).optional(),
-      pubDatetime: z.date(),
-      modDatetime: z.date().optional().nullable(),
-      draft: z.boolean().optional(),
-      /**
-       * Tags attached to the work — e.g. a genre ("玄幻"), a medium
-       * ("影视") or a series name.
-       */
-      tags: z.array(z.string()).default([]),
-      canonicalURL: z.string().optional(),
-    }),
+    z
+      .object({
+        title: z.string(),
+        slug: z.string(),
+        type: z
+          .enum(["novel", "essay", "review", "game", "character", "short"])
+          .default("essay"),
+        description: z.string().optional(),
+        /**
+         * For reviews, the score evaluates the work. For character analyses,
+         * it expresses how much the author likes the character.
+         *
+         * It is a number rather than a string: a string would make `4.5` and
+         * `4.50` two different values, and it would have to be parsed again
+         * by anything that wants to compare or average the scores.
+         *
+         * The scale is five stars, and the scale is continuous: a score of
+         * 4.3 is allowed, and is drawn as four stars and three tenths of the
+         * fifth. The scale is deliberately not tied to the kind of the work:
+         * a work that carries no score simply leaves the field out, and a
+         * work that is not a review may still be scored.
+         *
+         * Zero is a valid score. An absent score means
+         * the work has not been rated; scores use increments of 0.1.
+         */
+        rating: z.number().min(0).max(5).multipleOf(0.1).optional(),
+        series: z.string().optional(),
+        chapterNumber: z.number().optional(),
+        status: z.enum(["ongoing", "completed"]).optional(),
+        cover: contentImage(image).optional(),
+        pubDatetime: z.date(),
+        modDatetime: z.date().optional().nullable(),
+        draft: z.boolean().optional(),
+        /**
+         * Tags attached to the work — e.g. a genre ("玄幻"), a medium
+         * ("影视") or a series name.
+         */
+        tags: z.array(z.string()).default([]),
+        canonicalURL: z.string().optional(),
+      })
+      .refine(work => work.tags[0] === writingTypeTags[work.type], {
+        path: ["tags"],
+        message: "个人创作的首个标签必须与文章类型一致",
+      }),
 });
 
 export const collections = { posts, notes, writing };
