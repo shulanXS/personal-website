@@ -21,6 +21,17 @@ export default {
     description:
       "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与创作。",
   },
+  share: {
+    open: "保存为图片",
+    busy: "正在生成图片…",
+    save: "保存 PNG",
+    tip: "手机上也可以长按图片保存。",
+    retry: "重试",
+    close: "关闭",
+    loadError: "分享功能加载失败，请重试。",
+    imageError: "配图加载失败，请检查网络后重试。",
+    renderError: "设备未能生成完整长图，请关闭其他标签页后重试。",
+  },
   nav: {
     home: "首页",
     posts: "技术文章",

@@ -1,0 +1,41 @@
+---
+import config from "@/config";
+import { useTranslations } from "@/i18n";
+interface Props {
+  title?: string;
+  date: Date;
+}
+const { title, date } = Astro.props;
+const t = useTranslations(config.site.uiLang);
+---
+
+<button
+  type="button"
+  data-share-image
+  data-share-title={title}
+  data-share-zone={config.site.timezone}
+  data-share-date={date.toISOString()}
+  data-pagefind-ignore
+  class="text-foreground/70 hover:text-accent relative z-10 cursor-pointer text-sm underline-offset-4 hover:underline"
+  data-i18n="share.open">{t.share.open}</button
+>
+<script>
+  import { useTranslations } from "@/i18n";
+  document.addEventListener("click", async event => {
+    const button =
+      event.target instanceof Element &&
+      event.target.closest<HTMLButtonElement>("[data-share-image]");
+    if (!button || button.disabled) return;
+    button.disabled = true;
+    try {
+      const { openShareImage } = await import("@/scripts/shareImage");
+      if (button.isConnected) openShareImage(button);
+    } catch {
+      window.alert(
+        useTranslations(document.documentElement.lang).share.loadError
+      );
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>

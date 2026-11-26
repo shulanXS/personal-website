@@ -27,6 +27,17 @@ export interface UIStrings {
     /** The one-line description of the site. */
     description: string;
   };
+  share: {
+    open: string;
+    busy: string;
+    save: string;
+    tip: string;
+    retry: string;
+    close: string;
+    loadError: string;
+    imageError: string;
+    renderError: string;
+  };
   nav: {
     home: string;
     posts: string;

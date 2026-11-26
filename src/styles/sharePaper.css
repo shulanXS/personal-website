@@ -1,0 +1,108 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  position: relative;
+  width: 720px;
+  padding: 46px 52px 32px;
+  background: #fbfaf6;
+  color: #272923;
+  font:
+    20px/1.65 Georgia,
+    "Noto Serif SC Reading",
+    "Noto Serif SC Reading Extended",
+    serif;
+  overflow-wrap: anywhere;
+}
+time,
+figcaption {
+  font-size: 16px;
+  color: #65695f;
+}
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.27;
+  margin: 1.1em 0 0.45em;
+}
+h1 {
+  font-size: 36px;
+  margin-top: 14px;
+}
+p,
+figure,
+pre,
+blockquote,
+table {
+  margin: 16px 0;
+}
+blockquote {
+  border-left: 3px solid #8c9885;
+  padding-left: 18px;
+}
+pre,
+code {
+  font: 0.86em/1.55 monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+pre {
+  padding: 16px;
+  background: #eeeee7;
+}
+pre code {
+  font-size: inherit;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  font-size: 16px;
+}
+th,
+td {
+  padding: 8px;
+  border: 1px solid #c9ccc2;
+  text-align: left;
+  vertical-align: top;
+}
+a {
+  color: #355e51;
+}
+section img,
+section svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+}
+footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  border-top: 1px solid #b9bdb2;
+  padding-top: 20px;
+}
+footer img {
+  width: 38px;
+  height: 38px;
+}
+footer span {
+  margin-left: auto;
+  font:
+    18px Georgia,
+    serif;
+}
+aside {
+  position: absolute;
+  right: 14px;
+  width: 16px;
+  color: #b6b8ae;
+  font-size: 14px;
+  line-height: 1.25;
+}
