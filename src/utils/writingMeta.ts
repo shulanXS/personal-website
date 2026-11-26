@@ -21,7 +21,7 @@ export type WritingGroup = {
   /**
    * The kind of the work — a novel, an essay, a review or a short story.
    */
-  type: "novel" | "essay" | "review" | "character" | "short";
+  type: "novel" | "essay" | "review" | "game" | "character" | "short";
   /**
    * The number of characters of the whole group.
    */
@@ -87,6 +87,7 @@ export const WRITING_TYPES = [
   "novel",
   "essay",
   "review",
+  "game",
   "character",
   "short",
 ] as const;
@@ -109,6 +110,7 @@ export const WRITING_TYPE_TAGS = [
   "小说",
   "随笔",
   "观后感",
+  "游戏测评",
   "角色分析",
   "短篇",
 ] as const;

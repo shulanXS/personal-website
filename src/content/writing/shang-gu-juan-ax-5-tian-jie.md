@@ -1,7 +1,7 @@
 ---
 title: 《上古卷轴5：天际》玩后感
 slug: shang-gu-juan-ax-5-tian-jie
-type: review
+type: game
 description: 在我心中排名第一的游戏，甚至第二名和它的差距就像隔着一道天堑
 rating: 5
 pubDatetime: 2025-11-16T08:11:00.000Z

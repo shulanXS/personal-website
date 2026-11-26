@@ -1,7 +1,7 @@
 ---
 title: 《饿殍：明末千里行》玩后感：真好，她到底还是长大了
 slug: e-piao-ming-mo-qian-li-xing
-type: review
+type: game
 description: 这是我头一回因为打游戏哭。盯着屏幕愣了一会儿，心里其实有点茫然。我知道自己是冲着满穗哭的，可真要立刻说出个所以然，当时却半个字也挤不出来。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false

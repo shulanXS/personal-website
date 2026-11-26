@@ -40,6 +40,7 @@ const TYPE_LABEL_KEYS: Record<WritingGroup["type"], string> = {
   novel: "writing.novel",
   essay: "writing.essay",
   review: "writing.review",
+  game: "writing.game",
   character: "writing.character",
   short: "writing.short",
 };
@@ -48,6 +49,7 @@ const TYPE_LABELS: Record<WritingGroup["type"], string> = {
   novel: t.writing.novel,
   essay: t.writing.essay,
   review: t.writing.review,
+  game: t.writing.game,
   character: t.writing.character,
   short: t.writing.short,
 };
@@ -409,8 +411,9 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                           <RatingStars
                             value={work.data.rating}
                             tone={
-                              work.data.type === "character"
-                                ? "character"
+                              work.data.type === "character" ||
+                              work.data.type === "game"
+                                ? work.data.type
                                 : "default"
                             }
                             size="xs"

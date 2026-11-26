@@ -165,6 +165,8 @@ export default {
     novel: "原创小说",
     essay: "随笔",
     review: "观后感",
+    game: "游戏测评",
+    gameRatingAccessible: "游玩体验 {{0}} / 5",
     character: "角色分析",
     playReview: "玩后感",
     short: "短篇",

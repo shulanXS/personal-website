@@ -111,7 +111,7 @@ const writing = defineCollection({
       title: z.string(),
       slug: z.string(),
       type: z
-        .enum(["novel", "essay", "review", "character", "short"])
+        .enum(["novel", "essay", "review", "game", "character", "short"])
         .default("essay"),
       description: z.string().optional(),
       /**

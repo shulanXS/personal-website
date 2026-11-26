@@ -1,4 +1,5 @@
 ---
+import IconGamepad from "@/assets/icons/IconGamepad.svg";
 import IconStarFilled from "@/assets/icons/IconStarFilled.svg";
 import IconHeartFilled from "@/assets/icons/IconHeartFilled.svg";
 import { flatRuntimeTranslations, useTranslations } from "@/i18n";
@@ -42,7 +43,7 @@ type Props = {
    * and the stars are the confirmation of it.
    */
   variant?: "inline" | "stacked";
-  tone?: "default" | "character";
+  tone?: "default" | "character" | "game";
   class?: string;
 };
 
@@ -100,27 +101,26 @@ const starSizeClasses = {
  * the runtime switcher rebuilds is the same name the server wrote.
  */
 const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
-const RatingIcon = tone === "character" ? IconHeartFilled : IconStarFilled;
-const ratingKey =
-  tone === "character"
-    ? "writing.characterAffinityAccessible"
-    : "writing.ratingAccessible";
-const ratingLabel =
-  tone === "character"
-    ? t.writing.characterAffinityAccessible
-    : t.writing.ratingAccessible;
+const symbols = {
+  game: [IconGamepad, "gamepad", "gameRatingAccessible"],
+  character: [IconHeartFilled, "heart", "characterAffinityAccessible"],
+  default: [IconStarFilled, "star", "ratingAccessible"],
+} as const;
+const [RatingIcon, symbol, label] = symbols[tone];
+const ratingKey = `writing.${label}`;
+const ratingLabel = t.writing[label];
 const ariaLabel = formatTemplate(ratingLabel, dict, [written]);
 ---
 
 <span
   class:list={[
     "app-rating",
-    tone === "character" && "app-rating-character",
+    `app-rating-${tone}`,
     `app-rating-${variant}`,
     `app-rating-size-${size}`,
     className,
   ]}
-  data-rating-symbol={tone === "character" ? "heart" : "star"}
+  data-rating-symbol={symbol}
   role="img"
   aria-label={ariaLabel}
   data-i18n={ratingKey}

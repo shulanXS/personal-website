@@ -1727,6 +1727,16 @@
    * above. This is the shape of the score in the margin of a listing,
    * where the column is narrow and the two cannot sit side by side.
    */
+  .app-rating-game {
+    --rating: #137264;
+    --rating-empty: #cfe5df;
+  }
+
+  [data-theme="dark"] .app-rating-game {
+    --rating: #79dcc4;
+    --rating-empty: #31584f;
+  }
+
   .app-rating-character {
     --rating: #c026a3;
     --rating-heart: #ff5cce;

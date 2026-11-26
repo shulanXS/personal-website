@@ -208,6 +208,8 @@ export interface UIStrings {
     essay: string;
     /** A review — a piece written about a film, a series or a game. */
     review: string;
+    game: string;
+    gameRatingAccessible: string;
     character: string;
     playReview: string;
     short: string;

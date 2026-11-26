@@ -112,7 +112,7 @@ function applySort(): void {
   // Read the URL on every filter event; module state can outlive a page visit.
   order = readOrder();
 
-  const activeOrder = ["review", "character"].includes(
+  const activeOrder = ["review", "game", "character"].includes(
     new URL(window.location.href).searchParams.get("type") ?? ""
   )
     ? order

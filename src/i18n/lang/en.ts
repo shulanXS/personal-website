@@ -156,6 +156,8 @@ export default {
     novel: "Novel",
     essay: "Essay",
     review: "Review",
+    game: "Game Reviews",
+    gameRatingAccessible: "Gameplay experience {{0}} / 5",
     character: "Character Analysis",
     playReview: "Game Review",
     short: "Short Story",

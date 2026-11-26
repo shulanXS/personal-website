@@ -118,7 +118,11 @@ const tags = data.tags ?? [];
         data.rating !== undefined && (
           <RatingStars
             value={data.rating}
-            tone={data.type === "character" ? "character" : "default"}
+            tone={
+              data.type === "character" || data.type === "game"
+                ? data.type
+                : "default"
+            }
             size="md"
             showValue
           />
