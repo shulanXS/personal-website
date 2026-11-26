@@ -69,7 +69,7 @@ function drawContentWatermarks(
 ) {
   ctx.save();
   ctx.font = "bold 34px Georgia, serif";
-  ctx.fillStyle = "rgba(72, 67, 50, 0.18)";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.15)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
@@ -135,13 +135,11 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     }).format(new Date(button.dataset.shareDate!));
     const metadata = doc.createElement("header");
     metadata.append(date);
-    const rating = button.parentElement
-      ?.querySelector("[data-rating-symbol]")
-      ?.getAttribute("aria-label");
-    if (rating) {
-      const score = doc.createElement("strong");
-      score.textContent = rating;
-      metadata.append(score);
+    const rating = button.parentElement?.querySelector("[data-rating-symbol]");
+    if (rating) metadata.append(doc.importNode(rating, true));
+    for (const icon of metadata.querySelectorAll("svg")) {
+      const color = icon.closest(".app-rating-star-fill") ? "#a66528" : "#d1c6af";
+      icon.setAttribute("color", color);
     }
     paper.append(metadata);
     if (button.dataset.shareTitle) {

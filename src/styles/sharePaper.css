@@ -10,7 +10,7 @@ main {
   min-height: calc(100vw * 4 / 3);
   display: flex;
   flex-direction: column;
-  padding: 34px 34px 12px;
+  padding: 34px 34px 5px;
   color: #272923;
   font:
     22px/1.65 Georgia,
@@ -21,11 +21,37 @@ main {
 }
 header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px 16px;
   font-size: 16px;
+}
+.app-rating,
+.app-rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.app-rating {
+  gap: 8px;
+  font-weight: 600;
+}
+.app-rating-star,
+.app-rating-icon {
+  display: block;
+  width: 19px;
+  height: 19px;
+}
+.app-rating-star {
+  position: relative;
+}
+.app-rating-star-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--app-rating-fill);
+  overflow: hidden;
 }
 time,
 figcaption {
@@ -91,13 +117,13 @@ section svg {
   margin: 16px auto;
 }
 section {
-  margin-bottom: 14px;
+  margin-bottom: 5px;
 }
 section > :last-child {
   margin-bottom: 0;
 }
 footer {
   margin-top: auto;
-  height: 48px;
+  height: 38px;
   border-top: 1px solid #b6ae98;
 }
