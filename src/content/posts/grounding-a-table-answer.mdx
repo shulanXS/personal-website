@@ -1,21 +1,41 @@
 ---
-title: "Evidence Grounding for Document Question Answering"
+title: "How to Cite the Right Cell in a PDF Table"
 description: "Separate page retrieval, table-cell attribution, and coordinate projection when building verifiable citations for PDF answers."
 pubDatetime: 2026-11-26T18:10:00Z
 tags: ["AI", "Document AI","RAG","Evaluation"]
 ---
 
-A document QA system can generate the correct scalar value while citing the wrong evidence. Table answers make this especially easy: a value may appear in several rows, and its meaning depends on the row header, column header and unit. I therefore treat answer generation and evidence localization as separate outputs with separate tests.
+“What is the overnight rate for Zone B?” is an unusually good question for testing a PDF assistant. A person can answer it by running a finger across a row. To do the same thing from a PDF, the application must find the right edition of the schedule, locate the rate table, follow two headers to a cell, and show the reader where that cell came from. A system can skip the last three steps and occasionally give exactly the same answer. How would we catch it?
 
 In the example, `$18` occurs twice. Selecting the right document, page and string still leaves two candidate cells. The distinguishing information is the intersection of *Zone B* and *Overnight*. A crop containing only the number loses the context needed for verification.
 
 ![A sample freight schedule highlights the Zone B overnight cell. A second 18 appears under standard service for Zone C.](../../assets/applied-ai/freight-page.png)
+
+Try covering the column headings in the figure. You can still read every price perfectly, but you can no longer say which one pays for overnight service. Cover the row labels instead and you lose the destination. This is the smallest evidence unit I would accept for this question: the value, the two labels that select it, and the currency that gives it meaning. Those pieces need not occupy one tidy rectangle.
+
+A common ingestion pipeline turns a PDF into a stream of text and cuts it into chunks for search. On an ordinary paragraph that is a reasonable starting point. On this table a chunk such as “B 12 18 C 18 24” preserves an impressive fraction of the characters and very little of their relationship. I would use page-level retrieval to find candidates, then pass a page image or row-and-column representation to the reader. If the parser cannot associate a cell with its headers, the image gives the application a second way to inspect the relationship.
 
 ## From retrieval to a stable citation
 
 Coarse-to-fine retrieval narrows a multi-page document to candidate pages, then allocates higher-resolution reading to the relevant regions. This reduces the amount of visual material consumed in detail. It also creates a hard recall boundary: an accurate reader cannot ground an answer on a page excluded by the first stage. Keep the candidate page IDs and the final evidence region so those failures can be diagnosed separately. [Doc-V*, ACL 2026](https://aclanthology.org/2026.acl-long.2129/)
 
 My citation record contains a document ID and immutable revision, a zero-based page index, a coordinate-space definition and four cell edges. The viewer can highlight a tight box while displaying enough of the surrounding table to preserve the headers. Replacing an edition with a new revision requires resolving or recomputing its citation. A page number in the current edition has no durable relationship to the earlier evidence.
+
+### The answer record I would give the viewer
+
+```json
+{
+  "answer": {"amount": 18, "currency": "USD"},
+  "evidence": {
+    "document": "freight-schedule", "revision": "example-v1",
+    "page_index": 6, "row": "Zone B", "column": "Overnight",
+    "space": "upright-raster-top-left", "size": [600, 360],
+    "cell_xyxy": [390, 184, 550, 231]
+  }
+}
+```
+
+The fixture treats printed page 7 as the seventh page of the file, hence index 6. A real document can have front matter that offsets the printed labels. The value can now be formatted as a price without parsing a sentence. The evidence can be opened without searching the PDF for the characters “18.” I would let the reader produce candidate labels and coordinates, then check them against the page bounds and the parsed table where one exists. A box within bounds proves only that the viewer can draw it. Two perfectly legal boxes in this example contain the same amount. Saving the labels makes that remaining ambiguity visible during review.
 
 ## Project the rectangle into the viewer
 
@@ -43,4 +63,8 @@ For a 300 × 180 display, the left edge projects to 195 CSS pixels. Add a 12-pix
 
 ## Evaluate the two failure surfaces
 
-For retrieval, measure whether a labeled evidence page appears in the candidate set. For grounding, condition on that page being present and score the selected cell or overlap with an annotated region. A useful counterfactual edits only the target cell from $18 to $21, leaving the distractor untouched. The answer should change while the citation continues to identify the same row and column. If only the answer changes, inspect region extraction or the viewer transform before retuning the language model.
+Imagine a labeled set of 100 questions with one gold page and one target cell each. Suppose the retriever includes the right page 80 times. A reader picks the right cell on 72 of those 80. Its conditional cell accuracy is 90%, but only 72% of all questions have an end-to-end grounded answer if a missing page makes success impossible. Improving the reader to perfection would recover eight cases. Getting the missing pages into the candidate set addresses a different twenty. These are illustrative counts. A useful evaluation report would publish the underlying misses so someone could inspect them.
+
+I would also change just the target rate from $18 to $21 in a second copy of the fixture. Keep the Zone C distractor at $18. The answer should switch to $21, and the highlight should stay at Zone B, Overnight. If the answer stays at $18, examine the retrieved revision and the cell selection. If it switches to $21 but the box drifts only when the browser zooms, the reader probably did its job. Replacing the model would be a costly way to debug a coordinate transform.
+
+For this table, my acceptance test is something a reader can do in one click. Open the citation, read the row and column, and recover the stated price independently. That test explains why a correct scalar, a page link and a verifiable answer are three different milestones.

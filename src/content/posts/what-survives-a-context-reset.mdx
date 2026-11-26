@@ -1,13 +1,17 @@
 ---
-title: "Context Compaction as State Reconstruction"
+title: "What an Agent Must Remember After a Context Reset"
 description: "Design a handoff that preserves constraints, provenance, permissions, and unresolved decisions across model context resets."
 pubDatetime: 2026-11-26T19:44:00Z
 tags: ["AI", "Agents", "Harness", "Context Engineering"]
 ---
 
+Give a room-search assistant this instruction: “There are thirty of us, including two wheelchair users. Tuesday after four, under $180 for the whole booking. Show me options.” Let it search for ten minutes, then hand the task to a fresh session. The revealing question is whether the successor can evaluate one awkward room correctly. Asking it to repeat the gist of the conversation is a much easier test.
+
+I would give both sessions the same candidate room. It has 28 fixed seats and two wheelchair spaces. The quote is $165 plus an $18 mandatory fee. A summary that says “30 seats, accessible, budget around $180” sounds close. It loses at least two decisions: whether the wheelchair spaces count inside the 30 and whether the fee belongs inside the cap. A fluent successor can now produce a confident rejection for the wrong reason or an equally confident acceptance.
+
 A context reset discards the transcript presented to the next model invocation. It need not discard the application's durable state. I think of compaction as a **lossy projection**: given the previous transcript, keep the information that can change the next valid decision. A short summary can preserve the topic and still lose the task.
 
-Consider a search constraint of 30 people **including** two wheelchair spaces. “30 seats plus accessibility” preserves the nouns and loses the inclusion relationship. The next agent can now reject a room with 28 fixed seats and two wheelchair spaces even if it follows its instructions perfectly.
+Notice what information an extractive summary would preserve by luck. Repeating the original short instruction keeps “including,” “whole” and “show me.” Those are tiny words compared with the names of the rooms the agent explored, yet each one controls a distinct decision. I would spend more of the next context window on those three words than on a long narrative of unsuccessful searches.
 
 ## Separate the sources of state
 
@@ -26,10 +30,38 @@ I persist user constraints with a pointer to the turn that established them, too
 
 Here `fees_included` interprets the user's phrase “whole booking under $180.” Keeping the source turn makes that interpretation inspectable. An absolute date and timezone are still unknown, so the next worker needs to resolve them. `present_options` is a permission boundary. A handoff that says “finish the booking” would expand the authorized action.
 
+This first version of the handoff still loses a detail. “Under $180” is a strict upper bound. A record called `max_total` is easy to read as “at most $180.” At $183 both interpretations reject the room, so the initial fixture will never catch the mistake. A second quote for exactly $180 makes it visible. In a machine-consumed contract I would store the operator explicitly, for example `total_cents < 18000`, and retain the user's actual words alongside it. Likewise “after four” deserves a boundary case at exactly 16:00 if that distinction affects the booking.
+
+Here is a small executable probe for that boundary. Each outcome names the rule that made the decision, so getting the final yes or no for the wrong reason is visible.
+
+```python
+def screen(fixed, spaces, base_cents, fee_cents):
+    if spaces < 2 or fixed + spaces < 30:
+        return "capacity"
+    if base_cents + fee_cents >= 18_000:
+        return "price"
+    return "eligible to present"
+
+print(screen(28, 2, 16_500, 1_800))
+print(screen(28, 2, 16_200, 1_800))
+print(screen(28, 2, 15_800, 1_800))
+# price
+# price
+# eligible to present
+```
+
+### Reconstruct the next move
+
+A successor reads the constraints and retrieves the quote revision. First it checks the inclusive head count: 28 plus two gives 30. Then it computes the all-in price: 165 plus 18 gives 183. Finally it checks its authority. It may present qualifying options, but even a perfect quote would not authorize making a booking. Here the next step could be to find a cheaper slot or clarify the calendar date before querying a schedule. A short prose handoff saying “room unsuitable” cannot tell the successor which of those next moves might help.
+
 ## Test the handoff without its author
 
 A useful compaction test runs the same decision twice, once with the original context and once with only the saved handoff and its resolvable references. For a fixture with 28 fixed seats, two wheelchair spaces, a $165 base price and an $18 mandatory fee, both runs should admit the room on capacity and reject it on total price. Agreement on the rejection alone is weak evidence: a worker that mistakenly requires 32 places rejects the room for the wrong reason.
 
 For repeated sessions I keep a compact decision record containing the rejected candidate, the rule it failed and the observation revision. When the quote changes, the previous conclusion can be invalidated without forgetting the user's cap. Saving every failed search query would consume context while doing little to help that decision. Anthropic describes using structured handoffs between fresh contexts in long-running harnesses. [Harness design for long-running applications](https://www.anthropic.com/research/harness-design-long-running-apps)
+
+I also test what happens when the evidence changes after the reset. Replace only the quote with a $158 base and the same $18 fee. The all-in price is now $176. The earlier *price rejection* should disappear; the seating relationship and the permission to present options should survive. Then remove access to the quote artifact entirely. The successor should mark the price as unverified and fetch a current quote if it can. Treating a dead reference as a valid observation would make a short handoff look efficient precisely when it has failed.
+
+This is the measure of compaction I find most persuasive. Pick decisions near a boundary, predict how each should change under a small edit, and compare the next action taken with the full and compacted histories. Exact agreement in prose is unnecessary. Both workers should admit the same room on capacity, reject or accept it for the right price, and stop at the same permission boundary.
 
 The practical tradeoff is reconstruction cost. A pointer saves prompt tokens only when the referenced artifact remains accessible and affordable to fetch. For a recent, densely specified instruction, retaining the original two sentences can be cheaper and more faithful than generating, storing and verifying a paraphrase.

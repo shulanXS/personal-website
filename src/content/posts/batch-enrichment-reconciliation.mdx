@@ -7,6 +7,10 @@ tags: ["AI", "Batch Processing","Data Pipelines","Python"]
 
 import ResponsiveTable from "@/components/ResponsiveTable.astro";
 
+Take a small catalog with a mug, a scarf and a tray. We want a model to read each description and produce a normalized material tag overnight. The merchant changes the mug while the job is running. In the morning, the first row in the download describes the tray, the mug has a convincing answer for yesterday's description, and the scarf has no answer at all. If the importer simply writes back the file from top to bottom, a perfectly competent model can make the catalog worse.
+
+I find it useful to ask three questions about one line in that download. Which request produced it? What did the model see at submission time? Under what condition is the importer still entitled to change the live record? The first question is about identity, the second about provenance, and the third about concurrency. Putting a product ID in the prompt answers none of them reliably.
+
 Batch inference separates submission from completion. A worker can submit thousands of independent requests and consume their results later, when the source data may already have changed. I treat the importer as a data reconciliation problem with two joins: the provider result must match a submitted item, and that item must still be applicable to the live record.
 
 Claude's Message Batches API returns a caller-supplied `custom_id` and permits results in a different order from submission. Individual outcomes can succeed, error, expire or be canceled. A completed batch describes the provider's processing state. It does not establish that every output has been validated or published. [Batch processing guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)
@@ -26,6 +30,12 @@ Store a manifest keyed by `(run_id, custom_id)` before dispatch. Each entry shou
 </ResponsiveTable>
 
 The tray result belongs to its own manifest row even though it arrived first. The mug result is a successful inference for revision 3 and an obsolete update for revision 4. Both facts belong in the ledger. Re-running an expired item after the source changes should create an attempt against the new revision rather than rewriting the provenance of the old one.
+
+### Follow the tray through one interrupted import
+
+The importer sees `tray-v1` and finds a matching entry in the saved manifest. The manifest says which product to update even if the model happens to mention another SKU in its answer. The returned material “walnut” passes the allowed-value check for this schema. Only now is the importer ready to attempt a write. The manifest revision still has to match the product row *when that write executes*.
+
+Suppose the worker crashes after parsing the tray but before reading the other two lines. Downloading the file again is a reasonable recovery procedure. It should be possible to tell whether the tray write committed before the crash. A file offset alone cannot answer that, since persisting the offset and committing the product write are separate events unless explicitly coordinated. A durable per-result marker lets the importer start over and skip a committed application. It also gives an operator a direct answer to “what happened to this tray?” without reconstructing byte offsets.
 
 <details>
 <summary>Reconcile the three records and detect a partial download</summary>
@@ -68,6 +78,12 @@ print(actions["tray-v1"], actions["scarf-v2"])
 
 A version check in application memory can race a concurrent edit. Use a conditional update such as `UPDATE product SET tag = ? WHERE id = ? AND revision = ?` and inspect the affected-row count. Commit the updated value and the applied-result marker in the same transaction. Give that marker a unique logical key so downloading a results file twice cannot publish the same output twice.
 
+A zero-row update is worth inspecting. If the marker for this exact result already exists, a previous attempt completed and the importer can acknowledge it. If the product now has a higher source revision, the result is superseded. If the product was removed, the system should not quietly recreate it while applying an enrichment tag. All three situations can produce the same row count. The lookup after the failed conditional write gives that count its meaning.
+
+One small schema choice follows from this. When several enrichment fields can be generated independently for the same product revision, the applied marker must identify the field or logical job as well as the source revision. Otherwise a successful color tag can cause an outstanding material tag to be skipped. Conversely, if the two fields must be published together, the manifest and transaction should describe the pair as one result. That decision belongs to the consumer of the catalog.
+
 The reducer above rejects duplicate IDs *within a single downloaded file*. That guards the integrity of an import. Idempotent application across repeated imports is a separate database responsibility. Unknown IDs, malformed outputs and non-retryable provider errors belong in review or failure states. Missing items during a partial download remain unresolved until the terminal manifest is reconciled.
 
 The invariant I use for monitoring is that every manifest entry belongs to exactly one current disposition. Counts of applied, superseded, retryable, rejected and unresolved items must sum to the submission count. That catches a class of silent omissions that an aggregate provider success rate cannot reveal.
+
+In the three-item example, a complete import leaves one applied result, one superseded result and one retry candidate. A download containing only the tray has one actionable row and two unresolved submissions. Those two can be reconciled later; treating both as provider failures immediately could launch duplicate work while the downloader is merely reconnecting. The useful dashboard is a list of which submissions still need a decision, with a way to inspect their snapshots. A green “batch complete” indicator answers a much narrower question.

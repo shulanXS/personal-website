@@ -1,5 +1,5 @@
 ---
-title: "Isolating Agent Evaluation Trials"
+title: "Why a No-Op Agent Passed the Booking Test"
 description: "Use a no-op control and an initial-state snapshot to distinguish genuine task completion from a passing result inherited from another trial."
 pubDatetime: 2026-11-26T19:39:00Z
 tags: ["AI", "Agents", "Harness", "Agent Evaluation", "Test Isolation"]
@@ -7,7 +7,11 @@ tags: ["AI", "Agents", "Harness", "Agent Evaluation", "Test Isolation"]
 
 import ResponsiveTable from "@/components/ResponsiveTable.astro";
 
+An empty agent should make a cheap test subject. Give it the task “reserve seat 4B for Jo,” let it exit immediately, and inspect the booking system. If the grader congratulates it, there is little point in comparing expensive models yet. The interesting question is how a grader that queried the real database and found exactly the requested reservation managed to reach the wrong conclusion.
+
 An outcome grader evaluates a transition from an initial environment to a final environment. Testing the final predicate alone is valid only when the initial conditions are known. If a previous trial already created the target record, an agent that takes no action can pass. That contaminates comparisons between models and makes results depend on trial order.
+
+The crucial ambiguity is in the verb “reserve.” It asks for a change relative to a starting situation. A table queried only after the run tells us what exists now. It cannot tell us whether this trial created it, a prior trial left it behind, or Jo already held the seat when the task began. All three histories can end in an identical row. I want a fixture small enough to put those histories side by side.
 
 ## Reproduce the dependency with SQLite
 
@@ -38,6 +42,10 @@ with TemporaryDirectory() as folder:
 
 The second result has the desired final row and no state change. The third records an unchanged empty state. If both no-op trials were supposed to start empty, the first one's apparent success is entirely attributable to the harness. This is why I run a no-op baseline before spending inference budget on a new task. Temporary directories isolate the local files in this example. A service-backed evaluation also needs scoped queues, clocks, caches and provider fixtures. [Python temporary directories](https://docs.python.org/3/library/tempfile.html)
 
+Try reading the tuples one column at a time. The two shared-file trials have the same second column, `('Jo',)`, so any grader that reads only that column must give both trials the same verdict. Their first columns differ. Once the fixture specifies an initially free seat, only the first pair shows the requested transition. On the clean file the no-op produces `(None, None)`, making the faulty pass disappear with no change to the agent.
+
+This is also why refreshing a conversation ID is insufficient isolation for an agent that uses tools. The model can have an empty conversation while its database, queued jobs and cached tool responses all remember the previous trial. Reuse of immutable inputs such as a catalog snapshot is fine. A reusable mutable reservation table needs either a fresh copy or an enforced per-trial namespace. I would make the trial ID part of the fixture binding before starting any workers and check it again when grading.
+
 ## Specify what must change and what must survive
 
 For an “ensure reservation” task, a legitimate initial state can already satisfy the goal. Requiring every successful run to write a row would manufacture the opposite grading error. I use three fixtures with explicit postconditions:
@@ -52,6 +60,18 @@ For an “ensure reservation” task, a legitimate initial state can already sat
 
 </ResponsiveTable>
 
+### The no-op is a positive control in one of these rows
+
+In the middle row, a no-op can be exactly right. Jo already holds the seat and the task is to *ensure* the reservation. A grader that rewards the number of tool calls, or insists that one new row be inserted in every trial, would punish a correct low-impact decision. In the third row I would inspect both the database and the user's message. Leaving Pat's reservation in place protects the state. Telling Jo that the hold succeeded would still fail the task. Neither a transcript-only nor a final-row-only grader sees both requirements.
+
+A useful companion is a deliberately overactive agent. Let it create Jo's reservation but also remove another customer's seat. A target-row predicate passes. An evaluation that compares the protected rows or the allowed write set catches the damage. A negative control that does too little and one that does too much define a relatively narrow success region without prescribing the exact sequence of valid tool calls.
+
 Checking unrelated rows or a bounded write set catches an agent that satisfies the target by replacing an entire table. A transcript helps explain the change but the database and event log determine whether it occurred. For asynchronous tasks, wait for an explicit completion marker or a bounded timeout before taking the final snapshot. Otherwise a slow write can be attributed to the next trial.
 
 Two tests have high diagnostic value: reverse the trial order, then start two trials concurrently under different namespaces. Order sensitivity suggests leaked state. Cross-namespace effects indicate isolation is incomplete even when serial runs look clean. I fix those conditions before interpreting the benchmark as a statement about model capability. [Agent evaluation environments and outcomes](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)
+
+## The last write can arrive after the trial ends
+
+Consider a confirmation job queued by trial A. The harness resets a shared database, starts trial B, and only then does A's job execute. Resetting the database between trials sounded sufficient while the queue was empty. In this schedule it actively puts A's write into B's initial world. Assigning jobs a per-trial destination and waiting for a known completion or cancellation signal makes the boundary observable. A fixed sleep merely makes this schedule less frequent on a fast machine.
+
+For the seat example I would keep the fixture ID, before-state, after-state and emitted booking events with each verdict. If a future model suddenly appears to perform well, the first check is inexpensive: rerun the no-op and reverse the order. When those controls behave as specified, a change in the model score is finally worth investigating.

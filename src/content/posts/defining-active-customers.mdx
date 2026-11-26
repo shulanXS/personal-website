@@ -1,11 +1,13 @@
 ---
-title: "Semantic Grounding and Execution Tests for Text-to-SQL"
+title: "What Does “Active Customer” Mean in Text-to-SQL?"
 description: "Bind a natural-language metric to an entity, grain, predicate and time interval, then verify generated SQL with data mutations."
 pubDatetime: 2026-11-26T18:01:00Z
 tags: ["AI", "Analytics AI","Text-to-SQL","Evaluation"]
 ---
 
 import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+Ask an analytics assistant how many customers were active in October. Imagine that the growth team expects a number for its engagement dashboard and finance expects a number for its sales report. A person who knows both reports would ask which one is meant. A language model can produce valid SQL immediately, before anybody notices there were two questions. I use a four-row database to make that ambiguity observable.
 
 A Text-to-SQL query can be syntactically valid, execute successfully and still answer a different question from the user's. The difficult input is often the metric definition. “Active customer” could mean any customer with an event or only a customer who purchased. Both interpretations map naturally to the same tables and produce plausible counts.
 
@@ -21,6 +23,14 @@ I represent a metric as an entity, grain, qualifying predicate, time interval an
 | Cy | purchased | Nov 1, 00:00 |
 
 </ResponsiveTable>
+
+Read the table before running the code. For the engagement interpretation, Ada and Bo count. For the sales interpretation, only Bo counts. For October purchase *volume*, Bo contributes two events. Cy tests the period boundary. Those three answers use precisely the same table, so better schema retrieval alone cannot make the choice.
+
+## Translate the question into set operations
+
+My intermediate representation is deliberately close to something an analyst could review: take October events, keep purchases, project customer IDs, remove duplicates, count the surviving IDs. Each verb corresponds to one decision. Dropping “keep purchases” admits Ada. Dropping “remove duplicates” gives Bo two votes. Including both endpoints admits Cy at the first instant of November.
+
+This ordering is useful even if a database optimizer chooses a different physical execution plan. It supplies a plain-English specification against which to review generated SQL. For a recurring metric I would give that specification an owner and revision. For a one-off question I would present both plausible counts with their definitions, or ask which definition should drive the report if a downstream job needs exactly one value.
 
 ## Verify the aggregation and time boundary
 
@@ -47,6 +57,12 @@ The result is two customers with any October activity and one purchasing custome
 
 The fixture compares text timestamps only because their UTC representation and precision are uniform. For a production warehouse I use typed timestamps and convert the two local calendar boundaries to instants. A half-open interval composes with the next reporting period and avoids guessing the last representable timestamp on the final day. A local reporting day can have a different duration across a daylight-saving transition.
 
+### A query can pass today for the wrong reason
+
+Suppose someone writes `COUNT(*)` over October purchases and the test dataset contains one purchase per customer. The wrong query and the right query agree on every row of that snapshot. Adding fifty more customers with one purchase each yields a larger test with exactly the same blind spot. Bo's second purchase is valuable precisely because it breaks that agreement.
+
+Joins introduce a less obvious version of the same problem. If each order can carry several promotion codes, joining orders to promotions before counting can duplicate the order rows. A distinct customer count may still look correct while a neighboring revenue metric doubles. I would inspect the row grain immediately after the join and test the two metrics separately. Marking an entire generated query “verified” on the strength of one scalar hides that distinction.
+
 ## Metamorphic tests expose ambiguous semantics
 
 A metamorphic test changes the input data and specifies how the output should respond. Starting from the original fixture each time:
@@ -58,3 +74,9 @@ A metamorphic test changes the input data and specifies how the output should re
 These tests constrain the query's meaning without requiring the generated SQL to match a reference string. They also make a useful review tool: a domain expert can approve the expected changes without reading SQL. For joins, I add a one-to-many dimension record to expose duplicate counting after a join.
 
 A verified example ties an approved question to trusted SQL. It should carry a metric revision and the assumptions needed to reuse it. I show the selected metric and timezone with the answer so a reader can see why a query returning `1` was correct for purchasing customers.
+
+## What the person asking the question should see
+
+For the fixture I would return **1 purchasing customer in October 2026, UTC** and a short explanation: two qualifying purchases belonged to the same customer. A link to the metric definition can carry the predicate, timezone and version without forcing everyone to read SQL. If the user meant engagement, the answer is two customers, and the reason is Ada's sign-in. The correction alters the predicate; it should leave the time window and counting grain intact.
+
+There is a useful review question here even for teams that never show generated SQL. Can the system name a customer whose inclusion changes between two plausible definitions, and explain the change using an actual row? In this fixture that customer is Ada. If the system can produce only a number, a reviewer has very little to challenge. A count accompanied by its definition and one discriminating example gives the conversation somewhere precise to go.

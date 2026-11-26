@@ -5,9 +5,15 @@ pubDatetime: 2026-11-26T19:43:00Z
 tags: ["AI", "Agents", "Harness", "Tool Discovery", "MCP"]
 ---
 
+An accounting assistant is given two operations with “statement” in their descriptions. One produces a document for sharing. The other closes a billing period. Both can take an account and a month. If the user asks for a copy, a model can generate impeccable JSON for an operation with a very different consequence. That example is why I inspect the menu the model actually saw before proposing a better prompt.
+
 A tool catalog has two consumers. A retrieval layer may use names and descriptions to choose a shortlist. The model then reads the visible definitions to select an operation and fill in its arguments. The input schema constrains the shape of that call. A valid schema cannot tell a runtime that the user intended an entirely different operation.
 
 I diagnose tool selection at these boundaries because each failure calls for a different engineering change. If `export_statement` is absent from the shortlist, rewriting its JSON Schema has no effect on that turn. If the tool is visible but the model confuses it with `finalize_billing_period`, returning a longer shortlist may make the distinction harder.
+
+Imagine the following three records from one diagnostic run. The catalog has 80 operations. The retriever selected six and omitted the export tool. The generated call chose the period-closing tool and supplied a syntactically valid month. The third fact attracts attention because it is the event visible in the trace. Yet the model could never select the right tool from those six. An error labeled simply “wrong tool call” does not tell the engineer where to intervene.
+
+There is also a product distinction hidden in “send a copy.” Generating the PDF and delivering it to accounting are separate effects in this example. A model that successfully calls the export tool has obtained a document. The application still needs a resolved recipient and a delivery operation if the user wants an actual send. I would describe the output of export precisely so the assistant cannot interpret a successful PDF response as evidence that someone received it.
 
 ## Describe the observable effect
 
@@ -23,10 +29,28 @@ finalize_billing_period(account, month, expected_revision)
 
 The descriptions give the model an output to expect and a side effect to account for. The finalization schema still needs a period identifier and an expected revision. The backend must authorize the caller and enforce the revision precondition. In MCP, discovery and invocation are distinct protocol operations, typically `tools/list` and `tools/call`. How a host chooses which listed tools to present to a model is an application decision. [MCP tools specification](https://modelcontextprotocol.io/specification/2025-06-18/server/tools)
 
+### Which arguments should the model have to guess?
+
+`month="May"` looks fine in a chat transcript and is ambiguous across years. A tool can accept an explicit billing period such as `2026-05` and explain how to resolve phrases such as “last month” using the reporting timezone. If no year follows from context and more than one May is plausible, clarification is a valid outcome. A convenient schema default to the current year would silently turn missing context into a business choice.
+
+Other values are already known. The authenticated account and the user's roles are facts the host can attach after the model's choice. An expected revision can come from a previous period lookup. Making every one of those fields free-form increases the number of ways for a call to look complete while being grounded in nothing. In my tool definitions I distinguish values a user supplies, values a prior observation supplies and values owned by the application.
+
 ## Measure failures conditionally
 
 Suppose the correct tool is unique for each labeled request. Let `R` be the event that retrieval returned it, `S` that the model selected it, and `A` that the required arguments were correct. With execution held fixed, end-to-end routing accuracy is `P(R) × P(S | R) × P(A | R,S)`. These are conditional rates. Multiplying three independently measured headline accuracies does not generally give the same result.
 
 A useful controlled run injects the gold tool into the shortlist while keeping the user's wording and the rest of the menu fixed. Recovery implicates discoverability. Continued confusion points toward the descriptions, examples or the task label itself. If the call changes to the correct tool with the wrong month, the selection improved while argument grounding still failed. Measure the three outcomes independently and record the menu shown to the model. Research on large enterprise API catalogs also examines how much operation resolution remains visible to the reasoning loop. [EMNLP industry study](https://aclanthology.org/2026.emnlp-industry.179/)
+
+Consider this illustrative audit of 100 requests with one expected tool per request.
+
+| Decision | Eligible cases | Pass | Cases lost here |
+| --- | ---: | ---: | ---: |
+| Expected tool appears in the menu | 100 | 80 | 20 |
+| Model selects the visible tool | 80 | 60 | 20 |
+| Arguments match the request | 60 | 48 | 12 |
+
+The conditional rates are 80%, 75% and 80%. Their product is 48%, exactly the observed share of complete calls. Improving argument accuracy to 100% with everything else held fixed would lift the result to 60%. It would have no effect on the twenty requests that never saw the tool.
+
+In an actual shortlist experiment I would keep menu size constant when adding the gold tool, record which distractor was displaced, and repeat with several distractors or orderings. Otherwise an apparent improvement might be due to removing an unusually confusing competitor. The test set should include genuine requests to finalize a period as well as requests to export. A description that discourages finalization everywhere could “fix” every export example and make the catalog worse overall.
 
 For a handful of tools I prefer exposing all definitions. Staged discovery introduces latency and creates a new way to omit the right operation. I would pay that cost when held-out retrieval coverage and prompt size show that the larger catalog is actually harming decisions.

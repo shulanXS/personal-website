@@ -1,11 +1,15 @@
 ---
-title: "Reciprocal Rank Fusion in Hybrid Retrieval"
+title: "Why Hybrid Search Buries an Exact Part Number"
 description: "Derive a concrete hybrid ranking, examine rank-window effects, and identify when an exact identifier should follow its own retrieval path."
 pubDatetime: 2026-11-26T18:05:00Z
 tags: ["AI", "Search","RAG","Ranking"]
 ---
 
 import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+Type `AX-14B` into a parts catalog. Most people who enter just that string expect to land on a particular coupler. Now type “Does AX-14B fit the older pump?” The coupler is still important, but an installation bulletin may be the only document that actually answers the question. A search system has to decide what role the identifier plays before it can judge the ranking.
+
+I like this example because two reasonable search engines can both be working properly when the combined result feels wrong. A lexical engine rewards an exact sequence of characters. A dense retriever maps the query and documents into a space intended to bring similar meanings together. The dense engine may quite reasonably associate a pump service kit with the question. A fusion stage then has to turn those different kinds of evidence into one ordering.
 
 Sparse retrieval and dense retrieval produce scores on different scales. Reciprocal rank fusion (RRF) avoids calibrating those scores by using each document's position in each list. For a document `d`, sum `1 / (k + rank(d))` over the lists that contain it. Ranks start at one. A document missing from a truncated list contributes zero on that list. [Elasticsearch RRF reference](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion)
 
@@ -18,6 +22,10 @@ Sparse retrieval and dense retrieval produce scores on different scales. Recipro
 | 3 | Pump service kit | Universal adapter |
 
 </ResponsiveTable>
+
+## Work through the near tie by hand
+
+Read down each column as though it came from a separate search. The positions belong to the documents within that column. There is no direct correspondence between, say, a lexical score of 8.4 and a vector similarity of 0.82. RRF discards both magnitudes. What survives is that the coupler won one list, the kit appeared twice, and the bulletin held second place in both. That simplicity is useful when combining engines trained in quite different ways. Its price is the loss of information about *how emphatic* a win was.
 
 With `k = 60`, the service kit receives `1/63 + 1/61`. The bulletin gets `2/62`. The exact-code coupler receives only `1/61` despite winning lexical retrieval. Its drop to third follows directly from the aggregation rule. Inspecting the child rankings tells me the identifier was preserved by the lexical path; testing new tokenizers would address a different failure.
 
@@ -47,8 +55,16 @@ The rank constant controls how quickly a contribution decays with rank. When `k`
 
 The rank window controls eligibility. At a window of one, only the coupler and kit survive, each once at rank one. They tie. A deterministic tie-breaker makes the outcome reproducible but adds no evidence about product identity. Increasing the window can change the ordering of documents already present because they may now acquire contributions from additional lists.
 
+A small thought experiment helps me choose what to log. Imagine the exact coupler also appears at rank four in the semantic list. With a child window of three, that contribution is invisible. At four, the coupler's score becomes `1/61 + 1/64`, about 0.03202. It moves much closer to the kit but still trails the bulletin in this fixture. Increasing the number of results displayed to a user cannot recover that fourth-place contribution if the fusion stage has already discarded it. The child window and the page size are two distinct controls.
+
+When inspecting a missed hit, I want one row per candidate with its raw identifier, document ID, rank in each child, inclusion window and final score. The absence of the coupler in *both* child lists would point upstream. A first-place lexical hit that disappears after deduplication points instead to document identity. Two variants stored under the same family ID can collapse before ranking ever gets a say.
+
 ## Exact identity is an application constraint
 
 For a query consisting solely of a recognized catalog identifier, a unique match in an authorized exact-key index has a stronger interpretation than semantic similarity. I would surface that item directly and use fusion for related results. For a compatibility question containing the identical code, a service bulletin could be the most relevant document. The identifier helps constrain retrieval while the rest of the query defines what evidence is needed.
 
 Normalization belongs to the identifier namespace: case folding or stripping punctuation may collapse different products for some vendors. Retain the raw key and surface ambiguous matches. In evaluation I split whole-identifier top-one accuracy from prose recall and mixed-query relevance. Pooling them can hide a regression in exact lookup behind gains on a much larger set of natural-language queries.
+
+For an application test I would keep three queries together: `AX-14B`, “coupler for older pump,” and “will AX-14B fit the older pump?” For the first I can grade the returned SKU exactly. For the second I need a judged set of relevant alternatives. For the third I want the passage that establishes compatibility with the specified pump revision. The same top-one coupler result can earn full credit on the first query and fail the third completely.
+
+That is the limit I put on tuning the rank constant. It is a good control for how much to reward agreement among retrievers. The meaning of an exact catalog key, and the evidence a compatibility answer owes the reader, belong to the application.

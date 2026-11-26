@@ -7,15 +7,23 @@ tags: ["AI", "Model Routing","Evaluation","Human Review"]
 
 import ReviewBudget from "@/components/ReviewBudget.astro";
 
+Suppose a support desk can inspect two of the next eight automatically classified tickets. The model flags one true mistake as fairly risky and another as very risky. A reviewer would like to catch both. A queue ordered by score also contains perfectly correct tickets with high scores. This is a resource allocation question before it is a question about model confidence: which two decisions should a person see, and what happens to the other six?
+
 Selective prediction lets a classifier abstain and defer an input to another decision maker. A threshold on estimated error risk defines an operating point. I evaluate it with three quantities together: automatic coverage, error among accepted cases and review demand. Any one on its own can reward a policy the team cannot actually operate.
 
 Let `s(x)` be risk and let the application accept when `s(x) < t`. On a labeled dataset of `N` cases, coverage is `accepted / N`. Selective risk is `accepted errors / accepted`. Review demand is `N − accepted`. A cutoff that routes everything to review has zero automatic errors and an undefined selective risk, since the denominator is empty.
+
+The score and the label play different roles in the example below. The score is available when the decision must be made; the label says whether that automatic decision was wrong and is available to us because this is a labeled exercise. Sorting the tickets by their eventual labels would yield a marvelous routing policy that no deployed system could run. Move the threshold and look at the individual tickets that cross it. The jumps in the curve have names and outcomes.
 
 <ReviewBudget />
 
 ## Read a risk–coverage curve as a sequence of decisions
 
 The control uses eight labeled fixtures. At `t = 0.75`, six cases are accepted and one is wrong: coverage is 75% and selective risk is 1/6. At `t = 0.35`, four cases are accepted and none is wrong. That removes one observed error at the cost of two additional reviews. It does not establish that future automatically accepted cases have zero risk.
+
+At the two-review operating point, the queue contains the 0.75 case, which the model got right, and the 0.90 case, which it got wrong. The error scored 0.35 remains in the accepted group. Lowering the threshold to 0.35 also routes the 0.55 case, which was correct. This tells me exactly where the additional labor goes. There is no continuous slider setting that sends only the two actual errors to review while keeping the score order fixed. On these eight cases, even a perfectly chosen threshold has that limitation.
+
+A further subtlety appears at the boundary itself. With the strict comparison in the example, a score of exactly 0.35 enters review at a threshold of 0.35. Changing `<` to `<=` in a serving implementation silently changes the operating point. In a system that rounds scores before storage, many cases can sit on that boundary. I would log the actual decision and the policy version alongside the displayed score so that an auditor can reproduce it.
 
 ```python
 # (estimated risk, automatic decision was wrong)
@@ -36,8 +44,18 @@ print(report(0))
 
 If the goal is to review exactly two cases of equal handling cost, ranking by expected preventable loss is the relevant decision. Ranking by estimated error probability is a special case that assumes comparable harm and comparable reviewer effectiveness. Calibration matters when an absolute threshold must mean approximately the same thing on future traffic. A strictly monotone calibration map can change numeric cutoffs while preserving ordering. Improving calibration alone cannot move a confidently wrong case above the other cases in the queue. [Calibrated Deferral Routing, EMNLP 2026](https://aclanthology.org/2026.emnlp-industry.252/)
 
+### When error probability gives the wrong queue order
+
+Imagine two tickets each taking five minutes to inspect. One has a 40% chance of a harmless category error costing one unit. The other has a 10% chance of a routing error costing twenty units. If a reviewer reliably fixes either error, expected preventable loss is 0.4 units for the first ticket and 2 for the second. With one slot, the second review buys more. If the second error is hard for the reviewer to recognize, that calculation changes again. The conclusion depends on a model of the intervention as well as the model's risk score.
+
+In a desk with widely varying handling times I would also estimate the minutes a review occupies. A daily limit of twenty cases means something quite different if half the cases need an interpreter. These quantities can be rough at first. Writing them down exposes the assumption behind a “top two” rule and gives the team something to measure.
+
 ## Estimate error in the deployed acceptance region
 
 If labels arrive only for reviewed requests, outcomes in the automatic region are missing by design. The mean error among reviewed cases cannot estimate error among accepted cases. A simple policy is to sample a known fraction of accepted traffic for independent labeling. If sampling probabilities differ by score band, account for them when estimating population error.
 
 I choose the threshold on validation data, freeze it and report performance on a later period, including coverage by class, hourly queue arrivals and wait time. A fixed daily review total can still exceed short-term capacity. Finally, reviewed cases have their own error and latency. Selective risk measures the automatic branch; end-to-end service quality includes what happens after deferral.
+
+One last arithmetic check keeps me honest about accepted traffic. Suppose 900 accepted tickets fall in a low-score band and 100 in a higher band. Label 90 from the first band and find one error; label 50 from the second and find five. Under random sampling within each band the estimated error count is `900 × 1/90 + 100 × 5/50 = 20`, or 2% across the 1,000 accepted cases. The unweighted sample ratio, 6/140, overrepresents the heavily sampled higher band. These are example counts with sampling uncertainty, but the reason for weighting holds even in a much larger audit.
+
+That is the number I want next to review load: how often the decisions we actually allowed through were wrong, measured on traffic that had a real chance of being labeled.

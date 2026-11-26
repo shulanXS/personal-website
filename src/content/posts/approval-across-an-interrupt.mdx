@@ -5,9 +5,13 @@ pubDatetime: 2026-11-26T19:42:00Z
 tags: ["AI", "Agents", "Harness", "Human in the Loop"]
 ---
 
+A reviewer opens a quote for $36, reads it and leaves the tab open during lunch. A colleague changes the amount to $60. When the reviewer returns and clicks Approve, should the system apply the change? The click is genuine and the reviewer's session can still be valid. The difficult question is which proposal the click describes. A workflow that saves only `approved=true` has thrown away the information needed to answer it.
+
 An interrupt introduces two clocks into an agent workflow. The graph can pause at a checkpoint while the object under review continues to change in another system. Resuming the right graph thread restores its saved state. The approval still needs to identify the revision of the business object to which it applies.
 
 ## Observe what actually executes twice
+
+Start with the smaller of the two problems. What does a paused computation do when we supply its answer? It is tempting to picture an ordinary function waiting on a line, with its local variables alive until the human returns. A graph that supports durable interruptions has a different execution model. The following program deliberately puts a visible observation before the interruption. Counting that observation lets us distinguish “resume at the next line” from “enter the node again and replay up to the interruption.”
 
 The following example runs locally with `langgraph==1.2.15`, without a model or API key. `InMemorySaver` is sufficient for this process-local experiment. A restartable service needs a persistent checkpointer. [LangGraph interrupt semantics](https://docs.langchain.com/oss/python/langgraph/interrupts)
 
@@ -41,6 +45,10 @@ print(entries, result["approved"])
 
 Both entries come from the same node. On resume, execution starts at the beginning of that node and the matching `interrupt` call returns the supplied decision. The list makes this visible because it lives outside graph state. Replacing the append with an email or an order submission would repeat an external effect. Returning a state update after the interrupt avoids that particular repetition. External calls that must survive a crash still need an idempotency contract.
 
+Walk through the program once with a pencil. The first invocation supplies revision 7, enters `review`, appends 7 and reaches the interrupt. No approval has been returned by the node at that point. The second invocation supplies a resume value and the same thread ID. The node enters again, appends another 7, and the interrupt returns the supplied Boolean. The resulting graph state says approved. The external list contains two entries because the checkpoint did not roll back that ordinary Python mutation between calls.
+
+I would keep the pre-interrupt part of such a node small and stable. Recreating an identical review payload from saved state is harmless. Fetching today's live quote on re-entry and silently substituting it into the original review is a different operation. If the new quote needs review, show it as a new proposal with its own revision. Keeping the order of interrupt calls predictable also matters when a node contains several pauses, because a resume value has to correspond to the intended pause.
+
 ## Apply the decision at the write boundary
 
 Suppose the saved proposal identifies quote Q4, revision 7, for 3,600 cents. A colleague edits the live quote to revision 8 while the graph is paused. A read followed by an unconditional update leaves another race between those two statements. A conditional write lets the database check the reviewer's decision at the instant the transition happens.
@@ -65,5 +73,13 @@ print(updated, db.execute("select state from quote").fetchone()[0])
 ```
 
 The script prints `0 open`. Removing the competing edit produces `1 approved`. The version check works only if *every material edit increments the revision*. For a real proposal I bind the reviewer, tenant, action, amount, currency and expiry as well. A zero-row update needs a lookup: an already-applied approval may return its existing receipt, while a changed quote needs a new decision.
+
+### Distinguish a stale approval from a duplicate click
+
+Consider two ways to get a zero-row update. In the example, the quote is open at revision 8. The reviewer saw revision 7, so the useful response shows what changed and requests a decision on the new amount. In a second run, the quote is already approved at revision 7 and a saved receipt refers to this exact approval operation. The same zero tells us no new transition was made. Looking up the operation lets the second click receive the prior receipt without asking the person to approve again.
+
+I would persist the decision record and the conditional business update in the same local transaction where possible. If approval must trigger a remote order, the local decision can enqueue an identified operation and a worker can reconcile its receipt. A graph checkpoint alone cannot make an external order and an internal approval commit atomically. A failure between those steps is a recovery problem even when the user reviewed exactly the right quote. [Recovering a tool call after a lost reply](/posts/recovering-a-refund-tool-call/)
+
+The test cases follow directly from the two clocks. Resume an unchanged quote and expect one transition. Edit its amount before resume and expect none. Deliver the same approval twice and expect one receipt identity. Finally restart a worker after it records the decision but before it reports success. The reviewer should be able to discover what was decided without being asked to authorize a different purchase. None of these tests needs a language model. They verify the part of the workflow whose meaning should stay stable across model upgrades.
 
 This is why I keep checkpoint identity and proposal identity separate in a design review. The first answers “which computation should resume?” The second answers “which change did the person authorize?” A durable workflow needs both.

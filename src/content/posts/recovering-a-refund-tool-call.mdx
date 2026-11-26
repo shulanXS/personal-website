@@ -1,11 +1,13 @@
 ---
-title: "Idempotency and Recovery for Agent Tool Calls"
+title: "Recovering a Refund When the Tool Call Times Out"
 description: "Distinguish a logical operation from a model invocation, and reconcile writes whose provider response was lost."
 pubDatetime: 2026-11-26T18:07:00Z
 tags: ["AI", "Agents","Tool Calling","Reliability"]
 ---
 
 import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+The customer asks, “Did my refund go through?” The assistant saw the request leave and watched the connection time out. A tempting implementation catches the exception, tells the customer the refund failed and asks the model to try again. That turns a missing observation into a business decision. One way to see the flaw is to play both versions of the last second: in one, the connection drops on the way to the provider; in the other, it drops on the way back. The local log looks identical. The customer's balance does not.
 
 A timeout on a write leaves two possible histories. The provider may never have received the request, or it may have committed the effect and lost the response. Both histories produce the same exception at the caller. Asking the model to infer which one occurred cannot recover information that the transport did not deliver.
 
@@ -21,6 +23,14 @@ I assign a durable operation identity when the application records the user's ap
 | 09:14:05 | Same outcome returned on keyed replay | RF9 belongs to R17, confirmation can be shown |
 
 </ResponsiveTable>
+
+Read the 09:14:03 row from the right-hand column only. That is all the live application knows at that moment. The left-hand column is visible to us because we constructed the example. A recovery design that uses the left-hand column before obtaining another observation is relying on an oracle. The operation key is how we ask the provider a question whose answer remains meaningful in either history.
+
+## Which retries belong together?
+
+Suppose the customer deliberately requests a second refund of the same amount against another eligible item on the same charge. Hashing only the charge, amount and currency would incorrectly merge two valid decisions. At the opposite extreme, generating a fresh UUID on each HTTP delivery would split two attempts at the first decision. I issue the operation key once when accepting a particular intent. The payload is then bound to that key so accidental reuse with a different amount can be rejected.
+
+This also explains where to put the key in an agent system. The model can describe the proposed amount and reason. The application handling the confirmed action can allocate the durable identity and return it to the conversation. If a network library retries under the hood or a different worker wakes tomorrow, both can recover the same key from the operation record.
 
 ## Replay the operation with the same identity
 
@@ -57,6 +67,24 @@ Stripe's API describes a particular contract for idempotent POSTs, including par
 
 Persist the local operation before dispatch. On a definitive response, record the provider receipt. On ambiguous transport failure, retain an unresolved state and reconcile by the same key or by a supported receipt lookup. A webhook can arrive before the recovery worker receives its reply. Both should converge on one operation row. Downstream notifications also need a stable event identity if duplicate confirmation messages matter.
 
+Here is the state change I would permit in this example:
+
+```text
+approved R17 → dispatched R17 → outcome unknown
+                                   |
+                         recovery finds RF9 for R17
+                                   |
+                              confirmed RF9
+```
+
+A late timeout handler must never move that last state back to unknown. Imagine the webhook has already saved RF9 and the original sender wakes up a moment later with a timeout exception. An unconditional “set status to unknown” destroys information. I would let that handler record its attempt outcome while updating the operation only if it is still pending. If two different receipts are ever claimed for the same operation, keep both observations and raise a reconciliation conflict. Overwriting one would hide the very failure the ledger exists to detect.
+
 A database transaction can atomically update local bookkeeping. It cannot by itself make a remote side effect and a local receipt one transaction. Where a provider has no idempotency mechanism or lookup, the safe recovery policy may require manual reconciliation. After a provider's deduplication window expires, an old retry has the same problem.
+
+## What I would test before enabling automatic recovery
+
+There are three fault points worth injecting separately. Drop the request before it reaches the provider; recovery should create exactly one refund. Drop the response after the provider creates it; recovery should discover the same receipt. Finally, deliver the success webhook twice and in reverse order with the timed-out sender; the operation should stay confirmed and the customer should receive one confirmation. Counting successful tool returns would miss a double refund or a double email. The assertions belong on the provider's effect ledger and the notification record.
+
+Those tests also determine what the assistant can say. After a timeout, “I’m checking refund R17” is accurate. After a definitive rejection it can explain what needs to change. After RF9 has been matched to R17, it can confirm the refund and give the reference. The wording follows what the system has learned, which is a much more reliable input to the next turn than the exception class.
 
 The distinction I expose to an agent is confirmed, rejected or unresolved. That lets the model explain an uncertain result accurately while the harness retains responsibility for whether another external action may be attempted. [Tool execution in an agent harness](/posts/what-the-harness-owns/)

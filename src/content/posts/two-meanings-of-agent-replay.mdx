@@ -7,6 +7,10 @@ tags: ["AI", "Agents", "Harness", "Tracing", "Replay"]
 
 import ResponsiveTable from "@/components/ResponsiveTable.astro";
 
+A customer says the assistant told them that the Elm store had one unit of SKU J9. An engineer reruns the conversation after lunch and sees zero. Which result is wrong? Possibly neither. One result may describe revision 31 of the inventory while the other describes revision 32. “I replayed it” leaves out the most important part of the investigation: what was allowed to change?
+
+I separate three investigations before selecting a debugging tool. First, recover what the original assistant observed. Second, ask how changed decision logic would behave given that same observation. Third, find out what the application does against today's inventory. The word *replay* gets used for all three, though the evidence needed for each is different.
+
 An agent trace captures what happened during a run. A checkpoint stores enough state for a runtime to continue computation. A replay procedure defines which inputs are held fixed when some part of that computation runs again. The terms overlap in tools and dashboards, but the distinction matters whenever the world changes between the original run and the investigation.
 
 <ResponsiveTable>
@@ -31,12 +35,44 @@ An agent trace captures what happened during a run. A checkpoint stores enough s
 
 The trace supports the statement that the agent observed one item at inventory revision 31. It cannot establish that the item was available when a customer arrived later. If payloads must live outside the trace, a retained immutable reference and digest can preserve verifiability. A digest by itself cannot reconstruct data that has expired.
 
+Notice what the trace does *not* record about the stock. The assistant's sentence and the availability observation refer to each other, so we can audit the statement it made. Nothing here reserves the unit, records when the customer arrived or proves the inventory service itself was accurate. If the support question is “why was the customer unable to buy it?”, we need a later reservation or sale event. A more elaborate replay of these same three events cannot supply one.
+
+## Reconstruct the original decision before changing it
+
+I would start an inspector with empty state and feed it the request, the inventory result and the reply in sequence. The request opens a lookup for J9 at Elm. The observation associates quantity one with that lookup at revision 31. The reply closes the conversational turn and points back to the observation. The inspector should be able to render that progression while the inventory service is offline. If opening a historical trace triggers a fresh lookup, the debugging view can quietly rewrite its own evidence.
+
+A compact checkpoint taken after the observation might retain the store, SKU, revision and available count, which is plenty for drafting the next sentence. It can still omit how the store was selected or what the preceding model turn saw. Conversely, a rich event trace might lack the pending task queue needed to resume execution. Whether an artifact is adequate depends on the question we want it to answer.
+
 For concurrent calls I record tool-call IDs and parent relationships. Ordering all events by wall-clock timestamp loses the distinction between “after” and “caused by.” Two independent lookups can finish in either order. When comparing runs, I align the calls with their parents, then find the earliest meaningful difference in arguments or observations. OpenTelemetry's spans and links provide useful primitives for that representation. [OpenTelemetry traces](https://opentelemetry.io/docs/concepts/signals/traces/)
 
 ## The boundary of a counterfactual replay
 
 Suppose an updated policy asks for a different store after consuming the recorded result. The old trace contains no response for the new store. Feeding the old observation into the new action would produce a reproducible but invalid experiment. Stop at divergence, or branch into a versioned simulator or snapshot that can answer the new call. Record which environment supplied subsequent observations.
 
+Take a very small policy change first. The new policy must say “one reported at the time of lookup” whenever stock is exactly one. It needs the same recorded quantity as the old policy. We can compare the two replies while holding the observation fixed. Now try a policy that checks a second store whenever stock is low. Its next action asks for Cedar. The Elm observation contains no Cedar count. The experiment can establish that the new policy *would ask* about Cedar; it cannot establish what the final recommendation would be.
+
+The smallest version of this check can be implemented with an ordinary lookup. This snapshot contains only what the original run observed. Checking membership explicitly prevents a missing observation from silently becoming an observed inventory count of zero.
+
+```python
+observations = {("J9", "Elm"): (31, 1)}
+
+def inventory_at_replay(sku, store):
+    key = (sku, store)
+    if key not in observations:
+        return "unobserved", None
+    version, count = observations[key]
+    return f"revision {version}", count
+
+print(inventory_at_replay("J9", "Elm"))
+print(inventory_at_replay("J9", "Cedar"))
+# ('revision 31', 1)
+# ('unobserved', None)
+```
+
+If we have a historical inventory snapshot for both stores, we can continue against that snapshot and mark the Cedar observation as simulated from the saved state. If we query live instead, mark the new time and revision. These are perfectly reasonable experiments once their provenance is explicit. They cease to explain the original run at the first observation the original system never made.
+
 LangGraph checkpoints can preserve thread state across invocations. Resuming an execution does not make external services historical: an uncaptured read can return newer data and a repeated write can cause another effect. I keep the inspection path side-effect-free, and require a separate environment or an explicit execution policy for reruns. [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 
 The limit I put on a debugging conclusion is the earliest unavailable observation. Before that point, recorded state can establish what the agent saw and how the harness interpreted it. Beyond it, any account of what a different policy would have done depends on new assumptions.
+
+For this support ticket I would give a narrow, defensible answer. The recorded lookup for J9 at Elm returned one at revision 31, and the assistant used that observation. A rerun that returns zero gives a reason to check inventory changes after revision 31. It supplies no evidence of what the original model secretly “knew.” That distinction saves a surprising amount of debugging effort when several teams own different parts of a tool call.

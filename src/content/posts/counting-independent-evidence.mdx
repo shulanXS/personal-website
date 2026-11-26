@@ -1,15 +1,23 @@
 ---
-title: "Claim-Level Provenance in Multi-Agent Research"
+title: "When Three Research Agents Find the Same Source"
 description: "Represent attribution as a graph, distinguish repeated publications from distinct origins, and retain evidence whose predicates differ."
 pubDatetime: 2026-11-26T19:40:00Z
 tags: ["AI", "Agents", "Harness", "Multi-Agent Systems", "Provenance"]
 ---
+
+A travel researcher asks how many seats a ferry offers. Three research workers return the same number, 90, from three different websites. A fourth worker finds a vessel register with a capacity figure. A summarizer could announce “three sources agree” and treat the register as a dissenting vote. Before assigning any weight to that vote, I want to know where each number came from and exactly what each source counted.
 
 Parallel research workers reduce search time and cover more queries. They do not automatically produce independent evidence. If two workers read derivatives of the same announcement, their agreement has a shared cause. A synthesis step that counts worker votes or URLs will assign excess weight to a single observation.
 
 I attach provenance to **a claim in a passage**. An entire document is too coarse: the same report can repeat one figure from a press release and independently measure another. A useful claim key includes the subject, predicate, value, unit, scope and effective date. A support edge connects a source passage to that claim. A derivation edge records that the passage attributes it to another source. The W3C PROV model supplies vocabulary for derivation and primary sources. [W3C PROV-O](https://www.w3.org/TR/prov-o/)
 
 ![Three documents converge on one operator announcement about 90 seats. A separate vessel register is a second origin only for the distinct certified-capacity claim it records.](../../assets/agent-harness/source-lineage.png)
+
+## Read the arrows in the figure
+
+Start with the digest. It attributes the number to a newsletter. The newsletter in turn attributes it to the operator's announcement. If the operator made a transcription error, all three publications could repeat that error while quoting their immediate sources faithfully. Parallel retrieval has found three places a reader can see the claim and one known origin for its value. The duplicate coverage is still useful if one URL moves or a paraphrase supplies context. It simply answers a different question from independent corroboration.
+
+Now inspect the register. A certified maximum is an upper limit under its recorded conditions. An operator's advertised seating on a particular service may be lower because of configuration, staffing or sales policy. To establish a conflict I would first need the same vessel, date, configuration and predicate. An advertised count *above* an applicable certified limit might be reason to investigate. A count merely different from it does not by itself resolve what tickets are offered on this sailing.
 
 ## Collapse known derivations before synthesizing
 
@@ -34,8 +42,18 @@ print(roots("digest") == roots("newsletter") == {"operator"})
 
 In this fixture an empty parent list marks a **verified origin**. Production data needs a separate state for “attribution unknown.” Treating an unknown source as a fresh root would manufacture independence. A derivation cycle also leaves the original observation unknown. The code rejects it instead of guessing.
 
+### Independence is a claim about the observation
+
+Suppose the newsletter author also rode the ferry and counted 88 passenger seats on the upper and lower decks. The same newsletter now contains two records: a quotation of the advertised 90 and an original on-board count of 88. Collapsing the entire newsletter under the operator would erase the second observation. Treating the entire newsletter as independent would double-count the first. Passage-level edges let the coordinator do the right thing in both places.
+
+Even that count has qualifications. Was the count taken on our vessel? Were closed sections visible? Did the author count staff seats? I would retain the recorded method and date before comparing 88 with 90. Unknown ancestry is common on the web. An unattributed repetition can stay available to a human reviewer with its lineage marked unknown. There is no reason to promote it to an independent measurement simply because the worker failed to find a citation.
+
 ## What a worker should return to its coordinator
 
 I want the extracted claim, quoted evidence, locator, document revision, attribution and unresolved qualifiers. A coordinator can merge compatible claim keys, preserve their known origins and expose disagreements with their scope. A new URL or a paraphrase can broaden coverage without changing the origin count. A genuinely independent measurement deserves its own record even when it matches the advertised figure exactly.
+
+For this question the synthesized answer can be short while the evidence record stays rich. For example, “The operator advertises 90 seats for the referenced service. Two further publications repeat that announcement. The register describes a certified limit and does not give the number offered for this sailing.” If the question is instead whether *a seat is available to book now*, all four documents miss the critical observation. The coordinator should ask for current availability or say which fact is missing.
+
+This is where I would spend the next unit of retrieval budget. Another search for the exact phrase from the announcement is likely to find more descendants. A search for an independently dated deck plan or an account of an actual count has a chance of adding a different kind of evidence. The provenance graph therefore guides the next action as well as the wording of the final answer.
 
 A good test changes one property at a time. Syndicate a passage under a new URL and check that support still has one known origin. Then add an independent record with a different predicate and check that both claims survive. These tests exercise the coordinator after retrieval. Improving individual search workers would not fix a merger that discards the distinction. [Anthropic's multi-agent research system](https://www.anthropic.com/research/multi-agent-research-system)

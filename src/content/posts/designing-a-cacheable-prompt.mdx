@@ -1,9 +1,13 @@
 ---
-title: "Prompt Caching and the Economics of Prefix Reuse"
+title: "What a Timestamp Can Cost in a Cached Prompt"
 description: "Model prefix-cache eligibility and break-even reuse, then verify actual cache reads and time to first token under matched traffic."
 pubDatetime: 2026-11-26T18:02:00Z
 tags: ["AI", "Prompt Caching","LLM Operations","Python"]
 ---
+
+Consider two customers asking about returns. Both requests include the same tool descriptions and the same long returns policy. Each also includes a different account balance, order ID and current time. There is clearly some computation worth sharing here. Why does a tiny clock field near the start of a request keep a service from sharing a policy thousands of tokens long?
+
+In an autoregressive model, the representation of a token depends on the tokens before it. An identical policy paragraph preceded by two different timestamps occupies a different computational context on the two requests. By contrast, when both requests begin with the same policy, the service can in principle reuse the prefix state and continue from the point where the requests fork. The continuation can still ask an entirely different question and receive a freshly generated answer.
 
 During prefill, a language model processes the input prefix before decoding an answer. Prompt caching allows a service to reuse work associated with an eligible prefix on later requests. An identical paragraph appearing after an earlier difference cannot extend that same prefix match. This is why the serialization order of tools, instructions, retrieved content and per-request metadata matters even when the visible user question stays the same.
 
@@ -11,11 +15,21 @@ During prefill, a language model processes the input prefix before decoding an a
 
 In this fixture, 400 tokens represent stable tool definitions and 2,400 represent a stable policy. Moving a varying timestamp behind the policy increases the common prefix from 400 to 2,800 tokens. Those numbers bound what could be reused. The provider's supported block boundaries, model, minimum length, TTL and cache availability determine what actually receives a cache read. Claude documents creation and read usage separately. [Prompt caching documentation](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
 
+## Find the first difference in the request the service sees
+
+The diagram is a comparison between two serializations. Start at the left and move one token at a time. In the first layout the clock changes immediately after the tools. All 2,400 policy tokens lie beyond that mismatch. In the second, the clock still changes just as often, but it comes after the policy. Reordering the stable and volatile portions changes the maximum reusable work without changing the amount of information supplied.
+
+The prompt template in source control is only one input to this process. A wrapper might reorder the tool list, expand a dated instruction, or include a request ID inside a system block. I would compare the actual ordered blocks for two eligible requests and inspect provider-reported token counters. A hash of each stable block can help locate the first change while keeping account data out of routine logs. A matching hash in our logs establishes a match under our serializer. The service still decides cache eligibility.
+
 ## Derive the reuse threshold
 
 Let `P` be the eligible prefix length. In units where ordinary input processing costs one per token, let `w` be the creation price and `r` the read price. Across `n` requests, one creation followed by `n−1` successful reads costs `P × (w + (n−1)r)`. Ordinary processing costs `Pn`. For `r < 1`, caching is cheaper when `n > (w−r)/(1−r)`. The inequality assumes the entry stays eligible and warm throughout.
 
 With illustrative prices `w = 1.25` and `r = 0.10`, two requests cost `1.35P` instead of `2P`. A single request pays a premium of `0.25P`. A large one-off input can therefore have less caching value than a shorter prefix reused frequently before expiry.
+
+Real traffic rarely follows a perfectly warm sequence. Consider ten requests for the same 2,800-token prefix using the illustrative prices above. If there are two creations and eight reads, the prefix costs `2,800 × (2 × 1.25 + 8 × 0.10) = 9,240` ordinary-input cost units, versus 28,000 without caching. If nine are creations and just one is a read, it costs 31,780. Traffic volume alone cannot tell these workloads apart. The timing and grouping of that traffic determine how many creations have a later reader.
+
+These calculations deliberately leave out the changing suffix and generated output. If those costs are identical between the two layouts, they cancel in the comparison. They still belong in a forecast of the total bill. Quoting the percentage saving on the reusable prefix as the percentage saving on the whole service would greatly overstate the benefit when answers are long.
 
 <details>
 <summary>Reproduce the common-prefix counts</summary>
@@ -45,3 +59,9 @@ print(early, late)
 For comparable request pairs, record model version, creation tokens, read tokens and time to first token. Group by time since last reuse and input size. An aggregate request hit rate weights a tiny reused prefix the same as a long one. A token-weighted rate and latency distribution give a more useful picture. Output generation still takes place, so a prefill improvement may have little effect on total latency for a long response.
 
 I keep durable policy text early and freshly fetched account state after it. A regression test updates the account between two requests, then checks both the cache-read counter and the second answer. A cache hit with a fresh answer is expected. If a balance stays unchanged after the source update, investigate retrieval or an application-level answer cache before attributing the result to prefix reuse.
+
+### An experiment that can distinguish a fast hit from a short answer
+
+I would send matched pairs of questions with the same model, output limit and prompt content, varying only the placement of a field that is genuinely different on every request. For each pair I want the first request's creation count, the next request's read count, the size of the suffix and the time to the first generated token. Repeating the comparison after the cache expires supplies a cold control. Keeping a distribution of timings matters because a busy service can make a genuine hit slower than an unusually quick miss.
+
+Finally I would read the answers after changing an order's status between the paired requests. The purpose of sharing a prefix is to avoid rereading the policy. The user still expects today's order status. The best outcome in this experiment is quite specific: stable policy tokens receive cache reads, the changed status appears in the answer, and the saved prefill time is large enough to matter to the customer.

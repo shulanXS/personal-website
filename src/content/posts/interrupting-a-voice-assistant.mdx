@@ -1,9 +1,13 @@
 ---
-title: "Barge-In and Playback Synchronization in Voice Agents"
+title: "How Much of a Voice Agent’s Answer Did the Caller Hear?"
 description: "Calculate a truncation offset from rendered audio frames and keep conversation history consistent with a client-owned playback buffer."
 pubDatetime: 2026-11-26T18:08:00Z
 tags: ["AI", "Voice AI","Streaming","Interaction Design"]
 ---
+
+Imagine the assistant generates “The return counter is on the second floor, next to the stairs,” and the caller breaks in with “Which floor?” The player has already received the audio for the directions beyond “second floor.” The caller may have heard only “The return counter is on the…”. If the next model turn sees the whole generated sentence, “as I just said” is a perfectly understandable reply from the model and an infuriating one for the caller. The two participants have different conversation histories.
+
+To reason about that failure, I draw the path of a single assistant item through the device. Audio arrives in chunks, waits in a queue and is consumed at the playback rate. The line between consumed and queued audio is the one that matters when the user speaks. A transcript token arriving on the network has no obligation to line up with that line.
 
 Barge-in lets a user interrupt an assistant while it is speaking. Three components advance independently: the model generates audio, the network delivers it, and the device plays it. A correct interruption has to stop audible output and reconcile the assistant's conversation item with the portion that played. Canceling a model response cannot retract bytes already buffered at the client.
 
@@ -13,6 +17,10 @@ My reference clock is the **played-frame cursor for the interrupted item**. A ge
   <source src="/media/voice-turn/replay.mp4" type="video/mp4" />
   At interruption, 1,200 ms have arrived and 720 ms have played.
 </video>
+
+Pause the replay at the interruption. The right edge of the delivered segment marks what the client *could* play without receiving another packet. The played edge marks what it has evidence of having presented. The distance between the two is useful buffering during an uninterrupted turn and stale speech the instant the caller takes the floor. Both interpretations describe the same 480 ms.
+
+A playback implementation that owns the queue can attach an item ID and starting frame to each scheduled buffer. When an interruption occurs in the middle of a buffer, only the consumed part of that buffer counts. Adding up every scheduled buffer overstates the endpoint. Counting only completely finished buffers understates it. The choice matters most when buffers are large. A time estimate from the audio output clock, clamped to the item's scheduled range, is more informative than the wall time at which a network callback ran.
 
 ## Convert the cursor to an item-relative offset
 
@@ -35,6 +43,12 @@ print(truncate["item_id"], truncate["audio_end_ms"])
 
 A sample frame includes one sample per channel. Stereo doubles the byte count at a given duration while leaving the frame count unchanged. With resampling, convert the cursor using the rate of the clock that produced it. If a device exposes only the number of frames handed to the driver, the acoustic endpoint is an estimate with output latency attached.
 
+### Why the offset belongs to one item
+
+Suppose a device has played a complete greeting lasting 960 ms and then 720 ms of a second assistant item. Its session cursor now reads 1,680 ms. Sending 1,680 as the offset for the second item counts the greeting twice. I keep the item start in the same clock domain as the output cursor, subtract it, then convert to milliseconds. If the service splits one response into multiple content parts, the entry also needs the index of the audio part being truncated.
+
+There is a practical limit to this precision. A Bluetooth speaker can be further behind the application than a wired device, and the client cannot observe whether a person actually listened. The event is a claim about the best available playback position. I would record which clock supplied it and keep that uncertainty separate from the deterministic arithmetic in the example.
+
 ## Order the interruption by response identity
 
 At speech onset, fence off further callbacks for the old response and capture its playback position as playback stops. Clear its pending audio, cancel generation if it is still active, and truncate the correct item and content index. Track acknowledgement against that item. Microsoft Voice Live documents `conversation.item.truncate` and the `audio_end_ms` offset. Managed playback transports may already perform part of this sequence. [Voice Live API reference](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/voice-live-api-reference-2026-04-10)
@@ -42,3 +56,9 @@ At speech onset, fence off further callbacks for the old response and capture it
 One ordering is particularly revealing: generation completes, buffered audio remains, then the user interrupts. Canceling generation has nothing left to do. Truncation and queue cleanup still matter. Conversely, a delayed callback from the previous item must never be appended to a new turn that happens to be playing.
 
 To distinguish a cursor error from a model error, keep the input and network delivery fixed while increasing device buffering. The correct retained offset moves earlier. I measure time from the user's speech onset to audible silence separately from the time to server acknowledgement. They correspond to distinct failure modes and can move in opposite directions.
+
+## A late packet makes a good regression test
+
+I would replay this sequence with a fake output device: deliver chunks A and B for item 17, consume all of A and part of B, interrupt, then deliver a final chunk C for item 17 after item 18 has begun. Assert three things independently. The device never schedules C. The truncation message names item 17 and ends at the recorded offset inside B. The first chunk of item 18 still plays. A global “drop all incoming audio” flag can pass the first assertion and fail the third.
+
+Try the same trace with no audio played yet, and once more after the whole item has finished playing. These endpoints test a cut of zero and a cut at full duration without relying on anybody speaking at exactly the right moment. The property I want across the entire range is that advancing the output cursor by 240 frames at 24 kHz advances the retained endpoint by 10 ms. If a change to network buffering alters that relationship with the playback trace held fixed, the implementation is reading the wrong clock.

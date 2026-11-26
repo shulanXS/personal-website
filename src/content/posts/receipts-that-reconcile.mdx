@@ -1,15 +1,32 @@
 ---
-title: "Validating Structured Output in Document Extraction"
+title: "How to Tell Whether a Receipt Extractor Read the Total"
 description: "Use schema validation, label-to-region attribution, and monetary invariants to distinguish malformed output from a plausible but incorrect extraction."
 pubDatetime: 2026-11-26T18:09:00Z
 tags: ["AI", "Document AI","Structured Outputs","Python"]
 ---
 
-A schema tells a document extractor how to represent a record. It can require a currency, restrict an amount to a decimal string and reject missing fields. It cannot establish that a recognized number came from the correct line of the document. I keep a source region and its nearby label alongside each extracted value so this semantic error remains inspectable.
+A cashier sells two filters and a roll of tape. The customer hands over $20 and receives $1.60 in change. If an expense app records $20 as the sale, its JSON can be immaculate, its OCR can be letter-perfect, and its ledger will still be wrong by $1.60. Where, exactly, should the application have noticed?
+
+I start by separating the facts on paper from the fields I want in a database. The paper has several monetary amounts attached to different events. The sale creates an amount due. The tender records money presented. Change records money returned. “Largest amount near the bottom” sounds like a convenient extraction rule until you see all three on the same receipt.
 
 ![Sample receipt for two filters and tape. Subtotal 17.20, tax 1.20, total 18.40, cash tendered 20.00 and change 1.60.](../../assets/applied-ai/workshop-receipt.png)
 
 Here the OCR text includes both a total of 18.40 and cash tendered of 20.00. A model can transcribe every digit correctly and still assign `20.00` to `total`. Improving character recognition on this document would leave the error intact. Layout-aware parsing is useful because it retains enough region structure to make field attribution testable. [PaddleOCR-VL pipeline](https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/PaddleOCR-VL.html)
+
+## Follow one field from image to record
+
+For this receipt I would retain a small piece of evidence with each candidate field. For example, a proposed total of `20.00` points to the observed label `CASH` on the payment line. Keeping both values may feel redundant when reviewing a single image. Across a queue of exceptions it immediately separates “the extractor misread an eight” from “the extractor read the right digits on the wrong line.” A field containing only the normalized value destroys that distinction.
+
+```text
+requested field     observed label     observed text     normalized cents
+sale total          TOTAL              18.40             1840
+money presented     CASH               20.00             2000
+money returned      CHANGE              1.60              160
+```
+
+There are three opportunities to intervene. At decoding time the schema can require a decimal string and an allowed currency code. After decoding, parsing can reject an amount the currency cannot represent. At the document level a rule can compare fields that describe the same transaction from different directions. Moving a check earlier is helpful only when the information it needs is already there. A schema cannot compare a proposed value with pixels it has never seen.
+
+I would also allow a genuinely missing field to remain missing. A blank change line on a card slip is different from a printed `0.00` on a cash receipt. The first says there is no observation for this check. The second is an observed amount that can legitimately participate in the arithmetic.
 
 ## Two independent consistency checks
 
@@ -44,8 +61,16 @@ print(review("20.00", "20.00", "1.60", "CASH"))
 
 The validator includes a label check as well as both arithmetic checks. Decimal parsing and integer cents avoid binary floating-point artifacts for this currency. The assumptions matter: a tax-inclusive price, a discount allocated per line, multiple tenders, or a currency with a different minor-unit convention needs a corresponding rule. A missing cash line makes the settlement rule unavailable. Treating it as a numeric zero invents data.
 
+Read the three flags as a diagnostic. If only the label check fires, inspect the crop and its neighbor before changing the arithmetic. If the observed TOTAL looks correct but the sale equation fails, inspect the line quantities, discount and tax convention. If both sale and settlement equations independently point to 1,840 cents while the candidate says 2,000, the payment line is a good place to look first. I still preserve the original candidate. Silently replacing it with the computed answer would make it impossible to tell whether the extractor or validator produced the stored value.
+
 ## What reconciliation cannot prove
 
 On a fully paid card receipt, TOTAL and CARD can legitimately display the same number. A model that points to the CARD line may satisfy both equations. Conversely, a correct extraction can fail a naïve arithmetic check if the merchant rounds tax per item. I would route these outcomes differently: the first is an attribution question, the second may require a new accounting rule for the document family.
 
 A review record should include the candidate field, source crop, normalized value, rule revision and reason for escalation. For evaluation, report field accuracy and automatic acceptance coverage, then count incorrect fields *among automatically accepted records*. Measuring only the accepted set rewards systems that quietly move the difficult documents into the manual queue.
+
+## How I would decide which receipts can post automatically
+
+Consider a labeled sample of 100 receipts. A strict rule accepts 60 and passes one wrong total. A looser rule accepts 90 and passes three wrong totals. The first policy sends 40 receipts to review for a 1-in-60 observed error rate among automatic postings. The second sends 10 and has a 3-in-90 rate. Whether those 30 saved reviews are worth two extra bad postings depends on the amounts and how the ledger is used. I would inspect the three bad records before picking a threshold. Three aliases for TOTAL suggest a different fix from three receipts whose tender and sale happen to match.
+
+The record I want at the end is modest: a value the application can use, the line a person can inspect, and the checks that were actually applicable. That gives an accountant a way to correct one receipt and an engineer a way to learn from the correction.

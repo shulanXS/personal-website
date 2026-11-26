@@ -7,7 +7,15 @@ tags: ["AI", "Agents", "Harness", "Tool Calling"]
 
 import HoldReplay from "@/components/HoldReplay.astro";
 
+Ask a library assistant to hold the last available copy of a book. The catalog says one copy is on the shelf. The assistant replies, “I’ve reserved it for you.” That sentence could follow a successful reservation, an unanswered request, or a model that never called the reservation service at all. Reading the sentence will never tell us which. To understand what an agent harness does, I follow the request that would make the sentence true.
+
 An agent harness is the runtime around a model: it assembles the next input, exposes tools, executes requested actions, records their results, and decides when control returns to the user. The distinction that helped me understand the architecture is **who owns each fact**. The model owns a proposed action. The tool service owns its side effect. The harness owns the record connecting the two.
+
+## What the model knows before it acts
+
+Give the model the user's request, the conversation so far and two tool descriptions: a catalog lookup and a reservation operation. It can reason that a hold requires a copy ID and choose to look one up. It cannot see the library database through the descriptions. When the lookup returns `copy=C73, available=true`, the model has a dated observation of a copy that was available at lookup time. A second reader can reserve it before our request arrives. This is why I put the availability check that decides the hold inside the reservation service.
+
+The harness has access to facts I would avoid asking the model to supply. It knows the signed-in reader, which library account is in scope, which tools this session can invoke and which request is being retried. Those values can be attached by the application after it parses the model's proposal. Having the model repeat a reader ID from conversation text gives an untrusted piece of generated text authority it does not need.
 
 ## One tool call crosses two interfaces
 
@@ -22,6 +30,8 @@ next model input  tool_result(tool_use_id=u7, content=receipt)
 
 The two identifiers have different lifetimes. `u7` connects a result to one model invocation. `H17` identifies the authorized operation even if a recovery worker has to query it after the conversation ends. Using a fresh model-generated call ID as the business operation ID can turn a retry into a second action.
 
+There is another join hidden in the four lines of the trace. The tool response is data from the service, and the next model message must make clear which call produced it. Suppose a single turn requests the availability of copies C73 and C81. C81's lookup returns first. Appending results by arrival position could attach C81's availability to the call about C73. Matching by call ID preserves the observation. Checking the resource inside the receipt protects the business operation. Both checks are useful even when the demonstration has just one call.
+
 ## The execution loop needs a state transition rule
 
 A catalog lookup may show an available copy. A later reservation may still conflict. The invariant I use is that a run can enter `confirmed` only after an authoritative result matches the pending operation and its resource. A successful network exchange carrying a rejection cannot satisfy that predicate. A lost reply provides insufficient evidence to evaluate it.
@@ -29,5 +39,11 @@ A catalog lookup may show an available copy. A later reservation may still confl
 <HoldReplay />
 
 The three traces share all events up to dispatch. They diverge only when the runtime receives a receipt, a conflict, or a transport timeout. A conflict permits the model to suggest another resource. An ambiguous write requires reconciliation using the existing operation ID. A model response ending normally means that generation has ended. Whether the task has reached its acceptance condition is a separate runtime decision. [Idempotency and ambiguous writes](/posts/recovering-a-refund-tool-call/)
+
+## What I would render after each ending
+
+For a confirmed hold the UI can show the receipt and pickup instructions. For a conflict it can offer to look for another copy; changing copies may require a fresh choice from the reader. After a timeout I would show the operation as pending and let the user return to it by its stable reference. Sending another model turn with “try harder” in the prompt cannot supply the missing receipt. A recovery worker that can query the reservation service might.
+
+I would test the three paths with a deterministic stand-in for the library. Start every run with C73 available and the same model proposal. Vary only the service outcome. Inspect the final application state, the copy named by the receipt and the message the model was allowed to present. Then deliver the first successful receipt twice. A valid harness can learn the same fact twice without creating a second hold. This test isolates the part under the application's control and can run without paying for a model invocation.
 
 I keep conversational choices in the model and irreversible transitions in ordinary code. Drafting a helpful explanation can tolerate several equally good outputs. Marking inventory reserved has a precise truth condition. Encoding that condition once in the harness gives both the UI and the evaluation suite the same meaning of success.
