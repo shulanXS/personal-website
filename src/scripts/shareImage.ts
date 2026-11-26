@@ -91,9 +91,8 @@ function drawSignature(
   logo: HTMLImageElement,
   dividerTop: number
 ) {
-  // The mark has transparent space inside its SVG. Position its visible ring
-  // against the divider, independently of the footer's box height.
-  const y = dividerTop + 15;
+  // The visible ring extends about 13px above and below its centre.
+  const y = dividerTop + 29;
   ctx.fillStyle = "#37392e";
   ctx.font = '600 22px "Noto Serif SC Reading", serif';
   const name = ctx.measureText(signature);
