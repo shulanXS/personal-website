@@ -91,12 +91,12 @@ function drawSignature(
   const nameFont = ctx.font;
   ctx.font = "19px Georgia, serif";
   const site = ctx.measureText(domain);
-  const left = (width - (36 + 9 + name.width + 18 + site.width)) / 2;
+  const left = 52;
   ctx.drawImage(logo, left, y - 18, 36, 36);
   ctx.textBaseline = "alphabetic";
   ctx.fillText(
     domain,
-    left + 36 + 9 + name.width + 18,
+    width - left - site.width,
     y + (site.actualBoundingBoxAscent - site.actualBoundingBoxDescent) / 2
   );
   ctx.font = nameFont;
@@ -250,7 +250,12 @@ export async function saveShareImage(
   const blob = await renderImage(button, signal);
   signal.throwIfAborted();
   const url = URL.createObjectURL(blob);
-  const download = document.createElement("a");
+  const frame = document.createElement("iframe");
+  frame.hidden = true;
+  frame.setAttribute("aria-hidden", "true");
+  document.body.append(frame);
+  const receiver = frame.contentDocument!;
+  const download = receiver.createElement("a");
   download.href = url;
   download.download =
     (
@@ -258,11 +263,14 @@ export async function saveShareImage(
     ).replace(/[<>:"/\\|?*]/g, "-") + ".png";
   download.hidden = true;
   download.setAttribute("data-astro-reload", "");
-  document.body.append(download);
+  receiver.body.append(download);
   try {
     download.click();
   } finally {
     download.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+    window.setTimeout(() => {
+      frame.remove();
+      URL.revokeObjectURL(url);
+    }, 30000);
   }
 }

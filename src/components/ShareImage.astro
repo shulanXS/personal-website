@@ -26,8 +26,8 @@ const t = useTranslations(config.site.uiLang);
 >
   <svg
     aria-hidden="true"
-    width="18"
-    height="18"
+    width="15"
+    height="15"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -35,8 +35,10 @@ const t = useTranslations(config.site.uiLang);
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <path d="M12 3v11m-4-4 4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
-    ></path>
+    <path
+      class="download-mark"
+      d="M12 3v11m-4-4 4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path>
+    <path class="saved-mark" d="m4 12 5 5L20 6"></path>
   </svg>
 </button>
 <style>
@@ -47,18 +49,26 @@ const t = useTranslations(config.site.uiLang);
     place-items: center;
     flex: none;
     vertical-align: middle;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 1px solid var(--border);
-    border-radius: 50%;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    background: transparent;
     color: var(--foreground);
-    background: var(--background);
+    opacity: 0.62;
     cursor: pointer;
   }
   .share-image-button:hover,
-  .share-image-button:focus-visible {
+  .share-image-button:focus-visible,
+  .share-image-button[data-saved] {
+    opacity: 1;
     color: var(--accent);
-    border-color: currentColor;
+  }
+  .saved-mark,
+  [data-saved] .download-mark {
+    display: none;
+  }
+  [data-saved] .saved-mark {
+    display: block;
   }
   .share-image-button[aria-busy="true"] {
     opacity: 0.55;
@@ -66,8 +76,8 @@ const t = useTranslations(config.site.uiLang);
   }
   @media (pointer: coarse) {
     .share-image-button {
-      width: 2.75rem;
-      height: 2.75rem;
+      width: 2rem;
+      height: 2rem;
     }
   }
   :global(.share-image-status) {
@@ -116,7 +126,16 @@ const t = useTranslations(config.site.uiLang);
     try {
       const { saveShareImage } = await import("@/scripts/shareImage");
       await saveShareImage(button, controller.signal);
-      notify(t.saved);
+      button.setAttribute("data-saved", "");
+      const message = document.createElement("span");
+      message.className = "sr-only";
+      message.setAttribute("role", "status");
+      button.after(message);
+      message.textContent = t.saved;
+      window.setTimeout(() => {
+        button.removeAttribute("data-saved");
+        message.remove();
+      }, 2400);
     } catch (error) {
       if (!controller.signal.aborted)
         notify(

@@ -7,6 +7,9 @@ body {
 main {
   position: relative;
   width: 720px;
+  min-height: 960px;
+  display: flex;
+  flex-direction: column;
   padding: 46px 52px 32px;
   background-color: #f5eedd;
   color: #272923;
@@ -80,8 +83,11 @@ section svg {
   height: auto;
   margin: 16px auto;
 }
+section {
+  margin-bottom: 30px;
+}
 footer {
-  margin-top: 30px;
+  margin-top: auto;
   height: 60px;
   border-top: 1px solid #b6ae98;
 }

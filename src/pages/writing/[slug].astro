@@ -6,6 +6,7 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import Footer from "@/components/Footer.astro";
+import ShareImage from "@/components/ShareImage.astro";
 import Datetime from "@/components/Datetime.astro";
 import TagChip from "@/components/TagChip.astro";
 import RatingStars from "@/components/RatingStars.astro";
@@ -117,6 +118,7 @@ const tags = data.tags ?? [];
     </h1>
     <div class="mt-2 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2">
       <Datetime pubDatetime={data.pubDatetime} modDatetime={data.modDatetime} />
+      <ShareImage title={data.title} date={data.pubDatetime} />
       {
         /*
         The score of the work, if it has one.
