@@ -5,7 +5,6 @@ import { renderMarkdown, noteFallbackTitle } from "@/utils/markdown";
 import { formatWallDate, formatFullDate } from "@/utils/formatDate";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
-import ShareImage from "@/components/ShareImage.astro";
 import TagChip from "./TagChip.astro";
 import IconChevronDown from "@/assets/icons/IconChevronDown.svg";
 
@@ -247,7 +246,6 @@ const isLong = (data.content ?? "").length > 120;
       */
     }
     <div class="app-note-entry-foot">
-      <ShareImage title={data.title} date={data.pubDatetime} />
       {
         tags.length > 0 && (
           <ul class="app-note-entry-tags" data-pagefind-ignore>

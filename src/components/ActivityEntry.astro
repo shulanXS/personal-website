@@ -148,7 +148,7 @@ const project = entry.project;
               {entry.title}
             </a>
           </h2>
-          {entry.kind === "post" && <ShareImage title={entry.title} date={entry.date} href={entry.url} />}
+          {entry.kind === "writing" && <ShareImage title={entry.title} date={entry.date} href={entry.url} />}
           </div>
 
           {entry.description && (

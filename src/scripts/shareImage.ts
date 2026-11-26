@@ -110,13 +110,10 @@ function drawSignature(
 async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
   signal.throwIfAborted();
   const href = button.dataset.shareHref;
-  const note = button.closest(".app-note-entry, .app-note-inline");
   const body = href
     ? await articleBody(href, signal)
-    : note
-      ? note.querySelector("[data-note-body]")
-      : document.querySelector("#article");
-  const gallery = note?.querySelectorAll<HTMLImageElement>("ul img") ?? [];
+    : document.querySelector("#article");
+  if (!body) throw new Error("article");
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
   frame.tabIndex = -1;
@@ -142,36 +139,31 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       paper.append(title);
     }
     const content = doc.createElement("section");
-    if (body) {
-      for (const node of body.childNodes)
-        content.append(doc.importNode(node, true));
-      for (const control of content.querySelectorAll(
-        "script,style,button,label,select,noscript,.heading-link,[hidden],[data-controls]"
-      ))
-        control.remove();
-      for (const video of content.querySelectorAll("video")) {
-        const poster = video.getAttribute("poster");
-        if (poster) {
-          const img = doc.createElement("img");
-          img.src = poster;
-          img.alt = video.getAttribute("aria-label") || "";
-          video.replaceWith(img);
-        } else {
-          video.replaceWith(
-            doc.createTextNode(
-              video.textContent || video.getAttribute("aria-label") || ""
-            )
-          );
-        }
+    for (const node of body.childNodes)
+      content.append(doc.importNode(node, true));
+    for (const control of content.querySelectorAll(
+      "script,style,button,label,select,noscript,.heading-link,[hidden],[data-controls]"
+    ))
+      control.remove();
+    for (const video of content.querySelectorAll("video")) {
+      const poster = video.getAttribute("poster");
+      if (poster) {
+        const img = doc.createElement("img");
+        img.src = poster;
+        img.alt = video.getAttribute("aria-label") || "";
+        video.replaceWith(img);
+      } else {
+        video.replaceWith(
+          doc.createTextNode(
+            video.textContent || video.getAttribute("aria-label") || ""
+          )
+        );
       }
-      for (const detail of content.querySelectorAll("details"))
-        detail.open = true;
-      for (const element of content.querySelectorAll("[style]"))
-        element.removeAttribute("style");
     }
-    for (const image of gallery) {
-      if (!body?.contains(image)) content.append(doc.importNode(image, true));
-    }
+    for (const detail of content.querySelectorAll("details"))
+      detail.open = true;
+    for (const element of content.querySelectorAll("[style]"))
+      element.removeAttribute("style");
     const footer = doc.createElement("footer");
     const logo = doc.createElement("img");
     logo.src = mark;

@@ -2,7 +2,6 @@
 import type { CollectionEntry } from "astro:content";
 import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
 import { renderMarkdown, noteFallbackTitle } from "@/utils/markdown";
-import ShareImage from "@/components/ShareImage.astro";
 import TagChip from "./TagChip.astro";
 
 type Props = {
@@ -106,5 +105,4 @@ const tags = data.tags ?? [];
       </ul>
     )
   }
-  <ShareImage title={data.title} date={data.pubDatetime} />
 </article>
