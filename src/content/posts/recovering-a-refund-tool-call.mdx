@@ -1,0 +1,62 @@
+---
+title: "Idempotency and Recovery for Agent Tool Calls"
+description: "Distinguish a logical operation from a model invocation, and reconcile writes whose provider response was lost."
+pubDatetime: 2026-11-26T18:07:00Z
+tags: ["AI", "Agents","Tool Calling","Reliability"]
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+A timeout on a write leaves two possible histories. The provider may never have received the request, or it may have committed the effect and lost the response. Both histories produce the same exception at the caller. Asking the model to infer which one occurred cannot recover information that the transport did not deliver.
+
+I assign a durable operation identity when the application records the user's approved intent. Individual model turns and HTTP attempts may come and go. The resource, principal, parameters and idempotency key for that logical operation remain bound together. A change to the amount or destination requires a new authorization decision.
+
+<ResponsiveTable>
+
+| Time | What the provider knows | What the assistant can prove |
+| --- | --- | --- |
+| 09:14:00 | No request received | Customer approved operation R17 for 1,200 cents |
+| 09:14:01 | Refund RF9 created | An attempt for R17 was dispatched |
+| 09:14:03 | RF9 still exists | Response timed out, outcome unknown |
+| 09:14:05 | Same outcome returned on keyed replay | RF9 belongs to R17, confirmation can be shown |
+
+</ResponsiveTable>
+
+## Replay the operation with the same identity
+
+```python
+# In-memory stand-in for a provider that remembers completed operations.
+receipts = {}
+
+def submit(key, payload, lose_reply=False):
+    if key in receipts:
+        previous, receipt = receipts[key]
+        if previous != payload:
+            raise ValueError("approval payload changed")
+        return receipt
+    receipt = f"RF{len(receipts) + 9}"
+    receipts[key] = (payload, receipt)
+    if lose_reply:
+        raise TimeoutError("reply lost after commit")
+    return receipt
+
+approved = ("charge-8", 1200, "USD")
+try:
+    submit("R17", approved, lose_reply=True)
+except TimeoutError:
+    recovered = submit("R17", approved)
+assert recovered == "RF9" and len(receipts) == 1
+print(recovered)
+```
+
+The stand-in provider records the effect before raising the timeout. Reusing `R17` returns `RF9` without allocating another refund. Moving the injected loss before the first commit produces the same final count through a different history. Changing the retry key in the original version breaks the one-effect property. The dictionary models serialized requests and process-local storage; in deployment the provider must implement durable deduplication for the relevant concurrency and failure conditions.
+
+Stripe's API describes a particular contract for idempotent POSTs, including parameter checks, retention and reuse of a saved result. A repeated error can be the stored response. A new key is therefore a new operation, not a general workaround for an error. [Stripe idempotent requests](https://docs.stripe.com/api/idempotent_requests)
+
+## Local state and the remote commit
+
+Persist the local operation before dispatch. On a definitive response, record the provider receipt. On ambiguous transport failure, retain an unresolved state and reconcile by the same key or by a supported receipt lookup. A webhook can arrive before the recovery worker receives its reply. Both should converge on one operation row. Downstream notifications also need a stable event identity if duplicate confirmation messages matter.
+
+A database transaction can atomically update local bookkeeping. It cannot by itself make a remote side effect and a local receipt one transaction. Where a provider has no idempotency mechanism or lookup, the safe recovery policy may require manual reconciliation. After a provider's deduplication window expires, an old retry has the same problem.
+
+The distinction I expose to an agent is confirmed, rejected or unresolved. That lets the model explain an uncertain result accurately while the harness retains responsibility for whether another external action may be attempted. [Tool execution in an agent harness](/posts/what-the-harness-owns/)

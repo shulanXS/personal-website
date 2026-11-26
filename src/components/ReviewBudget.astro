@@ -1,0 +1,80 @@
+---
+const cases = [
+  ["A", "Receipt copy", 5, false],
+  ["B", "Delivery estimate", 10, false],
+  ["C", "Reset instructions", 15, false],
+  ["D", "Update address", 25, false],
+  ["E", "Duplicate charge", 35, true],
+  ["F", "Split shipment", 55, false],
+  ["G", "Invoice correction", 75, false],
+  ["H", "Charged after cancellation", 90, true],
+] as const;
+const threshold = 75;
+---
+
+<review-budget>
+  <figure class="replay">
+    <figcaption>Selective prediction at eight observed risk scores</figcaption>
+    <label hidden>
+      Send to review at or above <strong data-threshold>0.75</strong>
+      <input type="range" min="0" max="100" step="5" value={threshold} aria-label="Risk threshold" aria-valuetext="0.75" />
+    </label>
+    <ol role="list">
+      {cases.map(([id, topic, risk, wrong]) => (
+        <li data-risk={risk} data-wrong={String(wrong)}>
+          <span class="case"><b>{id}</b> {topic}</span>
+          <span class="risk">{(risk / 100).toFixed(2)}</span>
+          <span class="route">{risk >= threshold ? "Review" : wrong ? "Missed error" : "Accepted"}</span>
+        </li>
+      ))}
+    </ol>
+    <output aria-live="polite">2 reviews · 6 accepted · 1 accepted error</output>
+  </figure>
+</review-budget>
+
+<style>
+  .replay { margin: 1.5rem 0; padding: clamp(.8rem, 3vw, 1.45rem); border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: .6rem; }
+  figcaption { font-weight: 700; color: inherit; margin: 0 0 .8rem; }
+  label { display: block; font-size: .92rem; }
+  label[hidden] { display: none; }
+  input { display: block; width: 100%; margin: .55rem 0 1rem; accent-color: var(--accent); }
+  ol { padding: 0; margin: .6rem 0; }
+  li { display: grid; grid-template-columns: minmax(0,1fr) 3.1em 8em; gap: .4rem; align-items: baseline; margin: 0; padding: .35rem 0; border-top: 1px solid color-mix(in srgb, currentColor 16%, transparent); font-size: .85rem; }
+  .case b { display: inline-block; margin-right: .35em; }
+  .risk, output { font-variant-numeric: tabular-nums; }
+  .route { text-align: right; }
+  [data-wrong="true"] .route { font-weight: 700; }
+  output { display: block; margin-top: .8rem; font-size: .95rem; }
+</style>
+
+<script>
+  class ReviewBudget extends HTMLElement {
+    connectedCallback() {
+      const label = this.querySelector("label")!;
+      const slider = this.querySelector("input")!;
+      const threshold = this.querySelector<HTMLElement>("[data-threshold]")!;
+      const rows = this.querySelectorAll<HTMLElement>("[data-risk]");
+      const output = this.querySelector("output")!;
+      const update = () => {
+        const cutoff = slider.valueAsNumber;
+        const formatted = (cutoff / 100).toFixed(2);
+        threshold.textContent = formatted;
+        slider.setAttribute("aria-valuetext", formatted);
+        let reviews = 0;
+        let errors = 0;
+        for (const row of rows) {
+          const review = Number(row.dataset.risk) >= cutoff;
+          const miss = !review && row.dataset.wrong === "true";
+          if (review) reviews++;
+          if (miss) errors++;
+          row.querySelector(".route")!.textContent = review ? "Review" : miss ? "Missed error" : "Accepted";
+        }
+        output.value = `${reviews} review${reviews === 1 ? "" : "s"} · ${rows.length - reviews} accepted · ${errors} accepted error${errors === 1 ? "" : "s"}`;
+      };
+      slider.oninput = update;
+      update();
+      label.hidden = false;
+    }
+  }
+  if (!customElements.get("review-budget")) customElements.define("review-budget", ReviewBudget);
+</script>

@@ -8,7 +8,7 @@ const BASE = "http://localhost:4321";
  * live on the search page now, and the about page was removed entirely.
  */
 const PAGES = [
-  ["home", "/"], ["posts", "/posts/"], ["post-detail", "/posts/astro-paper-v5/"],
+  ["home", "/"], ["posts", "/posts/"], ["post-detail", "/posts/grounding-a-table-answer/"],
   ["notes", "/notes/"],
   ["writing", "/writing/"], ["writing-detail", "/writing/chapter-one/"],
   ["projects", "/projects/"],

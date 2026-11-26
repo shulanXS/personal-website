@@ -1,0 +1,35 @@
+---
+title: "Context Compaction as State Reconstruction"
+description: "Design a handoff that preserves constraints, provenance, permissions, and unresolved decisions across model context resets."
+pubDatetime: 2026-11-26T19:44:00Z
+tags: ["AI", "Agents", "Harness", "Context Engineering"]
+---
+
+A context reset discards the transcript presented to the next model invocation. It need not discard the application's durable state. I think of compaction as a **lossy projection**: given the previous transcript, keep the information that can change the next valid decision. A short summary can preserve the topic and still lose the task.
+
+Consider a search constraint of 30 people **including** two wheelchair spaces. “30 seats plus accessibility” preserves the nouns and loses the inclusion relationship. The next agent can now reject a room with 28 fixed seats and two wheelchair spaces even if it follows its instructions perfectly.
+
+## Separate the sources of state
+
+I persist user constraints with a pointer to the turn that established them, tool observations with their versions and expiration times, and pending actions with their approval status. These records have different rules for replacement. A newer quote can supersede an earlier quote. A model's inference about the user's maximum spend cannot supersede the user's instruction.
+
+```json
+{
+  "party": {"total": 30, "wheelchair_spaces_in_total": 2},
+  "start": {"day": "Tuesday", "after_local": "16:00"},
+  "budget": {"currency": "USD", "max_total": 180, "fees_included": true},
+  "permission": "present_options",
+  "evidence": {"user_constraints": "turn-4", "room_quotes": "quotes-v2"},
+  "open": ["Which calendar date and time zone does Tuesday mean?"]
+}
+```
+
+Here `fees_included` interprets the user's phrase “whole booking under $180.” Keeping the source turn makes that interpretation inspectable. An absolute date and timezone are still unknown, so the next worker needs to resolve them. `present_options` is a permission boundary. A handoff that says “finish the booking” would expand the authorized action.
+
+## Test the handoff without its author
+
+A useful compaction test runs the same decision twice, once with the original context and once with only the saved handoff and its resolvable references. For a fixture with 28 fixed seats, two wheelchair spaces, a $165 base price and an $18 mandatory fee, both runs should admit the room on capacity and reject it on total price. Agreement on the rejection alone is weak evidence: a worker that mistakenly requires 32 places rejects the room for the wrong reason.
+
+For repeated sessions I keep a compact decision record containing the rejected candidate, the rule it failed and the observation revision. When the quote changes, the previous conclusion can be invalidated without forgetting the user's cap. Saving every failed search query would consume context while doing little to help that decision. Anthropic describes using structured handoffs between fresh contexts in long-running harnesses. [Harness design for long-running applications](https://www.anthropic.com/research/harness-design-long-running-apps)
+
+The practical tradeoff is reconstruction cost. A pointer saves prompt tokens only when the referenced artifact remains accessible and affordable to fetch. For a recent, densely specified instruction, retaining the original two sentences can be cheaper and more faithful than generating, storing and verifying a paraphrase.

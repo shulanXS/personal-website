@@ -15,12 +15,12 @@ function ok(name, cond, extra = "") {
 // --- 1. Collection filtering on /posts/ ---------------------------------
 await page.goto(`${BASE}/posts/`, { waitUntil: "networkidle" });
 const totalItems = await page.locator("[data-tagged-item]").count();
-await page.click('[data-tag-chip="复盘"]');
+await page.click('[data-tag-chip="voice-ai"]');
 await page.waitForTimeout(300);
 const visibleAfter = await page.locator("[data-tagged-item]:not([hidden])").count();
 ok("集合页点击标签过滤", visibleAfter === 1 && visibleAfter < totalItems,
    `[total=${totalItems} visible=${visibleAfter}]`);
-ok("过滤后 URL 同步", page.url().includes("tag=%E5%A4%8D%E7%9B%98"), page.url());
+ok("过滤后 URL 同步", page.url().includes("tag=voice-ai"), page.url());
 const emptyVisible = await page.locator("[data-tag-empty]:not([hidden])").count();
 ok("无结果时空态隐藏", emptyVisible === 0);
 
@@ -35,7 +35,7 @@ ok("点击全部重置过滤", afterReset >= totalItems, `[visible=${afterReset}
 ok("重置后 URL 清除 tag", !page.url().includes("tag="), page.url());
 
 // --- 3. Direct link with ?tag= ------------------------------------------
-await page.goto(`${BASE}/posts/?tag=${encodeURIComponent("读后感")}`, { waitUntil: "networkidle" });
+await page.goto(`${BASE}/posts/?tag=${encodeURIComponent("image-editing")}`, { waitUntil: "networkidle" });
 await page.waitForTimeout(400);
 const directVisible = await page.locator("[data-tagged-item]:not([hidden])").count();
 ok("带 ?tag= 直达自动应用", directVisible === 1, `[visible=${directVisible}]`);
@@ -43,7 +43,7 @@ ok("带 ?tag= 直达自动应用", directVisible === 1, `[visible=${directVisibl
 // --- 4. Search page: grouped cross-section results ----------------------
 await page.goto(`${BASE}/search/`, { waitUntil: "networkidle" });
 await page.waitForTimeout(600);
-await page.click('[data-tag-chip="复盘"]');
+await page.click('[data-tag-chip="ai"]');
 await page.waitForTimeout(400);
 const groups = await page.locator("[data-tag-group]").count();
 const groupNames = await page.locator("[data-tag-group] h3").allTextContents();
@@ -97,7 +97,7 @@ for (const [name, path] of [["posts", "/posts/"], ["notes", "/notes/"], ["writin
   ok(`${name} 卡片内标签不可点击`, clickable === 0, `[n=${clickable}]`);
 }
 
-await page.goto(`${BASE}/posts/astro-paper-v5/`, { waitUntil: "networkidle" });
+await page.goto(`${BASE}/posts/grounding-a-table-answer/`, { waitUntil: "networkidle" });
 const staticChip = await page.locator("[data-tag-static]").count();
 const clickableOnDetail = await page.locator("a[data-tag-chip], button[data-tag-chip]").count();
 ok("详情页标签为静态文本", staticChip > 0 && clickableOnDetail === 0, `[static=${staticChip} clickable=${clickableOnDetail}]`);
@@ -149,7 +149,7 @@ ok(
   `[${listDate.kind} "${listDate.text}"]`
 );
 
-await page.goto(`${BASE}/posts/astro-paper-v5/`, { waitUntil: "networkidle" });
+await page.goto(`${BASE}/posts/grounding-a-table-answer/`, { waitUntil: "networkidle" });
 const dateText = await page.locator("[data-date]").first().textContent();
 ok("时间精确到时分", /\d{4}年\d{1,2}月\d{1,2}日 \d{2}:\d{2}/.test(dateText ?? ""), `"${dateText?.trim()}"`);
 

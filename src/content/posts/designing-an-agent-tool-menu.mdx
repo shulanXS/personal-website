@@ -1,0 +1,32 @@
+---
+title: "Tool Discovery and Schema Design in Agent Runtimes"
+description: "Separate retrieval of the correct tool, selection among visible tools, and grounding its arguments using a controlled shortlist experiment."
+pubDatetime: 2026-11-26T19:43:00Z
+tags: ["AI", "Agents", "Harness", "Tool Discovery", "MCP"]
+---
+
+A tool catalog has two consumers. A retrieval layer may use names and descriptions to choose a shortlist. The model then reads the visible definitions to select an operation and fill in its arguments. The input schema constrains the shape of that call. A valid schema cannot tell a runtime that the user intended an entirely different operation.
+
+I diagnose tool selection at these boundaries because each failure calls for a different engineering change. If `export_statement` is absent from the shortlist, rewriting its JSON Schema has no effect on that turn. If the tool is visible but the model confuses it with `finalize_billing_period`, returning a longer shortlist may make the distinction harder.
+
+## Describe the observable effect
+
+For the request “send a copy of the May statement to accounting,” the significant distinction is whether the operation returns a document or changes the ledger. Compare two candidate definitions:
+
+```text
+export_statement(account, month)
+  Produce a PDF copy for sharing. The billing period stays editable.
+
+finalize_billing_period(account, month, expected_revision)
+  Lock the period against further edits. The response is a finalization receipt.
+```
+
+The descriptions give the model an output to expect and a side effect to account for. The finalization schema still needs a period identifier and an expected revision. The backend must authorize the caller and enforce the revision precondition. In MCP, discovery and invocation are distinct protocol operations, typically `tools/list` and `tools/call`. How a host chooses which listed tools to present to a model is an application decision. [MCP tools specification](https://modelcontextprotocol.io/specification/2025-06-18/server/tools)
+
+## Measure failures conditionally
+
+Suppose the correct tool is unique for each labeled request. Let `R` be the event that retrieval returned it, `S` that the model selected it, and `A` that the required arguments were correct. With execution held fixed, end-to-end routing accuracy is `P(R) × P(S | R) × P(A | R,S)`. These are conditional rates. Multiplying three independently measured headline accuracies does not generally give the same result.
+
+A useful controlled run injects the gold tool into the shortlist while keeping the user's wording and the rest of the menu fixed. Recovery implicates discoverability. Continued confusion points toward the descriptions, examples or the task label itself. If the call changes to the correct tool with the wrong month, the selection improved while argument grounding still failed. Measure the three outcomes independently and record the menu shown to the model. Research on large enterprise API catalogs also examines how much operation resolution remains visible to the reasoning loop. [EMNLP industry study](https://aclanthology.org/2026.emnlp-industry.179/)
+
+For a handful of tools I prefer exposing all definitions. Staged discovery introduces latency and creates a new way to omit the right operation. I would pay that cost when held-out retrieval coverage and prompt size show that the larger catalog is actually harming decisions.

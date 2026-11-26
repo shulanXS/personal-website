@@ -1,0 +1,54 @@
+---
+title: "Reciprocal Rank Fusion in Hybrid Retrieval"
+description: "Derive a concrete hybrid ranking, examine rank-window effects, and identify when an exact identifier should follow its own retrieval path."
+pubDatetime: 2026-11-26T18:05:00Z
+tags: ["AI", "Search","RAG","Ranking"]
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+Sparse retrieval and dense retrieval produce scores on different scales. Reciprocal rank fusion (RRF) avoids calibrating those scores by using each document's position in each list. For a document `d`, sum `1 / (k + rank(d))` over the lists that contain it. Ranks start at one. A document missing from a truncated list contributes zero on that list. [Elasticsearch RRF reference](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion)
+
+<ResponsiveTable>
+
+| Rank | Lexical list | Semantic list |
+| ---: | --- | --- |
+| 1 | AX-14B coupler | Pump service kit |
+| 2 | Installation bulletin | Installation bulletin |
+| 3 | Pump service kit | Universal adapter |
+
+</ResponsiveTable>
+
+With `k = 60`, the service kit receives `1/63 + 1/61`. The bulletin gets `2/62`. The exact-code coupler receives only `1/61` despite winning lexical retrieval. Its drop to third follows directly from the aggregation rule. Inspecting the child rankings tells me the identifier was preserved by the lexical path; testing new tokenizers would address a different failure.
+
+```python
+from collections import defaultdict
+
+lists = [("coupler", "bulletin", "kit"), ("kit", "bulletin", "adapter")]
+
+def fuse(rankings, window, k=60):
+    scores = defaultdict(float)
+    for ranking in rankings:
+        for rank, doc in enumerate(ranking[:window], 1):
+            scores[doc] += 1 / (k + rank)
+    return sorted(scores.items(), key=lambda row: (-row[1], row[0]))
+
+for doc, score in fuse(lists, window=3):
+    print(doc, f"{score:.6f}")
+# kit 0.032266
+# bulletin 0.032258
+# coupler 0.016393
+# adapter 0.015873
+```
+
+## What the two ranking parameters control
+
+The rank constant controls how quickly a contribution decays with rank. When `k` is large relative to the ranks under consideration, each observation contributes nearly the same amount. Agreement across lists then carries considerable weight. In the example the kit and bulletin differ by just `2 / (61 × 62 × 63)`, about 0.0000084. The small margin explains why their relative order is sensitive. It does not explain the much larger gap to the coupler.
+
+The rank window controls eligibility. At a window of one, only the coupler and kit survive, each once at rank one. They tie. A deterministic tie-breaker makes the outcome reproducible but adds no evidence about product identity. Increasing the window can change the ordering of documents already present because they may now acquire contributions from additional lists.
+
+## Exact identity is an application constraint
+
+For a query consisting solely of a recognized catalog identifier, a unique match in an authorized exact-key index has a stronger interpretation than semantic similarity. I would surface that item directly and use fusion for related results. For a compatibility question containing the identical code, a service bulletin could be the most relevant document. The identifier helps constrain retrieval while the rest of the query defines what evidence is needed.
+
+Normalization belongs to the identifier namespace: case folding or stripping punctuation may collapse different products for some vendors. Retain the raw key and surface ambiguous matches. In evaluation I split whole-identifier top-one accuracy from prose recall and mixed-query relevance. Pooling them can hide a regression in exact lookup behind gains on a much larger set of natural-language queries.

@@ -1,0 +1,57 @@
+---
+title: "Isolating Agent Evaluation Trials"
+description: "Use a no-op control and an initial-state snapshot to distinguish genuine task completion from a passing result inherited from another trial."
+pubDatetime: 2026-11-26T19:39:00Z
+tags: ["AI", "Agents", "Harness", "Agent Evaluation", "Test Isolation"]
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+An outcome grader evaluates a transition from an initial environment to a final environment. Testing the final predicate alone is valid only when the initial conditions are known. If a previous trial already created the target record, an agent that takes no action can pass. That contaminates comparisons between models and makes results depend on trial order.
+
+## Reproduce the dependency with SQLite
+
+The script uses a database file as the environment. An acting trial reserves a seat. A no-op trial reads the state and exits. The only variable between the last two calls is which database file the harness gives the no-op.
+
+```python
+import sqlite3
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+def trial(path, act):
+    with sqlite3.connect(path) as db:
+        db.execute("create table if not exists seat(id text primary key, owner text)")
+        before = db.execute("select owner from seat where id='4B'").fetchone()
+        if act:
+            db.execute("insert into seat values ('4B', 'Jo')")
+        after = db.execute("select owner from seat where id='4B'").fetchone()
+    db.close()
+    return before, after
+
+with TemporaryDirectory() as folder:
+    shared = Path(folder) / "shared.db"
+    clean = Path(folder) / "clean.db"
+    print(trial(shared, True))   # (None, ('Jo',))
+    print(trial(shared, False))  # (('Jo',), ('Jo',))
+    print(trial(clean, False))   # (None, None)
+```
+
+The second result has the desired final row and no state change. The third records an unchanged empty state. If both no-op trials were supposed to start empty, the first one's apparent success is entirely attributable to the harness. This is why I run a no-op baseline before spending inference budget on a new task. Temporary directories isolate the local files in this example. A service-backed evaluation also needs scoped queues, clocks, caches and provider fixtures. [Python temporary directories](https://docs.python.org/3/library/tempfile.html)
+
+## Specify what must change and what must survive
+
+For an “ensure reservation” task, a legitimate initial state can already satisfy the goal. Requiring every successful run to write a row would manufacture the opposite grading error. I use three fixtures with explicit postconditions:
+
+<ResponsiveTable>
+
+| Initial state | Acceptable final state | Additional check |
+| --- | --- | --- |
+| Resource is available | Requested reservation exists | One reservation created |
+| Same principal already holds it | Existing reservation retained | No duplicate notification or booking |
+| Another principal holds it | Existing owner's reservation retained | Conflict reported, no transfer |
+
+</ResponsiveTable>
+
+Checking unrelated rows or a bounded write set catches an agent that satisfies the target by replacing an entire table. A transcript helps explain the change but the database and event log determine whether it occurred. For asynchronous tasks, wait for an explicit completion marker or a bounded timeout before taking the final snapshot. Otherwise a slow write can be attributed to the next trial.
+
+Two tests have high diagnostic value: reverse the trial order, then start two trials concurrently under different namespaces. Order sensitivity suggests leaked state. Cross-namespace effects indicate isolation is incomplete even when serial runs look clean. I fix those conditions before interpreting the benchmark as a statement about model capability. [Agent evaluation environments and outcomes](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)

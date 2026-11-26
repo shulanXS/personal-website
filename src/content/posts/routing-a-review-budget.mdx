@@ -1,0 +1,43 @@
+---
+title: "Selective Prediction and Human-Review Thresholds"
+description: "Calculate risk and coverage at a routing threshold, distinguish calibration from ranking, and account for unlabeled accepted traffic."
+pubDatetime: 2026-11-26T18:04:00Z
+tags: ["AI", "Model Routing","Evaluation","Human Review"]
+---
+
+import ReviewBudget from "@/components/ReviewBudget.astro";
+
+Selective prediction lets a classifier abstain and defer an input to another decision maker. A threshold on estimated error risk defines an operating point. I evaluate it with three quantities together: automatic coverage, error among accepted cases and review demand. Any one on its own can reward a policy the team cannot actually operate.
+
+Let `s(x)` be risk and let the application accept when `s(x) < t`. On a labeled dataset of `N` cases, coverage is `accepted / N`. Selective risk is `accepted errors / accepted`. Review demand is `N − accepted`. A cutoff that routes everything to review has zero automatic errors and an undefined selective risk, since the denominator is empty.
+
+<ReviewBudget />
+
+## Read a risk–coverage curve as a sequence of decisions
+
+The control uses eight labeled fixtures. At `t = 0.75`, six cases are accepted and one is wrong: coverage is 75% and selective risk is 1/6. At `t = 0.35`, four cases are accepted and none is wrong. That removes one observed error at the cost of two additional reviews. It does not establish that future automatically accepted cases have zero risk.
+
+```python
+# (estimated risk, automatic decision was wrong)
+cases = [(0.05, False), (0.10, False), (0.15, False), (0.25, False),
+         (0.35, True), (0.55, False), (0.75, False), (0.90, True)]
+
+def report(threshold):
+    accepted = [wrong for risk, wrong in cases if risk < threshold]
+    reviews = len(cases) - len(accepted)
+    rate = sum(accepted) / len(accepted) if accepted else None
+    return reviews, sum(accepted), rate
+
+assert report(0.75) == (2, 1, 1/6)
+assert report(0.35) == (4, 0, 0)
+print(report(0))
+# (8, 0, None)
+```
+
+If the goal is to review exactly two cases of equal handling cost, ranking by expected preventable loss is the relevant decision. Ranking by estimated error probability is a special case that assumes comparable harm and comparable reviewer effectiveness. Calibration matters when an absolute threshold must mean approximately the same thing on future traffic. A strictly monotone calibration map can change numeric cutoffs while preserving ordering. Improving calibration alone cannot move a confidently wrong case above the other cases in the queue. [Calibrated Deferral Routing, EMNLP 2026](https://aclanthology.org/2026.emnlp-industry.252/)
+
+## Estimate error in the deployed acceptance region
+
+If labels arrive only for reviewed requests, outcomes in the automatic region are missing by design. The mean error among reviewed cases cannot estimate error among accepted cases. A simple policy is to sample a known fraction of accepted traffic for independent labeling. If sampling probabilities differ by score band, account for them when estimating population error.
+
+I choose the threshold on validation data, freeze it and report performance on a later period, including coverage by class, hourly queue arrivals and wait time. A fixed daily review total can still exceed short-term capacity. Finally, reviewed cases have their own error and latency. Selective risk measures the automatic branch; end-to-end service quality includes what happens after deferral.

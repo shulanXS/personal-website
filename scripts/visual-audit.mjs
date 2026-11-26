@@ -8,7 +8,7 @@ mkdirSync(OUT, { recursive: true });
 const PAGES = [
   ["home", "/"],
   ["posts", "/posts/"],
-  ["post-detail", "/posts/astro-paper-v5/"],
+  ["post-detail", "/posts/grounding-a-table-answer/"],
   ["notes", "/notes/"],
   ["writing", "/writing/"],
   ["writing-detail", "/writing/chapter-one/"],

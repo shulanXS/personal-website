@@ -1,0 +1,73 @@
+---
+title: "Reconciling Asynchronous LLM Batch Results"
+description: "Join results to immutable submissions, guard writes by source revision, and classify missing or expired items without duplicating work."
+pubDatetime: 2026-11-26T18:06:00Z
+tags: ["AI", "Batch Processing","Data Pipelines","Python"]
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+Batch inference separates submission from completion. A worker can submit thousands of independent requests and consume their results later, when the source data may already have changed. I treat the importer as a data reconciliation problem with two joins: the provider result must match a submitted item, and that item must still be applicable to the live record.
+
+Claude's Message Batches API returns a caller-supplied `custom_id` and permits results in a different order from submission. Individual outcomes can succeed, error, expire or be canceled. A completed batch describes the provider's processing state. It does not establish that every output has been validated or published. [Batch processing guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)
+
+## Identity and revision serve different purposes
+
+Store a manifest keyed by `(run_id, custom_id)` before dispatch. Each entry should resolve to an immutable input snapshot or digest, the source entity and revision, and the model, prompt and output-schema revisions. The custom ID identifies the submitted request. The source revision determines whether its answer is current enough to publish. Joining by array position loses the first property. Joining only by product ID loses the second.
+
+<ResponsiveTable>
+
+| Submitted ID | Input snapshot | On arrival |
+| --- | --- | --- |
+| mug-v3 | Description says stoneware | Merchant already replaced it with mug-v4 |
+| scarf-v2 | Description says wool | Item expired before inference |
+| tray-v1 | Description says walnut | Valid result arrived first |
+
+</ResponsiveTable>
+
+The tray result belongs to its own manifest row even though it arrived first. The mug result is a successful inference for revision 3 and an obsolete update for revision 4. Both facts belong in the ledger. Re-running an expired item after the source changes should create an attempt against the new revision rather than rewriting the provenance of the old one.
+
+<details>
+<summary>Reconcile the three records and detect a partial download</summary>
+
+```python
+manifest = {"mug-v3": ("mug", 3), "scarf-v2": ("scarf", 2),
+            "tray-v1": ("tray", 1)}
+current = {"mug": 4, "scarf": 2, "tray": 1}
+results = [("tray-v1", "succeeded", "walnut"),
+           ("mug-v3", "succeeded", "stoneware"),
+           ("scarf-v2", "expired", None)]
+
+def reconcile(rows):
+    seen, actions = set(), {}
+    for key, status, tag in rows:
+        if key not in manifest or key in seen:
+            raise ValueError(f"unexpected result: {key}")
+        seen.add(key)
+        sku, snapshot = manifest[key]
+        if current[sku] != snapshot:
+            actions[key] = "superseded"
+        elif status == "expired":
+            actions[key] = "retry"
+        elif status == "succeeded" and tag in {"walnut", "stoneware", "wool"}:
+            actions[key] = "apply:" + tag
+        else:
+            actions[key] = "review"
+    return actions, sorted(manifest.keys() - seen)
+
+actions, missing = reconcile(results)
+assert missing == [] and actions["mug-v3"] == "superseded"
+assert reconcile(results[:1])[1] == ["mug-v3", "scarf-v2"]
+print(actions["tray-v1"], actions["scarf-v2"])
+# apply:walnut retry
+```
+
+</details>
+
+## Make the publication boundary atomic
+
+A version check in application memory can race a concurrent edit. Use a conditional update such as `UPDATE product SET tag = ? WHERE id = ? AND revision = ?` and inspect the affected-row count. Commit the updated value and the applied-result marker in the same transaction. Give that marker a unique logical key so downloading a results file twice cannot publish the same output twice.
+
+The reducer above rejects duplicate IDs *within a single downloaded file*. That guards the integrity of an import. Idempotent application across repeated imports is a separate database responsibility. Unknown IDs, malformed outputs and non-retryable provider errors belong in review or failure states. Missing items during a partial download remain unresolved until the terminal manifest is reconciled.
+
+The invariant I use for monitoring is that every manifest entry belongs to exactly one current disposition. Counts of applied, superseded, retryable, rejected and unresolved items must sum to the submission count. That catches a class of silent omissions that an aggregate provider success rate cannot reveal.

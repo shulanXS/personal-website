@@ -115,10 +115,10 @@ async function withPage(ctx, fn) {
 
   // 7. progress bar works after a client-side navigation
   await withPage(ctx, async (page) => {
-    await page.goto(BASE + "/posts/astro-paper-v5/", { waitUntil: "networkidle" });
+    await page.goto(BASE + "/posts/grounding-a-table-answer/", { waitUntil: "networkidle" });
     await page.waitForTimeout(400);
     await page.evaluate(() => {
-      const a = [...document.querySelectorAll("a")].find(x => x.getAttribute("href")?.includes("/posts/astro-paper-v4/"));
+      const a = [...document.querySelectorAll("a")].find(x => x.getAttribute("href")?.includes("/posts/receipts-that-reconcile/"));
       a?.click();
     });
     await page.waitForTimeout(1400);
@@ -130,7 +130,7 @@ async function withPage(ctx, fn) {
 
   // 8. heading anchors + copy buttons exist and are not duplicated
   await withPage(ctx, async (page) => {
-    await page.goto(BASE + "/posts/astro-paper-v5/", { waitUntil: "networkidle" });
+    await page.goto(BASE + "/posts/grounding-a-table-answer/", { waitUntil: "networkidle" });
     await page.waitForTimeout(600);
     const info = await page.evaluate(() => ({
       headings: document.querySelectorAll("a.heading-link").length,
@@ -145,7 +145,7 @@ async function withPage(ctx, fn) {
 
   // 9. lightbox opens and closes
   await withPage(ctx, async (page) => {
-    await page.goto(BASE + "/posts/examples/tailwind-typography/", { waitUntil: "networkidle" });
+    await page.goto(BASE + "/posts/testing-a-local-image-edit/", { waitUntil: "networkidle" });
     await page.waitForTimeout(700);
     await page.locator("article img").first().scrollIntoViewIfNeeded();
     await page.locator("article img").first().click();
@@ -160,7 +160,7 @@ async function withPage(ctx, fn) {
   // 10. no console errors across key pages
   {
     const errs = [];
-    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/xue-luo-jiang-chuan-1/", "/projects/", "/search/"]) {
+    for (const p of ["/", "/posts/", "/posts/grounding-a-table-answer/", "/notes/", "/writing/", "/writing/xue-luo-jiang-chuan-1/", "/projects/", "/search/"]) {
       const page = await ctx.newPage();
       const e = [];
       page.on("pageerror", err => e.push(`${p} PAGEERROR ${err.message}`));
@@ -305,7 +305,7 @@ async function withPage(ctx, fn) {
   // 12. no horizontal overflow on any page
   await withPage(ctx, async (page) => {
     const bad = [];
-    for (const p of ["/", "/posts/", "/posts/astro-paper-v5/", "/notes/", "/writing/", "/writing/xue-luo-jiang-chuan-1/", "/projects/", "/about/", "/search/", "/404/"]) {
+    for (const p of ["/", "/posts/", "/posts/grounding-a-table-answer/", "/notes/", "/writing/", "/writing/xue-luo-jiang-chuan-1/", "/projects/", "/about/", "/search/", "/404/"]) {
       await page.goto(BASE + p, { waitUntil: "networkidle" });
       await page.waitForTimeout(300);
       const o = await page.evaluate(() => ({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth }));

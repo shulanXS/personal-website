@@ -1,0 +1,44 @@
+---
+title: "Barge-In and Playback Synchronization in Voice Agents"
+description: "Calculate a truncation offset from rendered audio frames and keep conversation history consistent with a client-owned playback buffer."
+pubDatetime: 2026-11-26T18:08:00Z
+tags: ["AI", "Voice AI","Streaming","Interaction Design"]
+---
+
+Barge-in lets a user interrupt an assistant while it is speaking. Three components advance independently: the model generates audio, the network delivers it, and the device plays it. A correct interruption has to stop audible output and reconcile the assistant's conversation item with the portion that played. Canceling a model response cannot retract bytes already buffered at the client.
+
+My reference clock is the **played-frame cursor for the interrupted item**. A generated-token count has no fixed conversion to speech duration. A byte count needs the sample format, channel count and sample rate. Measuring elapsed wall time since receipt also includes buffering delays.
+
+<video controls playsinline preload="metadata" width="800" height="450" poster="/media/voice-turn/poster.png" aria-label="Silent replay of generated and played audio. At interruption 1,200 milliseconds have arrived and 720 milliseconds have played.">
+  <source src="/media/voice-turn/replay.mp4" type="video/mp4" />
+  At interruption, 1,200 ms have arrived and 720 ms have played.
+</video>
+
+## Convert the cursor to an item-relative offset
+
+At 24,000 frames per second, 28,800 received frames represent 1,200 ms. If 17,280 frames have played, the retained history ends at 720 ms. Discarding the remaining 480 ms locally prevents future playback. Sending the 720 ms endpoint to the service reconciles the conversation item. The trace uses synthetic timing values to expose the two clocks independently.
+
+```python
+def cut_point(received, played, rate):
+    if rate <= 0 or not 0 <= played <= received:
+        raise ValueError("inconsistent playback cursor")
+    return played * 1000 // rate
+
+cut = cut_point(received=28_800, played=17_280, rate=24_000)
+truncate = dict(type="conversation.item.truncate",
+                item_id="assistant-17", content_index=0,
+                audio_end_ms=cut)
+assert cut_point(28_800, 0, 24_000) == 0
+print(truncate["item_id"], truncate["audio_end_ms"])
+# assistant-17 720
+```
+
+A sample frame includes one sample per channel. Stereo doubles the byte count at a given duration while leaving the frame count unchanged. With resampling, convert the cursor using the rate of the clock that produced it. If a device exposes only the number of frames handed to the driver, the acoustic endpoint is an estimate with output latency attached.
+
+## Order the interruption by response identity
+
+At speech onset, fence off further callbacks for the old response and capture its playback position as playback stops. Clear its pending audio, cancel generation if it is still active, and truncate the correct item and content index. Track acknowledgement against that item. Microsoft Voice Live documents `conversation.item.truncate` and the `audio_end_ms` offset. Managed playback transports may already perform part of this sequence. [Voice Live API reference](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/voice-live-api-reference-2026-04-10)
+
+One ordering is particularly revealing: generation completes, buffered audio remains, then the user interrupts. Canceling generation has nothing left to do. Truncation and queue cleanup still matter. Conversely, a delayed callback from the previous item must never be appended to a new turn that happens to be playing.
+
+To distinguish a cursor error from a model error, keep the input and network delivery fixed while increasing device buffering. The correct retained offset moves earlier. I measure time from the user's speech onset to audible silence separately from the time to server acknowledgement. They correspond to distinct failure modes and can move in opposite directions.

@@ -1,0 +1,42 @@
+---
+title: "Agent Traces, Checkpoints, and Replay Semantics"
+description: "Distinguish reconstructing recorded state, evaluating a changed policy on fixed observations, and rerunning tools against a live environment."
+pubDatetime: 2026-11-26T19:38:00Z
+tags: ["AI", "Agents", "Harness", "Tracing", "Replay"]
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+An agent trace captures what happened during a run. A checkpoint stores enough state for a runtime to continue computation. A replay procedure defines which inputs are held fixed when some part of that computation runs again. The terms overlap in tools and dashboards, but the distinction matters whenever the world changes between the original run and the investigation.
+
+<ResponsiveTable>
+
+| Operation | Reads | Executes | Question it can answer |
+| --- | --- | --- | --- |
+| Inspect a recorded run | Captured events and observations | A deterministic state reducer | What state did these events imply? |
+| Evaluate a changed policy | Fixed prefix of recorded observations | New decision logic | Where does this policy first diverge? |
+| Run against a live system | Current tool responses | Model and tools | What does the application do now? |
+
+</ResponsiveTable>
+
+## Capture observations at the decision boundary
+
+```json
+[
+  {"seq": 1, "kind": "request", "id": "r12", "sku": "J9", "store": "Elm"},
+  {"seq": 2, "kind": "inventory_result", "id": "obs7", "available": 1, "version": 31},
+  {"seq": 3, "kind": "assistant_reply", "uses": "obs7", "text": "One is available."}
+]
+```
+
+The trace supports the statement that the agent observed one item at inventory revision 31. It cannot establish that the item was available when a customer arrived later. If payloads must live outside the trace, a retained immutable reference and digest can preserve verifiability. A digest by itself cannot reconstruct data that has expired.
+
+For concurrent calls I record tool-call IDs and parent relationships. Ordering all events by wall-clock timestamp loses the distinction between “after” and “caused by.” Two independent lookups can finish in either order. When comparing runs, I align the calls with their parents, then find the earliest meaningful difference in arguments or observations. OpenTelemetry's spans and links provide useful primitives for that representation. [OpenTelemetry traces](https://opentelemetry.io/docs/concepts/signals/traces/)
+
+## The boundary of a counterfactual replay
+
+Suppose an updated policy asks for a different store after consuming the recorded result. The old trace contains no response for the new store. Feeding the old observation into the new action would produce a reproducible but invalid experiment. Stop at divergence, or branch into a versioned simulator or snapshot that can answer the new call. Record which environment supplied subsequent observations.
+
+LangGraph checkpoints can preserve thread state across invocations. Resuming an execution does not make external services historical: an uncaptured read can return newer data and a repeated write can cause another effect. I keep the inspection path side-effect-free, and require a separate environment or an explicit execution policy for reruns. [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+
+The limit I put on a debugging conclusion is the earliest unavailable observation. Before that point, recorded state can establish what the agent saw and how the harness interpreted it. Beyond it, any account of what a different policy would have done depends on new assumptions.

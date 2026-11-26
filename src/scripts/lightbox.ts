@@ -56,7 +56,7 @@ function currentLocale(): string {
  * reading the page in.
  */
 export function decorateImages(article: HTMLElement): void {
-  const locale = currentLocale();
+  const locale = article.lang || currentLocale();
   const zoomImageLabel = getString("post.zoomImage", locale);
 
   const images = Array.from(article.querySelectorAll("img"));
@@ -79,7 +79,7 @@ export function initLightbox(options: LightboxOptions = {}) {
   if (!container) return;
   const article: HTMLElement = container;
 
-  const locale = currentLocale();
+  const locale = article.lang || currentLocale();
   const closeLabel = getString("post.closeImagePreview", locale);
   const previewLabel = getString("post.imagePreview", locale);
   // Don't attach twice to the same container.
@@ -102,6 +102,7 @@ export function initLightbox(options: LightboxOptions = {}) {
     lastFocused = trigger ?? (document.activeElement as HTMLElement | null);
 
     const overlayEl = document.createElement("div");
+    overlayEl.lang = locale;
     overlayEl.setAttribute("role", "dialog");
     overlayEl.setAttribute("aria-modal", "true");
     overlayEl.setAttribute(

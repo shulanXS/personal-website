@@ -1,0 +1,60 @@
+---
+title: "Semantic Grounding and Execution Tests for Text-to-SQL"
+description: "Bind a natural-language metric to an entity, grain, predicate and time interval, then verify generated SQL with data mutations."
+pubDatetime: 2026-11-26T18:01:00Z
+tags: ["AI", "Analytics AI","Text-to-SQL","Evaluation"]
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+A Text-to-SQL query can be syntactically valid, execute successfully and still answer a different question from the user's. The difficult input is often the metric definition. “Active customer” could mean any customer with an event or only a customer who purchased. Both interpretations map naturally to the same tables and produce plausible counts.
+
+I represent a metric as an entity, grain, qualifying predicate, time interval and reporting timezone. For *purchasing customers in October 2026 UTC*, the entity is a customer, the grain is distinct customer, the predicate is purchase, and the interval starts at October 1 inclusive and ends at November 1 exclusive. A metric catalog or an explicit clarification can supply that contract. Inferring it solely from available column names leaves an important product decision to the decoder. [Snowflake verified query repository](https://docs.snowflake.com/en/user-guide/views-semantic/verified-query-repository)
+
+<ResponsiveTable>
+
+| Customer | Event | UTC timestamp |
+| --- | --- | --- |
+| Ada | signed in | Oct 2, 12:00 |
+| Bo | purchased | Oct 3, 09:00 |
+| Bo | purchased | Oct 17, 09:00 |
+| Cy | purchased | Nov 1, 00:00 |
+
+</ResponsiveTable>
+
+## Verify the aggregation and time boundary
+
+```python
+import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("create table events(customer text, kind text, stamp text)")
+rows = [("Ada", "login", "2026-10-02T12:00:00Z"),
+        ("Bo", "purchase", "2026-10-03T09:00:00Z"),
+        ("Bo", "purchase", "2026-10-17T09:00:00Z"),
+        ("Cy", "purchase", "2026-11-01T00:00:00Z")]
+db.executemany("insert into events values (?, ?, ?)", rows)
+period = ("2026-10-01T00:00:00Z", "2026-11-01T00:00:00Z")
+query = """select count(distinct customer) from events
+           where stamp >= ? and stamp < ?"""
+any_activity = db.execute(query, period).fetchone()[0]
+purchasers = db.execute(query + " and kind = ?", (*period, "purchase")).fetchone()[0]
+print(any_activity, purchasers)
+# 2 1
+```
+
+The result is two customers with any October activity and one purchasing customer. Counting purchase *rows* also gives two because Bo purchased twice. This accidental numerical agreement is why matching a single expected scalar on one warehouse snapshot is a weak execution test.
+
+The fixture compares text timestamps only because their UTC representation and precision are uniform. For a production warehouse I use typed timestamps and convert the two local calendar boundaries to instants. A half-open interval composes with the next reporting period and avoids guessing the last representable timestamp on the final day. A local reporting day can have a different duration across a daylight-saving transition.
+
+## Metamorphic tests expose ambiguous semantics
+
+A metamorphic test changes the input data and specifies how the output should respond. Starting from the original fixture each time:
+
+- Duplicate Bo's purchase. The purchase-event count increases, but the distinct-purchaser count stays one.
+- Add an October login for Cy. The any-activity count becomes three. The purchase count stays one.
+- Move Cy's purchase one second before the upper boundary. The October purchaser count becomes two.
+
+These tests constrain the query's meaning without requiring the generated SQL to match a reference string. They also make a useful review tool: a domain expert can approve the expected changes without reading SQL. For joins, I add a one-to-many dimension record to expose duplicate counting after a join.
+
+A verified example ties an approved question to trusted SQL. It should carry a metric revision and the assumptions needed to reuse it. I show the selected metric and timezone with the answer so a reader can see why a query returning `1` was correct for purchasing customers.

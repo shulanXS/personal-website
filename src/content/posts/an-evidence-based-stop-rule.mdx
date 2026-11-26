@@ -1,0 +1,40 @@
+---
+title: "Stopping Criteria for Retrieval Agents"
+description: "Implement evidence-based termination with separate results for a supported answer, a verified blocker, and an exhausted search budget."
+pubDatetime: 2026-11-26T19:41:00Z
+tags: ["AI", "Agents", "Harness", "Retrieval", "Stopping Rules"]
+---
+
+A retrieval agent needs two stopping rules. A resource rule limits elapsed time, tokens or tool calls. An evidence rule determines whether the observations support an answer. I keep them separate because exhausting five searches is a fact about the run. It says nothing about whether the requested condition holds.
+
+For a conjunctive question, decompose the proposed answer into necessary claims. Give each claim a status, a scope and references to the observations that support it. A claim about Sunday opening hours needs evidence that applies to that location, entrance and date. A second copy of an undated page may improve retrieval confidence without resolving any of those qualifiers. HALT takes a verification-oriented approach to stopping retrieval agents. [HALT, Findings of EMNLP 2026](https://aclanthology.org/2026.findings-emnlp.343/)
+
+## Implement the decision independently of the search policy
+
+```python
+def decide(claims, calls_left):
+    if not claims:
+        raise ValueError("define the required claims first")
+    if "refuted" in claims:
+        return "candidate_blocked"
+    if all(status == "supported" for status in claims):
+        return "candidate_verified"
+    if calls_left == 0:
+        return "unresolved"
+    return "retrieve"
+
+print(decide(["supported", "unknown"], 0))
+print(decide(["supported", "refuted"], 0))
+# unresolved
+# candidate_blocked
+```
+
+Here the inputs are already adjudicated. Contradictory sources require a scope and freshness check before a verifier assigns `refuted`. An unresolved contradiction stays open. The ordering makes a detail explicit: the last permitted call can still resolve the question. Evaluate its evidence before reporting budget exhaustion.
+
+## Candidate scope changes the conclusion
+
+A Sunday itinerary can require a particular ferry, enough transfer time and an accessible entrance by 10:00. A date-specific closure notice refutes the entrance condition for that candidate. It establishes that this itinerary fails. It establishes global infeasibility only if the closure applies to **all** allowable itineraries or the search has covered them exhaustively. That difference between a conjunction within one candidate and a choice among candidates is easy to lose in a natural-language summary.
+
+When several candidates remain, I retain the open claim that would change the decision and use it to choose the next retrieval. If the agent repeatedly fetches the same document revision, the record shows identical evidence IDs and no change in coverage. That is a reason to reformulate the query, use another source or return an unresolved answer. It is never positive evidence that a missing fact is false.
+
+For evaluation, I would pair answer accuracy with excess calls *after* sufficient evidence was available, and count premature terminal answers separately. A policy can improve its average call count simply by giving up early. The failure that matters to the application is turning “budget exhausted” into a definite answer.

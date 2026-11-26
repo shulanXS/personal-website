@@ -21,6 +21,7 @@ const { title, description, ogImage, canonicalURL, pubDatetime, modDatetime } =
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  inLanguage: "en",
   headline: title ?? t.site.title,
   image: ogImage,
   ...(pubDatetime && { datePublished: pubDatetime.toISOString() }),

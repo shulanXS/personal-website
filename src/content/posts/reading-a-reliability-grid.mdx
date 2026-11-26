@@ -1,0 +1,43 @@
+---
+title: "Measuring Agent Reliability Across Repeated Trials"
+description: "Compute pass@k and pass^k per task and see what a pooled success rate discards about systematic and intermittent failures."
+pubDatetime: 2026-11-26T19:37:00Z
+tags: ["AI", "Agents", "Harness", "Agent Evaluation", "Reliability"]
+---
+
+Two agent builds can have the same pass rate and very different engineering problems. A pooled rate estimates how often a randomly selected observed trial passed. It discards which trials belonged to the same task. I keep the task-by-trial matrix because a missing capability and intermittent execution failures call for different follow-up experiments.
+
+![Two four-task grids with three trials each. Build A succeeds three, three, two, and zero times by task. Build B succeeds twice on each task. Both pass eight of twelve trials.](../../assets/agent-harness/reliability-grid.png)
+
+Both illustrative builds pass 8 of 12 trials. Build A has per-task counts of 3, 3, 2 and 0. Build B has 2 on every task. With three observed attempts per task, A demonstrates at least one success on three of four tasks and passes every attempt on two. B demonstrates all four tasks and passes every attempt on none. The distinction between occasional capability and consistent completion motivates repeated-trial evaluation in τ-bench. [τ-bench](https://arxiv.org/abs/2406.12045)
+
+## Use the task as the unit of aggregation
+
+For a task with `c` successes among `n` recorded trials, choose `k` distinct trials uniformly. There are `C(n,k)` possible groups. Exactly `C(n−c,k)` contain no successes, and `C(c,k)` contain only successes. This yields an estimator for at-least-one success and one for all-success. Compute each within a task and then average over tasks according to the intended workload.
+
+```python
+from math import comb
+from statistics import mean
+
+def measures(successes, n, k):
+    if not 0 <= successes <= n or not 1 <= k <= n:
+        raise ValueError("invalid trial counts")
+    groups = comb(n, k)
+    any_pass = 1 - comb(n - successes, k) / groups
+    all_pass = comb(successes, k) / groups
+    return any_pass, all_pass
+
+for counts in ([3, 3, 2, 0], [2, 2, 2, 2]):
+    pairs = [measures(c, 3, 3) for c in counts]
+    print(mean(p[0] for p in pairs), mean(p[1] for p in pairs))
+# 0.75 0.5
+# 1.0 0.0
+```
+
+The estimates describe the recorded groups. Extrapolating them to future runs requires representative tasks, fresh state and comparable conditions. Cubing the pooled `8/12` silently treats heterogeneous tasks as though they shared one independent success probability. Additional attempts on a few familiar tasks cannot establish coverage of new task types.
+
+## Decide which uncertainty to reduce
+
+For A, investigate the consistently failing row first. Check whether its requested operation exists and whether the grader accepts valid outcomes. For B, align a passing and failing trace for the same task and inspect the first diverging action or observation. To compare builds, use the same task set and preserve per-task pairing when estimating uncertainty. A task-level resample answers a different question from resampling individual turns.
+
+I would report all three quantities with their denominators. A retryable offline workflow may benefit from several attempts if a reliable verifier selects a successful result. A user-facing booking flow needs to work on the attempt the user actually makes. The metric follows that product constraint. [Guide to agent evaluation metrics](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)

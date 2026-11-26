@@ -1,0 +1,33 @@
+---
+title: "Anatomy of an Agent Harness"
+description: "Follow one client-side tool call from model output to execution, observation, and a verified application state."
+pubDatetime: 2026-11-26T19:45:00Z
+tags: ["AI", "Agents", "Harness", "Tool Calling"]
+---
+
+import HoldReplay from "@/components/HoldReplay.astro";
+
+An agent harness is the runtime around a model: it assembles the next input, exposes tools, executes requested actions, records their results, and decides when control returns to the user. The distinction that helped me understand the architecture is **who owns each fact**. The model owns a proposed action. The tool service owns its side effect. The harness owns the record connecting the two.
+
+## One tool call crosses two interfaces
+
+At the model interface, a client-side tool call is structured output with a name, arguments and call ID. At the application interface, it is a request made by a particular principal against a particular resource. Converting between the two is where validation, authorization and execution happen. For example, Anthropic's Messages interface emits a `tool_use` block. The client executes the requested tool and returns a `tool_result` associated with its `tool_use_id`. Several calls in one model response each need their own result. [Client-side tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
+
+```text
+model output      tool_use(id=u7, name=reserve_copy, copy=C73)
+runtime           validate C73 → resolve reader → record operation H17
+service response  receipt(operation=H17, copy=C73, status=confirmed)
+next model input  tool_result(tool_use_id=u7, content=receipt)
+```
+
+The two identifiers have different lifetimes. `u7` connects a result to one model invocation. `H17` identifies the authorized operation even if a recovery worker has to query it after the conversation ends. Using a fresh model-generated call ID as the business operation ID can turn a retry into a second action.
+
+## The execution loop needs a state transition rule
+
+A catalog lookup may show an available copy. A later reservation may still conflict. The invariant I use is that a run can enter `confirmed` only after an authoritative result matches the pending operation and its resource. A successful network exchange carrying a rejection cannot satisfy that predicate. A lost reply provides insufficient evidence to evaluate it.
+
+<HoldReplay />
+
+The three traces share all events up to dispatch. They diverge only when the runtime receives a receipt, a conflict, or a transport timeout. A conflict permits the model to suggest another resource. An ambiguous write requires reconciliation using the existing operation ID. A model response ending normally means that generation has ended. Whether the task has reached its acceptance condition is a separate runtime decision. [Idempotency and ambiguous writes](/posts/recovering-a-refund-tool-call/)
+
+I keep conversational choices in the model and irreversible transitions in ordinary code. Drafting a helpful explanation can tolerate several equally good outputs. Marking inventory reserved has a precise truth condition. Encoding that condition once in the harness gives both the UI and the evaluation suite the same meaning of success.

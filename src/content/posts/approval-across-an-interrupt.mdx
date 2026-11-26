@@ -1,0 +1,69 @@
+---
+title: "LangGraph Interrupts and Version-Bound Approvals"
+description: "Reproduce node re-entry on resume, then bind a human approval to the exact revision that was reviewed."
+pubDatetime: 2026-11-26T19:42:00Z
+tags: ["AI", "Agents", "Harness", "Human in the Loop"]
+---
+
+An interrupt introduces two clocks into an agent workflow. The graph can pause at a checkpoint while the object under review continues to change in another system. Resuming the right graph thread restores its saved state. The approval still needs to identify the revision of the business object to which it applies.
+
+## Observe what actually executes twice
+
+The following example runs locally with `langgraph==1.2.15`, without a model or API key. `InMemorySaver` is sufficient for this process-local experiment. A restartable service needs a persistent checkpointer. [LangGraph interrupt semantics](https://docs.langchain.com/oss/python/langgraph/interrupts)
+
+```python
+from typing import TypedDict
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import START, END, StateGraph
+from langgraph.types import Command, interrupt
+
+class State(TypedDict):
+    revision: int
+    approved: bool
+
+entries = []
+def review(state):
+    entries.append(state["revision"])
+    decision = interrupt({"review_revision": state["revision"]})
+    return {"approved": decision is True}
+
+graph = StateGraph(State)
+graph.add_node("review", review)
+graph.add_edge(START, "review")
+graph.add_edge("review", END)
+app = graph.compile(checkpointer=InMemorySaver())
+config = {"configurable": {"thread_id": "review-17"}}
+app.invoke({"revision": 7, "approved": False}, config)
+result = app.invoke(Command(resume=True), config)
+print(entries, result["approved"])
+# [7, 7] True
+```
+
+Both entries come from the same node. On resume, execution starts at the beginning of that node and the matching `interrupt` call returns the supplied decision. The list makes this visible because it lives outside graph state. Replacing the append with an email or an order submission would repeat an external effect. Returning a state update after the interrupt avoids that particular repetition. External calls that must survive a crash still need an idempotency contract.
+
+## Apply the decision at the write boundary
+
+Suppose the saved proposal identifies quote Q4, revision 7, for 3,600 cents. A colleague edits the live quote to revision 8 while the graph is paused. A read followed by an unconditional update leaves another race between those two statements. A conditional write lets the database check the reviewer's decision at the instant the transition happens.
+
+```python
+import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("create table quote(id text primary key, rev int, cents int, state text)")
+db.execute("insert into quote values ('Q4', 7, 3600, 'open')")
+approved = ("Q4", 7, 3600)  # captured when the reviewer saw the proposal
+
+db.execute("update quote set rev=8, cents=6000 where id='Q4'")
+with db:
+    updated = db.execute(
+        """update quote set state='approved'
+           where id=? and rev=? and cents=? and state='open'""",
+        approved,
+    ).rowcount
+print(updated, db.execute("select state from quote").fetchone()[0])
+# 0 open
+```
+
+The script prints `0 open`. Removing the competing edit produces `1 approved`. The version check works only if *every material edit increments the revision*. For a real proposal I bind the reviewer, tenant, action, amount, currency and expiry as well. A zero-row update needs a lookup: an already-applied approval may return its existing receipt, while a changed quote needs a new decision.
+
+This is why I keep checkpoint identity and proposal identity separate in a design review. The first answers “which computation should resume?” The second answers “which change did the person authorize?” A durable workflow needs both.

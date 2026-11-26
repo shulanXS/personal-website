@@ -1,0 +1,85 @@
+---
+const common = [
+  { owner: "Request", event: "Reserve copy C-73 at Cedar for reader R4.", state: "requested", detail: "The request identifies the desired branch. No inventory has been consulted." },
+  { owner: "Catalog", event: "Copy C-73 is listed as available.", state: "located", detail: "The catalog is a snapshot. Another reader can still claim the copy." },
+  { owner: "Harness", event: "Submit hold H17 for reader R4, copy C-73, branch Cedar.", state: "awaiting_library", detail: "Dispatch records an attempt. The circulation service still owns the decision." },
+];
+const endings = {
+  accepted: { owner: "Circulation service", event: "Receipt H17 confirms R4, C-73, Cedar.", state: "confirmed", detail: "The assistant can tell the reader the book is on hold at Cedar." },
+  conflict: { owner: "Circulation service", event: "C-73 was claimed at the counter before H17 arrived.", state: "unavailable", detail: "The assistant can offer another branch. It has no confirmed hold for this reader." },
+  timeout: { owner: "Transport", event: "H17 timed out while waiting for a reply.", state: "unresolved", detail: "The assistant can say it is checking H17. The receipt must be reconciled before reporting an outcome." },
+};
+---
+
+<hold-replay data-frames={JSON.stringify({ common, endings })}>
+  <figure>
+    <figcaption>Tool execution trace · operation H17</figcaption>
+    <div class="controls" data-controls hidden>
+      <label>
+        Provider outcome
+        <select>
+          <option value="accepted">Hold accepted</option>
+          <option value="conflict">Copy already claimed</option>
+          <option value="timeout">Reply lost</option>
+        </select>
+      </label>
+      <div class="transport">
+        <button type="button" data-back disabled>Previous</button>
+        <button type="button" data-next>Next event</button>
+      </div>
+    </div>
+    <div class="frame" aria-live="polite" aria-atomic="true">
+      <small data-owner>1 / 4 · Request</small>
+      <p data-event>{common[0].event}</p>
+      <p><code data-state>{common[0].state}</code></p>
+      <span data-detail>{common[0].detail}</span>
+    </div>
+    <noscript>
+      <p>The catalog locates C-73. Submitting H17 leaves the harness awaiting the library. A valid receipt confirms the hold, a claimed copy is unavailable, and a lost reply leaves H17 unresolved.</p>
+    </noscript>
+  </figure>
+</hold-replay>
+
+<style>
+  figure { margin: 1.5rem 0; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: .65rem; padding: clamp(.85rem, 3vw, 1.4rem); }
+  figcaption { color: inherit; font-weight: 700; margin: 0 0 1rem; }
+  .controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; justify-content: space-between; margin-bottom: 1rem; }
+  .controls[hidden] { display: none; }
+  label { display: grid; gap: .28rem; font-size: .86rem; }
+  select, button { color: var(--foreground); background: var(--background); border: 1px solid color-mix(in srgb, currentColor 45%, transparent); border-radius: .35rem; padding: .35rem .55rem; font: inherit; }
+  .transport { display: flex; gap: .4rem; font-size: .86rem; }
+  button:disabled { opacity: .55; }
+  .frame { border-left: .22rem solid var(--accent); padding: .3rem .8rem; }
+  .frame p { margin: .45rem 0; }
+  [data-event] { font-weight: 650; }
+  [data-detail] { display: block; font-size: .92rem; }
+  small { font-variant-numeric: tabular-nums; }
+</style>
+
+<script>
+  type Frame = { owner: string; event: string; state: string; detail: string };
+  class HoldReplay extends HTMLElement {
+    connectedCallback() {
+      const frames: { common: Frame[]; endings: Record<string, Frame> } = JSON.parse(this.dataset.frames!);
+      const select = this.querySelector("select")!;
+      const back = this.querySelector<HTMLButtonElement>("[data-back]")!;
+      const next = this.querySelector<HTMLButtonElement>("[data-next]")!;
+      let index = 0;
+      const paint = () => {
+        const current = frames.common[index] ?? frames.endings[select.value];
+        this.querySelector("[data-owner]")!.textContent = `${index + 1} / ${frames.common.length + 1} · ${current.owner}`;
+        this.querySelector("[data-event]")!.textContent = current.event;
+        this.querySelector("[data-state]")!.textContent = current.state;
+        this.querySelector("[data-detail]")!.textContent = current.detail;
+        back.disabled = index === 0;
+        next.disabled = index === frames.common.length;
+      };
+      back.onclick = () => { index--; paint(); };
+      next.onclick = () => { index++; paint(); };
+      select.onchange = paint;
+      paint();
+      this.querySelector<HTMLElement>("[data-controls]")!.hidden = false;
+    }
+  }
+  if (!customElements.get("hold-replay")) customElements.define("hold-replay", HoldReplay);
+</script>

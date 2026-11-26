@@ -86,7 +86,7 @@ function addHeadingLinks() {
 }
 
 function attachCopyButtons() {
-  const locale = currentLocale();
+  const locale = document.getElementById("article")?.lang || currentLocale();
   const copyButtonLabel = getString("post.copyCode", locale);
   const copiedLabel = getString("post.copiedCode", locale);
 
