@@ -1,8 +1,8 @@
 ---
-title: 《狩猎》观后感
+title: 观后感：《狩猎》
 slug: the-hunt-2012
 type: review
-description: 圣诞夜的教堂里，卢卡斯等一个认识他多年的人抬头看他。
+description: 圣诞夜的教堂里，卢卡斯等一个老朋友抬眼看他。当一个人已被众人的目光定了罪，两双眼睛还认得出从前的交情吗？
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

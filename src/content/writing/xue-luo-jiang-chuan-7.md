@@ -5,7 +5,7 @@ type: novel
 series: 雪落江川
 chapterNumber: 7
 status: completed
-description: "第七天的桂花赤豆元宵，一条被推上的窗，和一句再也没人听见的名字。"
+description: 桂花赤豆元宵还在，窗却终于关上了。七天前只是病历上的一个名字，如今再轻轻唤起，已经需要用尽力气。
 pubDatetime: 2025-06-07T01:19:26.000Z
 draft: false
 tags:

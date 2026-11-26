@@ -2,7 +2,7 @@
 title: 白日之外的赴约
 slug: zhuang-zhou-de-hu-die
 type: essay
-description: 有些梦醒来后反而更难受。我想记下梦里的她们，也想弄明白，为什么每次醒来都觉得少了点什么。
+description: 梦里的一次相见，醒来竟像一场失约。我想循着白日里那一点空落，看看那些只在睡梦中出现的人，究竟带走了什么。
 pubDatetime: 2026-05-17T05:44:00.000Z
 draft: false
 tags:

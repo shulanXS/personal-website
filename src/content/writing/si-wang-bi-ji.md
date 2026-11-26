@@ -1,8 +1,8 @@
 ---
-title: 《死亡笔记》观后感
+title: 观后感：《死亡笔记》
 slug: si-wang-bi-ji
 type: review
-description: 月和L的交锋看得很过瘾，但重刷时最让我发冷的，是月一步步越过底线竟然那么自然。
+description: 月每写下一个名字，下一次落笔便更容易一点。重看他与 L 的交锋，最令人不安的是那只手怎样渐渐不再迟疑。
 rating: 4.8
 pubDatetime: 2026-05-04T16:34:00.000Z
 draft: false

@@ -1,8 +1,8 @@
 ---
-title: 《大佛普拉斯》再看：肚财的小屋
+title: 观后感：《大佛普拉斯》
 slug: da-fo-pu-la-si-du-cai
 type: review
-description: 菜埔跟肚财一起吃过那么多顿饭，直到走进朋友的住处，才看见他独处时给自己留的天地。
+description: 一同吃过许多顿饭，菜埔才第一次走进肚财的小屋。原来离一个朋友最近的地方，也可能是他生前从未带你去过的天地。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

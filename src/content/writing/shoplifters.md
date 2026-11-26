@@ -1,8 +1,8 @@
 ---
-title: 《小偷家族》观后感
+title: 观后感：《小偷家族》
 slug: shoplifters
 type: review
-description: 一家人在屋檐下仰头听烟花。我最舍不得的，就是他们挤在一起抬头的那几秒。
+description: 一家人挤在屋檐下，听见了看不见的烟花。那几秒钟里，谁也无需拿出一纸证明，说明自己为什么属于身旁的人。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

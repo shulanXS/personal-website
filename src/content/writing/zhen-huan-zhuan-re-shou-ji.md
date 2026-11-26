@@ -1,8 +1,8 @@
 ---
-title: 《甄嬛传》观后感
+title: 观后感：《甄嬛传》
 slug: zhen-huan-zhuan-re-shou-ji
 type: review
-description: 以前只盼着甄嬛赢，重刷反而更难替任何人的结局高兴
+description: 年少时一心盼甄嬛赢，重看才发觉，每赢一步，她能与之分享的人便少一个。走到最高处，那份安静已有了寒意。
 rating: 4.9
 pubDatetime: 2025-03-14T05:51:00.000Z
 draft: false

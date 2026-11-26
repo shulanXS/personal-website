@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 1
 status: completed
 cover: ../../assets/covers/xue-luo-jiang-chuan.png
-description: "初见。十一月南方的肿瘤科病房，一个实习生第一次被交代去重点盯一个与自己同龄的晚期病人。"
+description: 十一月的南方病房里，实习生第一次被托付去留意一个同龄人。病历上的年龄只有两位数字，抬眼相见，却是两种截然不同的明天。
 pubDatetime: 2025-04-10T11:58:35.000Z
 draft: false
 tags:

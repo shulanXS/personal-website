@@ -1,8 +1,8 @@
 ---
-title: 《千与千寻》观后感
+title: 观后感：《千与千寻》
 slug: qian-yu-qian-xun
 type: review
-description: 汤屋夺走名字与记忆，千寻却在残酷的生存规则里守住了自我和善意。
+description: 汤屋把千寻的名字收走，只许她以工作换取栖身之地。她还记得怎样善待一个陌生人，也就留住了回家的线索。
 rating: 4.9
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

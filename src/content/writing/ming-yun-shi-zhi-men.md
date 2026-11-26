@@ -1,8 +1,8 @@
 ---
-title: 《命运石之门》观后感
+title: 观后感：《命运石之门》
 slug: ming-yun-shi-zhi-men
 type: review
-description: 前面那些看似琐碎的日常，到后面全都变了味。看完再想起来，连轻松的片段都让我难受。
+description: 秋叶原的蝉声起初漫长得令人心急。等时间开始倒流，才知道最奢侈的愿望，竟是把那段无所事事的午后再过一遍。
 rating: 5
 pubDatetime: 2026-05-22T06:47:00.000Z
 draft: false

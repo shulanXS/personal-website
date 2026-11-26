@@ -1,8 +1,8 @@
 ---
-title: 《海上钢琴师》观后感
+title: 观后感：《海上钢琴师》
 slug: the-legend-of-1900
 type: review
-description: 1900 隔着舷窗弹给一个姑娘的曲子，后来辗转到了从没见过她的人耳朵里。
+description: 舷窗边短短的一次相望，后来成了一支辗转流传的曲子。1900 留在船上，那一刻的心动却独自上了岸。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

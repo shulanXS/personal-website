@@ -1,8 +1,8 @@
 ---
-title: 《风骚律师》观后感
+title: 观后感：《风骚律师》
 slug: feng-sao-lv-shi
 type: review
-description: 吉米成为索尔的过程，比老白的崩塌更缓慢；直到最后，他才重新说出自己的名字。
+description: 吉米花了许多年让所有人记住索尔。等到他终于肯说出自己的名字，那两个音节比任何一场辩护都难。
 rating: 4.9
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

@@ -1,8 +1,8 @@
 ---
-title: 《雍正王朝》角色分析：苏舜卿
+title: 角色分析：《雍正王朝》苏舜卿
 slug: su-shun-qing
 type: character
-description: 从被出身定义到被授予诰命，苏舜卿最想守住的始终是与刘墨林平等相爱的尊严。
+description: 从出身到诰命，旁人给了苏舜卿许多称谓。她与刘墨林相对时所珍惜的，却是两个人可以平等叫出彼此名字的自由。
 rating: 5
 pubDatetime: 2026-11-21T12:00:00.000Z
 draft: false

@@ -1,8 +1,8 @@
 ---
-title: 《JOJO的奇妙冒险》观后感
+title: 观后感：《JOJO的奇妙冒险》
 slug: jojo-qi-miao-hua-yue
 type: review
-description: 我很爱看那些能力不一定更强、却靠想明白规则翻盘的战斗，还有绝境里不肯认输的人。
+description: 绝境里，哪怕能力悬殊，只要还能多问一句规则究竟如何运作，命运便尚有一道可以撬动的缝。
 rating: 4.5
 pubDatetime: 2025-03-29T19:39:00.000Z
 draft: false

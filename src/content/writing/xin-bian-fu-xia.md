@@ -1,8 +1,8 @@
 ---
-title: 《新蝙蝠侠》观后感
+title: 观后感：《新蝙蝠侠》
 slug: xin-bian-fu-xia
 type: review
-description: 哥谭的阴雨与罪案追踪之外，最打动我的是布鲁斯从“复仇”走向“希望”的那一步。
+description: 哥谭的长夜里，布鲁斯习惯让人看见他的影子便心生畏惧。直到有人需要牵着他的手走出去，他才懂得光该照向哪里。
 rating: 4.8
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

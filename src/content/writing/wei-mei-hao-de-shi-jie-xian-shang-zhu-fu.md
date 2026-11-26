@@ -1,8 +1,8 @@
 ---
-title: 《为美好的世界献上祝福！》观后感
+title: 观后感：《为美好的世界献上祝福！》
 slug: wei-mei-hao-de-shi-jie-xian-shang-zhu-fu
 type: review
-description: 这群人总在闯祸、还债、互相拖后腿，我却看得很放松。有时候就是想看他们一起犯傻。
+description: 一群人分摊债务，也分摊闯祸之后的狼狈。所谓美好世界，有时就是明知明天还要倒霉，今晚仍有人陪你笑出声。
 rating: 4.4
 pubDatetime: 2025-01-29T23:10:00.000Z
 draft: false

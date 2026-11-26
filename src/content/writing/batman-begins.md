@@ -1,8 +1,8 @@
 ---
-title: 《蝙蝠侠：侠影之谜》观后感
+title: 观后感：《蝙蝠侠：侠影之谜》
 slug: batman-begins
 type: review
-description: 布鲁斯第一次扮成蝙蝠侠出门，在码头认出了一件旧外套。我最喜欢的，是他竟然还记得跟穿衣服的人打声招呼。
+description: 码头上，穿着蝙蝠战衣的人认出了自己送出的旧外套。布鲁斯记得向穿衣人问好，那一刻，比面具先抵达的是一个人的目光。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

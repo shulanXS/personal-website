@@ -1,8 +1,8 @@
 ---
-title: 《黑神话：悟空》玩后感
+title: 游戏测评：《黑神话：悟空》
 slug: hei-myth-xiang-wu-kong
 type: game
-description: 美术和音乐让我很激动，真正玩下来，地图和叙事又让我有不少遗憾。
+description: 一段乐声便能唤起我记忆里的西游，亲手走过山路，又会为那些断开的线索怅然。神话落到脚下，自有它的回响与崎岖。
 rating: 4.2
 pubDatetime: 2025-06-16T16:18:00.000Z
 draft: false

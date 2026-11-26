@@ -87,8 +87,8 @@ export const WRITING_TYPES = [
   "novel",
   "essay",
   "review",
-  "game",
   "character",
+  "game",
   "short",
 ] as const;
 

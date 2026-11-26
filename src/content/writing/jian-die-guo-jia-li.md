@@ -1,8 +1,8 @@
 ---
-title: 《间谍过家家》观后感
+title: 观后感：《间谍过家家》
 slug: jian-die-guo-jia-li
 type: review
-description: 比起特工任务，我更爱看这一家三口买菜、上学、吃饭，慢慢把假家庭过成真的。
+description: 买菜、上学、围桌吃饭，原本都是扮演家人的功课。日子久了，牵挂先于真相生了根。
 rating: 4.7
 pubDatetime: 2025-03-16T04:41:00.000Z
 draft: false

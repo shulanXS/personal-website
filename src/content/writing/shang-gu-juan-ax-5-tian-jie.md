@@ -1,8 +1,8 @@
 ---
-title: 《上古卷轴5：天际》玩后感
+title: 游戏测评：《上古卷轴5：天际》
 slug: shang-gu-juan-ax-5-tian-jie
 type: game
-description: 在我心中排名第一的游戏，甚至第二名和它的差距就像隔着一道天堑
+description: 雪漫城外的路走过无数遍，我仍愿意再走一次。天际省最珍贵的自由，是巨龙还在远处盘旋，而我今天只想沿溪采花。
 rating: 5
 pubDatetime: 2025-11-16T08:11:00.000Z
 draft: false

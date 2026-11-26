@@ -1,8 +1,8 @@
 ---
-title: 《超脱》观后感
+title: 观后感：《超脱》
 slug: chao-tuo
 type: review
-description: 亨利试图与世界保持距离，却在看见他人的孤独后，选择承担一份未必有答案的重量。
+description: 亨利总想给自己留一点距离，可一旦看清另一张脸上的孤独，走开也就成了一种选择。
 rating: 4.5
 pubDatetime: 2026-11-20T12:00:00.000Z
 draft: false

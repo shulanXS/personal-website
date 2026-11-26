@@ -1,8 +1,8 @@
 ---
-title: 《遗传厄运》《异教徒》观后感
+title: 观后感：《遗传厄运》《异教徒》
 slug: best-horror-films
 type: review
-description: 这两部最让我害怕的都不是突然吓人的镜头。不过，隐喻太满的时候，我也会有点出戏。
+description: 在一个家、一个村庄里，最熟悉的礼数也能令人背脊发凉。恐惧藏得最深的时候，连解释它的隐喻都显得多余。
 rating: 4.4
 pubDatetime: 2025-12-09T00:55:00.000Z
 draft: false

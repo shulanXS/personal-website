@@ -5,7 +5,7 @@ type: novel
 series: 雪落江川
 chapterNumber: 4
 status: completed
-description: "深蓝布面笔记本，一句没说出口的“不公平”，和病房里久违的笑声。"
+description: 深蓝色笔记本边，那句不公平终究没有说出口。病房里久违的笑声响起，沉默也有了片刻可以歇脚的地方。
 pubDatetime: 2025-11-21T09:13:10.000Z
 draft: false
 tags:

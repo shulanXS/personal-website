@@ -1,8 +1,8 @@
 ---
-title: 《狂飙》角色分析：高启强
+title: 角色分析：《狂飙》高启强
 slug: gao-qi-qiang
 type: character
-description: 早期那个赔笑的卖鱼人让我心酸，后来他越体面，我反而越觉得发冷。张颂文把这段变化演得很有说服力。
+description: 鱼摊前那张赔笑的脸，后来也让别人学会了赔笑。重看高启强的一生，我想知道，他从什么时候起认不出那个低头的人。
 rating: 4.5
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

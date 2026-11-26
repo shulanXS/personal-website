@@ -1,8 +1,8 @@
 ---
-title: 《蝙蝠侠：黑暗骑士》观后感
+title: 观后感：《蝙蝠侠：黑暗骑士》
 slug: the-dark-knight
 type: review
-description: 两艘渡轮上，最让我紧张的是那个拿起引爆器、举起手又慢慢放下的普通乘客。
+description: 渡轮上的乘客举起引爆器，又慢慢放下。哥谭得以迎来天亮，靠的也是这只最终什么都没有按下的手。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

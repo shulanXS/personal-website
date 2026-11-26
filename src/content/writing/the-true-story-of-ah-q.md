@@ -1,8 +1,8 @@
 ---
-title: 《阿Q正传》观后感
+title: 观后感：《阿Q正传》
 slug: the-true-story-of-ah-q
 type: review
-description: 从脸上挤出来的那点得意，到纸上怎么也画不圆的圈，严顺开把阿Q的手足无措演得让人笑不痛快。
+description: 阿Q努力要把最后那个圈画圆，像他曾努力从屈辱里挤出一点得意。笑意到了这里忽然停住，只剩那只无处安放的手。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

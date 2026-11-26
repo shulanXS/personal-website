@@ -1,8 +1,8 @@
 ---
-title: 《雍正王朝》角色分析：年羹尧
+title: 角色分析：《雍正王朝》年羹尧
 slug: nian-geng-yao
 type: character
-description: 他能替雍正赢下西北战事，却始终没看清，军功与皇权之间那条不能跨过的线。
+description: 西北的战功一笔笔记得清楚，君臣之间的分寸却没有刻度。年羹尧最危险的时候，正是他觉得自己最有把握的时候。
 rating: 4.9
 pubDatetime: 2026-11-21T12:00:00.000Z
 draft: false

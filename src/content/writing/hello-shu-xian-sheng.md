@@ -1,8 +1,8 @@
 ---
-title: 《Hello！树先生》观后感
+title: 观后感：《Hello！树先生》
 slug: hello-shu-xian-sheng
 type: review
-description: 树哥在清醒时失去尊严，却在幻觉里得到被尊重的体面，看得人胸口发闷。
+description: 树先生清醒时讨不到的一点敬意，偏在幻觉里得到了。看着他终于能抬起头，我却越来越难替他高兴。
 rating: 4.7
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

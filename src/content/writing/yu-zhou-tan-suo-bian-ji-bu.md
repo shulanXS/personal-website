@@ -1,8 +1,8 @@
 ---
-title: 《宇宙探索编辑部》观后感
+title: 观后感：《宇宙探索编辑部》
 slug: yu-zhou-tan-suo-bian-ji-bu
 type: review
-description: 唐志军追寻宇宙答案的旅程荒诞又狼狈，最后留下的却是人与人之间克制的温柔。
+description: 唐志军带着宇宙那么大的问题上路，沿途尽是具体而狼狈的小事。走到最后，最值得轻声回答的，还是眼前这个人。
 rating: 4.7
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

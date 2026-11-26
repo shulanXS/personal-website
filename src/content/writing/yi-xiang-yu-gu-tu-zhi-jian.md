@@ -2,7 +2,7 @@
 title: 异乡与故土之间：一个赴美留学生的文化认同漫谈
 slug: yi-xiang-yu-gu-tu-zhi-jian
 type: essay
-description: 在美国待久了，我开始习惯用两套眼光看事情，也常常觉得自己两边都差半步。这篇记下我怎么慢慢接受这种状态。
+description: 在异乡住得越久，看故乡的眼光也悄悄变了。两边都差的那半步，慢慢成了我可以站定、回望两岸的地方。
 pubDatetime: 2025-04-26T08:08:00.000Z
 draft: false
 tags:

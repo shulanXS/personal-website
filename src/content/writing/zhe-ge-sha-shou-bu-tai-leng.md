@@ -1,8 +1,8 @@
 ---
-title: 《这个杀手不太冷》观后感
+title: 观后感：《这个杀手不太冷》
 slug: zhe-ge-sha-shou-bu-tai-leng
 type: review
-description: 里昂与玛蒂尔达在孤独中彼此照亮，最终那盆扎进泥土的植物替他们完成了告别。
+description: 里昂带着一盆植物辗转而居，后来有人替它寻到泥土。两个孤独的人曾短暂相依，竟也给世上某样东西留下了根。
 rating: 4.8
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

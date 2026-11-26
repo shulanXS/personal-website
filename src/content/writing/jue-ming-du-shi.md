@@ -1,8 +1,8 @@
 ---
-title: 《绝命毒师》观后感
+title: 观后感：《绝命毒师》
 slug: jue-ming-du-shi
 type: review
-description: 从沃尔特到海森堡，最让人脊背发凉的不是枪战，而是谎言与自尊如何一步步吞掉一个人。
+description: 沃尔特说了太多次为了家人。等这句话终于说不下去，留在沉默里的，才是他最舍不得放手的自己。
 rating: 4.9
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

@@ -1,8 +1,8 @@
 ---
-title: 《人民的名义》观后感
+title: 观后感：《人民的名义》
 slug: ren-min-de-ming-yi
 type: review
-description: 比起搜出多少现金，我更记得那些客客气气的饭局和会议。话说得越体面，背后的关系越让我觉得透不过气。
+description: 饭桌上的话客气周全，谁该先动筷子却从来不用说出口。权力最深的痕迹，常留在人人已经习惯的礼数里。
 rating: 4.9
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

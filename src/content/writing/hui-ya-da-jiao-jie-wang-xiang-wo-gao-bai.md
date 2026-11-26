@@ -1,8 +1,8 @@
 ---
-title: 《辉夜大小姐想让我告白》观后感
+title: 观后感：《辉夜大小姐想让我告白》
 slug: hui-ya-da-jiao-jie-wang-xiang-wo-gao-bai
 type: review
-description: 前面看他们互相试探笑得很开心，后来才发现，两个人都只是怕自己不够好。
+description: 一场告白被演算成无数次攻守。等笑声过去，才听见两个人藏在胜负心底的同一句话：这样的我，你也会喜欢吗？
 rating: 4.7
 pubDatetime: 2025-09-13T07:21:00.000Z
 draft: false

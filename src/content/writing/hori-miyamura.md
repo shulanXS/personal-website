@@ -1,8 +1,8 @@
 ---
-title: 《堀与宫村》观后感
+title: 观后感：《堀与宫村》
 slug: hori-miyamura
 type: review
-description: 我喜欢他们在一起以后的日常。不用一直表现得完美，也有人愿意留在身边，这点最让我羡慕。
+description: 堀与宫村最让我羡慕的时刻，都在相爱以后。一个人终于可以收起在人前的样子，另一个人还坐在身边。
 rating: 4.5
 pubDatetime: 2025-03-31T21:56:00.000Z
 draft: false

@@ -5,7 +5,7 @@ type: novel
 series: 雪落江川
 chapterNumber: 6
 status: completed
-description: "《沈明雪还想做的五件事》，一条永远锁不上的窗缝，和关于遗忘的恐惧。"
+description: 五件还想做的事写在纸上，风从锁不严的窗缝里进来。人能够留给明天的，除了愿望，还有希望被谁记住的心情。
 pubDatetime: 2025-08-21T18:22:37.000Z
 draft: false
 tags:

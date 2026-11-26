@@ -1,8 +1,8 @@
 ---
-title: 《美国队长3：内战》观后感
+title: 观后感：《美国队长3：内战》
 slug: mei-guo-dui-zhang-3-nei-zhan
 type: review
-description: 协议之争尚能讲理，西伯利亚的录像却让复仇者联盟陷入了一场没有赢家的决裂。
+description: 协议还容得下辩论，西伯利亚的那段录像却只容得下一个失去父母的人。盾牌落地时，各自坚持的正义都沉得令人拿不动。
 rating: 4.8
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

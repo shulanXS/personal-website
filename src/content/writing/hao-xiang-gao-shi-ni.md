@@ -1,8 +1,8 @@
 ---
-title: 《好想告诉你》角色分析：黑沼爽子
+title: 角色分析：《好想告诉你》黑沼爽子
 slug: hao-xiang-gao-shi-ni
 type: character
-description: 爽子说话慢，也总怕给别人添麻烦。我却很喜欢她那种不计较的真诚，看着她慢慢敢开口就很开心。
+description: 爽子说一句话，总要比旁人多花一点时间。好在有些心意迟迟才抵达，接住它的人也愿意等。
 rating: 5
 pubDatetime: 2025-10-06T17:46:00.000Z
 draft: false

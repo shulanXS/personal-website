@@ -1,8 +1,8 @@
 ---
-title: 《白夜行》观后感
+title: 观后感：《白夜行》
 slug: byakuyako-2006
 type: review
-description: 日剧一开始就让人认出亮司与雪穗。从那以后，每一次在同一条街上擦肩而过，都有了重量。
+description: 亮司与雪穗走过同一条街，却要把相识活成擦肩。白昼如此明亮，两个人竟只能借彼此的影子藏身。
 pubDatetime: 2026-11-26T06:00:00.000Z
 draft: false
 tags:

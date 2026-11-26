@@ -1,8 +1,8 @@
 ---
-title: 《反叛的鲁路修》观后感
+title: 观后感：《反叛的鲁路修》
 slug: fan-pan-de-lu-lu-xiu
 type: review
-description: 当年觉得Zero很帅，重看才更在意鲁路修每走一步失去了什么。结尾还是让我缓了很久。
+description: 年少时只看见 Zero 戴上面具的风姿。再看鲁路修走到终局，才发现每一次胜利，都让可以直呼他名字的人少了一个。
 rating: 4.8
 pubDatetime: 2026-05-17T21:29:11.000Z
 draft: false

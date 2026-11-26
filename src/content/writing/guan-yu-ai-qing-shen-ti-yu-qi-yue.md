@@ -2,7 +2,7 @@
 title: 关于我的恋爱观：我的“非主流”底线，以及我为何绝不妥协
 slug: guan-yu-ai-qing-shen-ti-yu-qi-yue
 type: essay
-description: 我对恋爱有些不太合时宜的坚持，尤其在承诺和亲密关系上。这篇把自己的想法说清楚。
+description: 我想从一句承诺谈起。两个人靠得越近，越需要知道彼此愿意交付什么，又有什么只因出于自愿才值得珍惜。
 pubDatetime: 2025-11-10T02:07:00.000Z
 draft: false
 tags:

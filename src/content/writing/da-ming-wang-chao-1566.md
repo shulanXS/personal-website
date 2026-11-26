@@ -1,8 +1,8 @@
 ---
-title: 《大明王朝1566》观后感
+title: 观后感：《大明王朝1566》
 slug: da-ming-wang-chao-1566
 type: review
-description: 本来想看权谋过招，最后最让我缓不过来的，却是那些连上牌桌的资格都没有的百姓。
+description: 庙堂上轻轻落下的一句话，到了田埂上，就是一家人整年的生计。重看这盘棋，我的目光总落在棋盘之外。
 rating: 4.9
 pubDatetime: 2026-11-19T12:00:00.000Z
 draft: false

@@ -2,7 +2,7 @@
 title: 从“工具”到“外挂大脑”：AI是如何一步步接管我的生活与思考的
 slug: ai-wai-gui-da-nao
 type: essay
-description: 从查资料到做决定、聊心事，我越来越习惯先问AI。方便是真的，越来越不愿自己费劲想问题，也是真的。
+description: 每当我先向 AI 发问，一个更慢的问题就退到了身后：若把犹疑也交给它，那个作决定的人还剩下多少自己的声音？
 pubDatetime: 2025-09-12T05:31:00.000Z
 draft: false
 tags:
