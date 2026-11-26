@@ -68,12 +68,12 @@ function drawContentWatermarks(
   footerTop: number
 ) {
   ctx.save();
-  ctx.font = "bold 29px Georgia, serif";
+  ctx.font = "bold 34px Georgia, serif";
   ctx.fillStyle = "rgba(72, 67, 50, 0.18)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 110) {
+  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 128) {
     const x = width * (row % 2 === 0 ? 0.30 : 0.70);
     ctx.save();
     ctx.translate(x, y);
@@ -133,7 +133,17 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       dateStyle: "long",
       timeZone: button.dataset.shareZone,
     }).format(new Date(button.dataset.shareDate!));
-    paper.append(date);
+    const metadata = doc.createElement("header");
+    metadata.append(date);
+    const rating = button.parentElement
+      ?.querySelector("[data-rating-symbol]")
+      ?.getAttribute("aria-label");
+    if (rating) {
+      const score = doc.createElement("strong");
+      score.textContent = rating;
+      metadata.append(score);
+    }
+    paper.append(metadata);
     if (button.dataset.shareTitle) {
       const title = doc.createElement("h1");
       title.textContent = button.dataset.shareTitle;
@@ -221,7 +231,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     });
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     drawContentWatermarks(ctx, footer.offsetTop);
-    drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 4);
+    drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 1);
     try {
       return await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(
