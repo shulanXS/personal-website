@@ -69,12 +69,12 @@ function drawContentWatermarks(
   footerTop: number
 ) {
   ctx.save();
-  ctx.font = "bold 34px Georgia, serif";
-  ctx.fillStyle = "rgba(72, 67, 50, 0.13)";
+  ctx.font = "bold 39px Georgia, serif";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.105)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 146) {
+  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 180) {
     const x = width * (row % 2 === 0 ? 0.3 : 0.7);
     ctx.save();
     ctx.translate(x, y);
