@@ -1,3 +1,4 @@
+import { useTranslations } from "@/i18n";
 import html2canvas from "html2canvas";
 import mark from "@/assets/monogram-logo.svg?url";
 import readingFont from "@/styles/reading-font.css?inline";
@@ -88,8 +89,11 @@ function drawContentWatermarks(
 function drawSignature(
   ctx: CanvasRenderingContext2D,
   logo: HTMLImageElement,
-  y: number
+  dividerTop: number
 ) {
+  // The mark has transparent space inside its SVG. Position its visible ring
+  // against the divider, independently of the footer's box height.
+  const y = dividerTop + 15;
   ctx.fillStyle = "#37392e";
   ctx.font = '600 22px "Noto Serif SC Reading", serif';
   const name = ctx.measureText(signature);
@@ -142,10 +146,20 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     if (rating) {
       const score = doc.importNode(rating, true);
       const value = score.querySelector(".app-rating-value");
+      const labels = useTranslations(document.documentElement.lang).share;
+      const caption = doc.createElement("small");
+      const symbol = rating.getAttribute("data-rating-symbol");
+      caption.textContent =
+        symbol === "heart"
+          ? labels.affinity
+          : symbol === "gamepad"
+            ? labels.gameplay
+            : labels.rating;
+      score.prepend(caption);
       if (value) {
-        value.textContent =
-          rating.getAttribute("aria-label") || value.textContent;
-        score.prepend(value);
+        const maximum = doc.createElement("small");
+        maximum.textContent = " / 5";
+        value.append(maximum);
       }
       for (const icon of score.querySelectorAll("svg")) {
         const color = icon.closest(".app-rating-star-fill")
@@ -237,7 +251,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     });
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     drawContentWatermarks(ctx, footer.offsetTop);
-    drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 1);
+    drawSignature(ctx, logo, footer.offsetTop);
     try {
       return await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(

@@ -28,6 +28,9 @@ export interface UIStrings {
     description: string;
   };
   share: {
+    rating: string;
+    affinity: string;
+    gameplay: string;
     open: string;
     saved: string;
     imageError: string;

@@ -31,18 +31,28 @@ main > time {
 .app-rating {
   flex-wrap: wrap;
   align-self: flex-start;
-  gap: 4px 14px;
-  border-left: 3px solid #ab773b;
-  padding-left: 10px;
-  font-size: 24px;
-  line-height: 1.35;
+  gap: 4px 10px;
+  font-size: 21px;
+  line-height: 1.2;
+}
+.app-rating-stars {
+  position: relative;
+  top: 0.34em;
+}
+.app-rating small {
+  font-size: 15px;
+  font-weight: 400;
+  color: #70685c;
+}
+.app-rating-value {
   font-weight: 600;
+  white-space: nowrap;
 }
 .app-rating-star,
 .app-rating-icon {
   display: block;
-  width: 21px;
-  height: 21px;
+  width: 17px;
+  height: 17px;
 }
 .app-rating-star {
   position: relative;
@@ -121,6 +131,6 @@ section > :last-child {
   margin-bottom: 0;
 }
 footer {
-  height: 32px;
+  height: 30px;
   border-top: 1px solid #b6ae98;
 }

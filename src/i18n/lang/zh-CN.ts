@@ -22,6 +22,9 @@ export default {
       "车文杰，硕士在读，研究方向为 AI 应用。在这里记录技术学习、阅读笔记与创作。",
   },
   share: {
+    rating: "作品评分",
+    affinity: "角色喜爱度",
+    gameplay: "游玩体验",
     open: "保存为图片",
     saved: "保存成功",
     imageError: "配图加载失败，请检查网络后重试。",

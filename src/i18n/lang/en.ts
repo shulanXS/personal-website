@@ -12,6 +12,9 @@ export default {
       "Wenjie Che, a master's student working on applied AI. Writing about technology, reading notes and fiction.",
   },
   share: {
+    rating: "Rating",
+    affinity: "Character affinity",
+    gameplay: "Gameplay",
     open: "Save as image",
     saved: "Image saved",
     imageError: "Could not load an illustration. Check your connection and try again.",
