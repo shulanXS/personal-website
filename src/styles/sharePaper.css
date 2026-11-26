@@ -8,7 +8,7 @@ main {
   position: relative;
   width: 720px;
   padding: 46px 52px 32px;
-  background: #fbfaf6;
+  background-color: #f5eedd;
   color: #272923;
   font:
     20px/1.65 Georgia,
@@ -81,22 +81,9 @@ section svg {
   margin: 16px auto;
 }
 footer {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-top: 30px;
-  border-top: 1px solid #b9bdb2;
-  padding-top: 20px;
-}
-footer img {
-  width: 38px;
-  height: 38px;
-}
-footer span {
-  margin-left: auto;
-  font:
-    18px Georgia,
-    serif;
+  height: 60px;
+  border-top: 1px solid #b6ae98;
 }
 aside {
   position: absolute;

@@ -4,38 +4,130 @@ import { useTranslations } from "@/i18n";
 interface Props {
   title?: string;
   date: Date;
+  href?: string;
 }
-const { title, date } = Astro.props;
+const { title, date, href } = Astro.props;
 const t = useTranslations(config.site.uiLang);
 ---
 
 <button
   type="button"
   data-share-image
+  data-share-href={href}
   data-share-title={title}
   data-share-zone={config.site.timezone}
   data-share-date={date.toISOString()}
   data-pagefind-ignore
-  class="text-foreground/70 hover:text-accent relative z-10 cursor-pointer text-sm underline-offset-4 hover:underline"
-  data-i18n="share.open">{t.share.open}</button
+  data-i18n="share.open"
+  data-i18n-attr="aria-label,title"
+  aria-label={t.share.open}
+  title={t.share.open}
+  class="share-image-button"
 >
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M12 3v11m-4-4 4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
+    ></path>
+  </svg>
+</button>
+<style>
+  .share-image-button {
+    position: relative;
+    z-index: 2;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    vertical-align: middle;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--foreground);
+    background: var(--background);
+    cursor: pointer;
+  }
+  .share-image-button:hover,
+  .share-image-button:focus-visible {
+    color: var(--accent);
+    border-color: currentColor;
+  }
+  .share-image-button[aria-busy="true"] {
+    opacity: 0.55;
+    cursor: progress;
+  }
+  @media (pointer: coarse) {
+    .share-image-button {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+  :global(.share-image-status) {
+    position: fixed;
+    bottom: max(1.5rem, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 90vw;
+    z-index: 100;
+    border-radius: 0.5rem;
+    padding: 0.55rem 1rem;
+    background: var(--foreground);
+    color: var(--background);
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
+</style>
 <script>
   import { useTranslations } from "@/i18n";
+  let pending = false;
+  let timer: number;
+  function notify(message: string) {
+    document.querySelector(".share-image-status")?.remove();
+    clearTimeout(timer);
+    const status = document.createElement("div");
+    status.className = "share-image-status";
+    status.setAttribute("role", "status");
+    document.body.append(status);
+    status.textContent = message;
+    timer = window.setTimeout(() => status.remove(), 3200);
+  }
   document.addEventListener("click", async event => {
     const button =
       event.target instanceof Element &&
       event.target.closest<HTMLButtonElement>("[data-share-image]");
-    if (!button || button.disabled) return;
-    button.disabled = true;
+    if (!button) return;
+    event.preventDefault();
+    if (pending) return;
+    pending = true;
+    button.setAttribute("aria-busy", "true");
+    const controller = new AbortController();
+    const cancel = () => controller.abort();
+    document.addEventListener("astro:before-swap", cancel, { once: true });
+    const t = useTranslations(document.documentElement.lang).share;
     try {
-      const { openShareImage } = await import("@/scripts/shareImage");
-      if (button.isConnected) openShareImage(button);
-    } catch {
-      window.alert(
-        useTranslations(document.documentElement.lang).share.loadError
-      );
+      const { saveShareImage } = await import("@/scripts/shareImage");
+      await saveShareImage(button, controller.signal);
+      notify(t.saved);
+    } catch (error) {
+      if (!controller.signal.aborted)
+        notify(
+          error instanceof Error && error.message === "image"
+            ? t.imageError
+            : t.renderError
+        );
     } finally {
-      button.disabled = false;
+      document.removeEventListener("astro:before-swap", cancel);
+      button.removeAttribute("aria-busy");
+      pending = false;
     }
   });
 </script>

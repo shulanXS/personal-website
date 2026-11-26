@@ -23,12 +23,7 @@ export default {
   },
   share: {
     open: "保存为图片",
-    busy: "正在生成图片…",
-    save: "保存 PNG",
-    tip: "手机上也可以长按图片保存。",
-    retry: "重试",
-    close: "关闭",
-    loadError: "分享功能加载失败，请重试。",
+    saved: "保存成功",
     imageError: "配图加载失败，请检查网络后重试。",
     renderError: "设备未能生成完整长图，请关闭其他标签页后重试。",
   },

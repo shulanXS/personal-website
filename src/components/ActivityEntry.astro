@@ -5,6 +5,7 @@ import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 import Datetime from "./Datetime.astro";
+import ShareImage from "./ShareImage.astro";
 import TagChip from "./TagChip.astro";
 import NoteInline from "./NoteInline.astro";
 import IconNote from "@/assets/icons/IconNote.svg";
@@ -134,6 +135,7 @@ const project = entry.project;
     {
       entry.kind !== "note" && (
         <div class="app-activity-body">
+          <div class="flex items-start justify-between gap-3">
           <h2 class="app-activity-title">
             <a
               {...writingLabel(entry.title)}
@@ -146,6 +148,8 @@ const project = entry.project;
               {entry.title}
             </a>
           </h2>
+          {entry.kind === "post" && <ShareImage title={entry.title} date={entry.date} href={entry.url} />}
+          </div>
 
           {entry.description && (
             <p

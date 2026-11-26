@@ -29,12 +29,7 @@ export interface UIStrings {
   };
   share: {
     open: string;
-    busy: string;
-    save: string;
-    tip: string;
-    retry: string;
-    close: string;
-    loadError: string;
+    saved: string;
     imageError: string;
     renderError: string;
   };

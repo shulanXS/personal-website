@@ -2,8 +2,6 @@ import html2canvas from "html2canvas";
 import mark from "@/assets/monogram-logo.svg?url";
 import readingFont from "@/styles/reading-font.css?inline";
 import paperStyle from "@/styles/sharePaper.css?inline";
-import "@/styles/shareDialog.css";
-import { useTranslations } from "@/i18n";
 
 const width = 720;
 const domain = "www.chewenjie.com";
@@ -51,11 +49,73 @@ async function embedImage(url: string, signal: AbortSignal) {
   });
 }
 
+// A small seamless grain tile keeps long exports inexpensive on phones.
+function paperTexture(doc: Document) {
+  const tile = doc.createElement("canvas");
+  tile.width = tile.height = 96;
+  const ctx = tile.getContext("2d")!;
+  const pixels = ctx.createImageData(tile.width, tile.height);
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    const grain = Math.round((Math.random() - 0.5) * 13);
+    pixels.data.set([245 + grain, 238 + grain, 221 + grain, 255], i);
+  }
+  ctx.putImageData(pixels, 0, 0);
+  return tile.toDataURL();
+}
+
+async function articleBody(url: string, signal: AbortSignal) {
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error("article");
+  const page = new DOMParser().parseFromString(
+    await response.text(),
+    "text/html"
+  );
+  const body = page.querySelector("#article");
+  if (!body) throw new Error("article");
+  for (const img of body.querySelectorAll("img[src],video[poster]")) {
+    const attr = img.tagName === "VIDEO" ? "poster" : "src";
+    img.setAttribute(attr, new URL(img.getAttribute(attr)!, response.url).href);
+  }
+  return body;
+}
+
+// Centre the actual ink of the two scripts on the same axis as the monogram.
+function drawSignature(
+  ctx: CanvasRenderingContext2D,
+  logo: HTMLImageElement,
+  y: number
+) {
+  ctx.fillStyle = "#37392e";
+  ctx.font = '600 22px "Noto Serif SC Reading", serif';
+  const name = ctx.measureText(signature);
+  const nameFont = ctx.font;
+  ctx.font = "19px Georgia, serif";
+  const site = ctx.measureText(domain);
+  const left = (width - (36 + 9 + name.width + 18 + site.width)) / 2;
+  ctx.drawImage(logo, left, y - 18, 36, 36);
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(
+    domain,
+    left + 36 + 9 + name.width + 18,
+    y + (site.actualBoundingBoxAscent - site.actualBoundingBoxDescent) / 2
+  );
+  ctx.font = nameFont;
+  ctx.fillText(
+    signature,
+    left + 45,
+    y + (name.actualBoundingBoxAscent - name.actualBoundingBoxDescent) / 2
+  );
+}
+
 async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
-  const note = button.closest("article");
-  const body = note
-    ? note.querySelector("[data-note-body]")
-    : document.querySelector("#article");
+  signal.throwIfAborted();
+  const href = button.dataset.shareHref;
+  const note = button.closest(".app-note-entry, .app-note-inline");
+  const body = href
+    ? await articleBody(href, signal)
+    : note
+      ? note.querySelector("[data-note-body]")
+      : document.querySelector("#article");
   const gallery = note?.querySelectorAll<HTMLImageElement>("ul img") ?? [];
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
@@ -69,6 +129,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     style.textContent = readingFont + paperStyle;
     doc.head.append(style);
     const paper = doc.createElement("main");
+    paper.style.backgroundImage = "url(" + paperTexture(doc) + ")";
     const date = doc.createElement("time");
     date.textContent = new Intl.DateTimeFormat(document.documentElement.lang, {
       dateStyle: "long",
@@ -114,16 +175,11 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     const footer = doc.createElement("footer");
     const logo = doc.createElement("img");
     logo.src = mark;
-    const name = doc.createElement("strong");
-    name.textContent = signature;
-    const url = doc.createElement("span");
-    url.textContent = domain;
-    footer.append(logo, name, url);
     paper.append(content, footer);
     // Resolve each asset before capture so a missing image cannot silently disappear.
     try {
       await Promise.all(
-        Array.from(paper.querySelectorAll("img"), async img => {
+        [logo, ...paper.querySelectorAll("img")].map(async img => {
           const src = new URL(img.getAttribute("src")!, document.baseURI).href;
           img
             .closest("picture")
@@ -141,6 +197,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     signal.throwIfAborted();
     doc.body.append(paper);
     paper.getBoundingClientRect();
+    await doc.fonts.load('600 22px "Noto Serif SC Reading"', signature);
     await doc.fonts.ready;
     const height = Math.ceil(paper.getBoundingClientRect().height);
     for (let top = 620; top < height - 150; top += 1050) {
@@ -168,6 +225,9 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       backgroundColor: "#fbfaf6",
       logging: false,
     });
+    const ctx = canvas.getContext("2d")!;
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 4);
     try {
       return await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(
@@ -183,65 +243,26 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
   }
 }
 
-export function openShareImage(button: HTMLButtonElement) {
-  if (document.querySelector("dialog.share-image")) return;
-  const t = useTranslations(document.documentElement.lang).share;
-  const dialog = document.createElement("dialog");
-  dialog.className = "share-image";
-  dialog.setAttribute("aria-label", t.open);
-  const close = document.createElement("button");
-  close.textContent = t.close;
-  close.onclick = () => dialog.close();
-  const heading = document.createElement("strong");
-  heading.textContent = t.open;
-  const header = document.createElement("header");
-  header.append(heading, close);
-  const status = document.createElement("p");
-  status.setAttribute("role", "status");
-  const preview = document.createElement("img");
-  preview.alt = t.open;
-  preview.hidden = true;
+export async function saveShareImage(
+  button: HTMLButtonElement,
+  signal: AbortSignal
+) {
+  const blob = await renderImage(button, signal);
+  signal.throwIfAborted();
+  const url = URL.createObjectURL(blob);
   const download = document.createElement("a");
-  download.textContent = t.save;
+  download.href = url;
   download.download =
     (
       button.dataset.shareTitle || button.dataset.shareDate!.slice(0, 10)
     ).replace(/[<>:"/\\|?*]/g, "-") + ".png";
   download.hidden = true;
-  const retry = document.createElement("button");
-  retry.textContent = t.retry;
-  const controller = new AbortController();
-  let url: string | undefined;
-  async function generate() {
-    retry.hidden = true;
-    status.textContent = t.busy;
-    try {
-      const blob = await renderImage(button, controller.signal);
-      if (controller.signal.aborted) return;
-      url = URL.createObjectURL(blob);
-      download.href = preview.src = url;
-      preview.hidden = download.hidden = false;
-      status.textContent = t.tip;
-    } catch (error) {
-      if (controller.signal.aborted) return;
-      status.textContent =
-        error instanceof Error && error.message === "image"
-          ? t.imageError
-          : t.renderError;
-      retry.hidden = false;
-    }
+  download.setAttribute("data-astro-reload", "");
+  document.body.append(download);
+  try {
+    download.click();
+  } finally {
+    download.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 30000);
   }
-  retry.onclick = generate;
-  dialog.append(header, status, download, retry, preview);
-  document.body.append(dialog);
-  function cleanup() {
-    controller.abort();
-    if (url) URL.revokeObjectURL(url);
-    dialog.remove();
-    document.removeEventListener("astro:before-swap", cleanup);
-  }
-  dialog.addEventListener("close", cleanup, { once: true });
-  document.addEventListener("astro:before-swap", cleanup);
-  dialog.showModal();
-  void generate();
 }

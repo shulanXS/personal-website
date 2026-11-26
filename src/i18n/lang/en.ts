@@ -13,12 +13,7 @@ export default {
   },
   share: {
     open: "Save as image",
-    busy: "Preparing image…",
-    save: "Save PNG",
-    tip: "On mobile, you can also press and hold the image to save it.",
-    retry: "Try again",
-    close: "Close",
-    loadError: "Could not load the image exporter. Please try again.",
+    saved: "Image saved",
     imageError: "Could not load an illustration. Check your connection and try again.",
     renderError: "Could not render the full image on this device. Close other tabs and try again.",
   },
