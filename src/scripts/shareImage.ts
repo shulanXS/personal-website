@@ -60,7 +60,7 @@ function paperTexture(doc: Document) {
     pixels.data.set([245 + grain, 238 + grain, 221 + grain, 255], i);
   }
   ctx.putImageData(pixels, 0, 0);
-  return tile.toDataURL();
+  return tile;
 }
 
 function drawContentWatermarks(
@@ -68,13 +68,13 @@ function drawContentWatermarks(
   footerTop: number
 ) {
   ctx.save();
-  ctx.font = "20px Georgia, serif";
-  ctx.fillStyle = "rgba(72, 67, 50, 0.09)";
+  ctx.font = "bold 29px Georgia, serif";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.18)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  for (let row = 0, y = 140; y < footerTop - 40; row++, y += 245) {
-    const x = width * (row % 2 === 0 ? 0.35 : 0.65);
+  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 110) {
+    const x = width * (row % 2 === 0 ? 0.30 : 0.70);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(-Math.PI / 7);
@@ -128,7 +128,6 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     style.textContent = readingFont + paperStyle;
     doc.head.append(style);
     const paper = doc.createElement("main");
-    paper.style.backgroundImage = "url(" + paperTexture(doc) + ")";
     const date = doc.createElement("time");
     date.textContent = new Intl.DateTimeFormat(document.documentElement.lang, {
       dateStyle: "long",
@@ -204,16 +203,22 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     const canvas = doc.createElement("canvas");
     canvas.width = Math.ceil(width * scale);
     canvas.height = Math.ceil(height * scale);
+    // Paint every output pixel, including the rounded last row of a long export.
+    const ctx = canvas.getContext("2d")!;
+    ctx.save();
+    ctx.scale(scale, scale);
+    ctx.fillStyle = ctx.createPattern(paperTexture(doc), "repeat")!;
+    ctx.fillRect(0, 0, canvas.width / scale, canvas.height / scale);
+    ctx.restore();
     await html2canvas(paper, {
       canvas,
       scale,
       width,
       height,
       windowWidth: width,
-      backgroundColor: "#fbfaf6",
+      backgroundColor: null,
       logging: false,
     });
-    const ctx = canvas.getContext("2d")!;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     drawContentWatermarks(ctx, footer.offsetTop);
     drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 4);
