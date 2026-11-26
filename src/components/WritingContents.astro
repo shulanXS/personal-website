@@ -1,5 +1,4 @@
 ---
-import ShareImage from "./ShareImage.astro";
 import { writingLabel } from "@/i18n/writingLabels";
 import { Image } from "astro:assets";
 import Datetime from "./Datetime.astro";
@@ -248,7 +247,6 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                         />
                       </span>
                     </a>
-                    <ShareImage title={work.data.title} date={work.data.pubDatetime} href={getWritingUrl(work.data.slug, locale)} />
                   </li>
                 ))}
               </ol>
@@ -472,7 +470,6 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                         />
                       </span>
                     </a>
-                    <ShareImage title={work.data.title} date={work.data.pubDatetime} href={getWritingUrl(work.data.slug, locale)} />
                   </li>
                 ))
               )}
@@ -503,16 +500,3 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
 
   setupWritingSort();
 </script>
-
-<style>
-  .app-writing-row:has(> :global([data-share-image])) {
-    position: relative;
-    padding-inline-end: 2rem;
-  }
-  .app-writing-row > :global([data-share-image]) {
-    position: absolute;
-    inset-inline-end: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-</style>

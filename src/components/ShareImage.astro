@@ -4,16 +4,14 @@ import { useTranslations } from "@/i18n";
 interface Props {
   title?: string;
   date: Date;
-  href?: string;
 }
-const { title, date, href } = Astro.props;
+const { title, date } = Astro.props;
 const t = useTranslations(config.site.uiLang);
 ---
 
 <button
   type="button"
   data-share-image
-  data-share-href={href}
   data-share-title={title}
   data-share-zone={config.site.timezone}
   data-share-date={date.toISOString()}

@@ -2,7 +2,6 @@
 import type { CollectionEntry } from "astro:content";
 import { getWritingUrl } from "@/utils/getPostPaths";
 import { tagSlug, tagDisplayName } from "@/utils/tagIndex";
-import ShareImage from "./ShareImage.astro";
 import Datetime from "./Datetime.astro";
 import TagChip from "./TagChip.astro";
 
@@ -59,7 +58,6 @@ const tagSlugs = tags.map(tagSlug);
 
         <div class="app-vertical-date">
           <Datetime pubDatetime={data.pubDatetime} bare />
-          <ShareImage title={data.title} date={data.pubDatetime} {href} />
         </div>
 
         {tags.length > 0 && (
@@ -101,7 +99,6 @@ const tagSlugs = tags.map(tagSlug);
         {data.description && <p>{data.description}</p>}
         <div class="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
           <Datetime pubDatetime={data.pubDatetime} />
-          <ShareImage title={data.title} date={data.pubDatetime} {href} />
         </div>
         {tags.length > 0 && (
           <ul class="mt-1 flex flex-wrap gap-2">

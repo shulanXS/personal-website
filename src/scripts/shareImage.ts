@@ -63,36 +63,23 @@ function paperTexture(doc: Document) {
   return tile.toDataURL();
 }
 
-async function articleBody(url: string, signal: AbortSignal) {
-  const response = await fetch(url, { signal });
-  if (!response.ok) throw new Error("article");
-  const page = new DOMParser().parseFromString(
-    await response.text(),
-    "text/html"
-  );
-  const body = page.querySelector("#article");
-  if (!body) throw new Error("article");
-  for (const img of body.querySelectorAll("img[src],video[poster]")) {
-    const attr = img.tagName === "VIDEO" ? "poster" : "src";
-    img.setAttribute(attr, new URL(img.getAttribute(attr)!, response.url).href);
-  }
-  return body;
-}
-
-function drawMarginWatermarks(
+function drawContentWatermarks(
   ctx: CanvasRenderingContext2D,
   footerTop: number
 ) {
   ctx.save();
-  ctx.translate(width - 14, 0);
-  ctx.rotate(Math.PI / 2);
-  ctx.font = "12px Georgia, serif";
-  ctx.fillStyle = "rgba(72, 67, 50, 0.32)";
+  ctx.font = "20px Georgia, serif";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.09)";
+  ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const label = "WENJIE CHE";
-  const lastStart = footerTop - ctx.measureText(label).width;
-  for (let top = 80; top < lastStart; top += 470) {
-    ctx.fillText(label, top, 0);
+
+  for (let row = 0, y = 140; y < footerTop - 40; row++, y += 245) {
+    const x = width * (row % 2 === 0 ? 0.35 : 0.65);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-Math.PI / 7);
+    ctx.fillText("WENJIE CHE", 0, 0);
+    ctx.restore();
   }
   ctx.restore();
 }
@@ -127,10 +114,7 @@ function drawSignature(
 
 async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
   signal.throwIfAborted();
-  const href = button.dataset.shareHref;
-  const body = href
-    ? await articleBody(href, signal)
-    : document.querySelector("#article");
+  const body = document.querySelector("#article");
   if (!body) throw new Error("article");
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
@@ -231,7 +215,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     });
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    drawMarginWatermarks(ctx, footer.offsetTop);
+    drawContentWatermarks(ctx, footer.offsetTop);
     drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 4);
     try {
       return await new Promise<Blob>((resolve, reject) =>
