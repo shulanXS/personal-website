@@ -1,4 +1,5 @@
 ---
+import { writingLabel } from "@/i18n/writingLabels";
 import IconHash from "@/assets/icons/IconHash.svg";
 import { tagSearchUrl } from "@/utils/routes";
 import config from "@/config";
@@ -97,7 +98,12 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
 
 {
   mode === "static" ? (
-    <span class={staticClasses} data-tag-static={slug} title={`#${name}`}>
+    <span
+      class={staticClasses}
+      data-tag-static={slug}
+      {...writingLabel(name, "title", "#")}
+      title={`#${name}`}
+    >
       <IconHash
         class:list={[
           "opacity-60",
@@ -105,7 +111,7 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
           flush && "app-tag-flush-hash",
         ]}
       />
-      <span>{name}</span>
+      <span {...writingLabel(name)}>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">
           {count}
@@ -118,10 +124,11 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
       class={chipClasses}
       data-tag-chip={slug}
       data-tag-mode="link"
+      {...writingLabel(name, "title", "#")}
       title={`#${name}`}
     >
       <IconHash class:list={["opacity-70", iconClasses[size]]} />
-      <span>{name}</span>
+      <span {...writingLabel(name)}>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">
           {count}
@@ -135,10 +142,11 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
       data-tag-chip={slug}
       data-tag-mode="filter"
       aria-pressed={active ? "true" : "false"}
+      {...writingLabel(name, "title", "#")}
       title={`#${name}`}
     >
       <IconHash class:list={["opacity-70", iconClasses[size]]} />
-      <span>{name}</span>
+      <span {...writingLabel(name)}>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">
           {count}

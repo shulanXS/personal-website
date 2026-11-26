@@ -1,4 +1,5 @@
 ---
+import { writingLabel } from "@/i18n/writingLabels";
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
@@ -65,7 +66,11 @@ const { Content } = await render(work);
 const tags = data.tags ?? [];
 ---
 
-<Layout title={`${data.title} | ${t.site.title}`} width="reading">
+<Layout
+  writingTitle={data.title}
+  title={`${data.title} | ${t.site.title}`}
+  width="reading"
+>
   <Header />
 
   <Breadcrumb />
@@ -96,10 +101,18 @@ const tags = data.tags ?? [];
     }
     {
       data.series && (
-        <p class="app-writing-series mb-1 text-sm">{data.series}</p>
+        <p
+          class="app-writing-series mb-1 text-sm"
+          {...writingLabel(data.series)}
+        >
+          {data.series}
+        </p>
       )
     }
-    <h1 class="app-writing-title text-2xl font-semibold sm:text-3xl">
+    <h1
+      {...writingLabel(data.title)}
+      class="app-writing-title text-2xl font-semibold sm:text-3xl"
+    >
       {data.title}
     </h1>
     <div class="mt-2 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -143,7 +156,9 @@ const tags = data.tags ?? [];
     }
     {
       data.description && (
-        <p class="app-writing-standfirst">{data.description}</p>
+        <p class="app-writing-standfirst" {...writingLabel(data.description)}>
+          {data.description}
+        </p>
       )
     }
 
@@ -192,6 +207,7 @@ const tags = data.tags ?? [];
             {seriesSiblings.map(sibling => (
               <li>
                 <a
+                  {...writingLabel(sibling.data.title, undefined, "", "")}
                   href={getWritingUrl(sibling.data.slug, locale)}
                   class:list={[
                     "hover:text-accent decoration-dashed underline-offset-4",
@@ -217,6 +233,7 @@ const tags = data.tags ?? [];
         >
           {prevWork ? (
             <a
+              {...writingLabel(prevWork.data.title, undefined, "← ", "")}
               href={getWritingUrl(prevWork.data.slug, locale)}
               class="text-accent decoration-dashed underline-offset-4 hover:underline"
             >
@@ -227,6 +244,7 @@ const tags = data.tags ?? [];
           )}
           {nextWork && (
             <a
+              {...writingLabel(nextWork.data.title, undefined, "", " →")}
               href={getWritingUrl(nextWork.data.slug, locale)}
               class="text-accent decoration-dashed underline-offset-4 hover:underline"
             >

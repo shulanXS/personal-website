@@ -1,4 +1,5 @@
 ---
+import { writingLabel } from "@/i18n/writingLabels";
 import { Image } from "astro:assets";
 import Datetime from "./Datetime.astro";
 import TagChip from "./TagChip.astro";
@@ -139,7 +140,12 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
           >
             <div class="app-writing-group-main">
               <div class="app-writing-group-head">
-                <h2 class="app-writing-group-name">{group.name}</h2>
+                <h2
+                  class="app-writing-group-name"
+                  {...writingLabel(group.name)}
+                >
+                  {group.name}
+                </h2>
                 {group.status && (
                   <span
                     class="app-writing-status"
@@ -209,11 +215,17 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                         {template("chapter", index + 1)}
                       </span>
                       <span class="app-writing-row-body">
-                        <span class="app-writing-row-title">
+                        <span
+                          class="app-writing-row-title"
+                          {...writingLabel(chapterTitle(work))}
+                        >
                           {chapterTitle(work)}
                         </span>
                         {chapterSummary(work) && (
-                          <span class="app-writing-row-desc">
+                          <span
+                            class="app-writing-row-desc"
+                            {...writingLabel(chapterSummary(work))}
+                          >
                             {chapterSummary(work)}
                           </span>
                         )}
@@ -261,6 +273,7 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                     <div class="app-writing-cover">
                       <Image
                         src={coverOf(group)!}
+                        {...writingLabel(group.name, "alt")}
                         alt={group.name ?? ""}
                         widths={[272, 544]}
                         sizes="272px"
@@ -270,11 +283,16 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                     </div>
                   ) : (
                     <div class="app-writing-cover app-writing-cover-plain">
-                      <span>{group.name}</span>
+                      <span {...writingLabel(group.name)}>{group.name}</span>
                     </div>
                   )}
 
-                  <h3 class="app-writing-card-title">{group.name}</h3>
+                  <h3
+                    class="app-writing-card-title"
+                    {...writingLabel(group.name)}
+                  >
+                    {group.name}
+                  </h3>
 
                   {/*
                     The tags of the work.
@@ -316,7 +334,9 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
         >
           <div class="app-writing-group-main">
             <div class="app-writing-group-head">
-              <h2 class="app-writing-group-name">{t.writing.standalone}</h2>
+              <h2 class="app-writing-group-name" data-i18n="writing.standalone">
+                {t.writing.standalone}
+              </h2>
               {/*
                 The order of the works.
 
@@ -423,11 +443,17 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                         )}
                       </span>
                       <span class="app-writing-row-body">
-                        <span class="app-writing-row-title">
+                        <span
+                          class="app-writing-row-title"
+                          {...writingLabel(work.data.title)}
+                        >
                           {work.data.title}
                         </span>
                         {work.data.description && (
-                          <span class="app-writing-row-desc">
+                          <span
+                            class="app-writing-row-desc"
+                            {...writingLabel(work.data.description)}
+                          >
                             {work.data.description}
                           </span>
                         )}

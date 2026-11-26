@@ -1,4 +1,5 @@
 ---
+import { writingLabel } from "@/i18n/writingLabels";
 import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 import { fileUrl } from "@/utils/routes";
@@ -25,6 +26,7 @@ type Props = {
    * the title would stay in the language the page was rendered in.
    */
   titleKey?: string;
+  writingTitle?: string;
   /**
    * Width scale of the page shell.
    *
@@ -44,6 +46,7 @@ const {
   ogImage = resolveDefaultOgImagePath(config),
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
   titleKey,
+  writingTitle,
   width = "default",
 } = Astro.props;
 
@@ -130,6 +133,7 @@ const uiLang = site.uiLang;
 
     <!-- Primary meta -->
     <title
+      {...writingLabel(writingTitle, undefined, "", ` | ${t.site.title}`)}
       data-i18n={titleKey ? "documentTitle" : undefined}
       data-i18n-args={titleKey ? `${titleKey},site.title` : undefined}
     >

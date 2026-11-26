@@ -61,6 +61,17 @@ export function applyLang(locale: string): void {
     }
   }
 
+  for (const element of document.querySelectorAll<HTMLElement>(
+    "[data-label-en]"
+  )) {
+    const value =
+      locale === "en" ? element.dataset.labelEn : element.dataset.labelZh;
+    if (value === undefined) continue;
+    const attribute = element.dataset.labelAttr;
+    if (attribute) element.setAttribute(attribute, value);
+    else setTextContent(element, value);
+  }
+
   document.documentElement.lang = locale;
 }
 
