@@ -211,12 +211,14 @@ function getSiteTimezone(): string | undefined {
  * Elements that do not carry the attribute are left untouched.
  */
 export function refreshDates(uiLang: string): void {
+  const languageFor = (el: HTMLElement) =>
+    el.closest("[data-fixed-en]") ? "en" : uiLang;
   const timeZone = getSiteTimezone();
 
   for (const el of document.querySelectorAll<HTMLElement>("[data-date]")) {
     const iso = el.dataset.date;
     if (!iso) continue;
-    const formatted = formatDateForLang(iso, uiLang, timeZone);
+    const formatted = formatDateForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -227,7 +229,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateCompact;
     if (!iso) continue;
-    const formatted = formatCompactDateForLang(iso, uiLang, timeZone);
+    const formatted = formatCompactDateForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -236,7 +238,7 @@ export function refreshDates(uiLang: string): void {
   for (const el of document.querySelectorAll<HTMLElement>("[data-date-day]")) {
     const iso = el.dataset.dateDay;
     if (!iso) continue;
-    const formatted = formatDayDateForLang(iso, uiLang, timeZone);
+    const formatted = formatDayDateForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -249,7 +251,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateMonthDay;
     if (!iso) continue;
-    const formatted = formatMonthDayDateForLang(iso, uiLang, timeZone);
+    const formatted = formatMonthDayDateForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -263,7 +265,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateStacked;
     if (!iso) continue;
-    const formatted = formatStackedDateForLang(iso, uiLang, timeZone);
+    const formatted = formatStackedDateForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -272,7 +274,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateStackedTime;
     if (!iso) continue;
-    const formatted = formatStackedTimeForLang(iso, uiLang, timeZone);
+    const formatted = formatStackedTimeForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -286,7 +288,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateDayOnly;
     if (!iso) continue;
-    const formatted = formatDayNumberForLang(iso, uiLang, timeZone);
+    const formatted = formatDayNumberForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -295,7 +297,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateDayCounter;
     if (!iso) continue;
-    const formatted = formatDayCounterForLang(iso, uiLang, timeZone);
+    const formatted = formatDayCounterForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -304,12 +306,10 @@ export function refreshDates(uiLang: string): void {
   month group there to carry the year and the month — so the date has to
   say them itself, and say them as one date.
   */
-  for (const el of document.querySelectorAll<HTMLElement>(
-    "[data-date-full]"
-  )) {
+  for (const el of document.querySelectorAll<HTMLElement>("[data-date-full]")) {
     const iso = el.dataset.dateFull;
     if (!iso) continue;
-    const formatted = formatDayDateForLang(iso, uiLang, timeZone);
+    const formatted = formatDayDateForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -318,7 +318,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateWeekday;
     if (!iso) continue;
-    const formatted = formatWeekdayForLang(iso, uiLang, timeZone);
+    const formatted = formatWeekdayForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -332,7 +332,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateMonthHeading;
     if (!iso) continue;
-    const formatted = formatMonthHeadingForLang(iso, uiLang, timeZone);
+    const formatted = formatMonthHeadingForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 
@@ -346,7 +346,7 @@ export function refreshDates(uiLang: string): void {
   )) {
     const iso = el.dataset.dateMonthLabel;
     if (!iso) continue;
-    const formatted = formatMonthLabelForLang(iso, uiLang, timeZone);
+    const formatted = formatMonthLabelForLang(iso, languageFor(el), timeZone);
     if (formatted !== el.textContent?.trim()) el.textContent = formatted;
   }
 }

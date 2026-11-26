@@ -43,14 +43,18 @@ export function getStoredLang(): string {
  * When replacing text content we only touch the element's own text nodes so
  * that icons and other nested elements inside the marker survive the swap.
  */
-export function applyLang(locale: string): void {
+export function applyLang(locale: string, root: Document = document): void {
   const dict = flatDictionaries[locale];
   if (!dict) return;
 
-  for (const element of document.querySelectorAll<HTMLElement>("[data-i18n]")) {
+  for (const element of root.querySelectorAll<HTMLElement>("[data-i18n]")) {
     const key = element.dataset.i18n;
     if (!key) continue;
-    const value = resolveValue(dict, key, element);
+    const value = resolveValue(
+      element.closest("[data-fixed-en]") ? flatDictionaries.en : dict,
+      key,
+      element
+    );
     if (value === undefined) continue;
 
     const attrs = element.dataset.i18nAttr;
@@ -61,18 +65,18 @@ export function applyLang(locale: string): void {
     }
   }
 
-  for (const element of document.querySelectorAll<HTMLElement>(
-    "[data-label-en]"
-  )) {
+  for (const element of root.querySelectorAll<HTMLElement>("[data-label-en]")) {
     const value =
-      locale === "en" ? element.dataset.labelEn : element.dataset.labelZh;
+      locale === "en" || element.closest("[data-fixed-en]")
+        ? element.dataset.labelEn
+        : element.dataset.labelZh;
     if (value === undefined) continue;
     const attribute = element.dataset.labelAttr;
     if (attribute) element.setAttribute(attribute, value);
     else setTextContent(element, value);
   }
 
-  document.documentElement.lang = locale;
+  root.documentElement.lang = locale;
 }
 
 /**
@@ -274,25 +278,5 @@ document.addEventListener("astro:before-swap", event => {
   const newDocument = (event as { newDocument?: Document }).newDocument;
   if (!newDocument) return;
 
-  const lang = getStoredLang();
-  newDocument.documentElement.setAttribute("lang", lang);
-
-  const dict = flatDictionaries[lang];
-  if (!dict) return;
-
-  for (const element of newDocument.querySelectorAll<HTMLElement>(
-    "[data-i18n]"
-  )) {
-    const key = element.dataset.i18n;
-    if (!key) continue;
-    const value = resolveValue(dict, key, element);
-    if (value === undefined) continue;
-
-    const attrs = element.dataset.i18nAttr;
-    if (attrs) {
-      applyAttrs(element, attrs, value);
-    } else {
-      setTextContent(element, value);
-    }
-  }
+  applyLang(getStoredLang(), newDocument);
 });

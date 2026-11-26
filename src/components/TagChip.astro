@@ -1,5 +1,5 @@
 ---
-import { writingLabel } from "@/i18n/writingLabels";
+import { tagLabel } from "@/i18n/tagLabels";
 import IconHash from "@/assets/icons/IconHash.svg";
 import { tagSearchUrl } from "@/utils/routes";
 import config from "@/config";
@@ -101,7 +101,7 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
     <span
       class={staticClasses}
       data-tag-static={slug}
-      {...writingLabel(name, "title", "#")}
+      {...tagLabel(name, "title", "#")}
       title={`#${name}`}
     >
       <IconHash
@@ -111,7 +111,7 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
           flush && "app-tag-flush-hash",
         ]}
       />
-      <span {...writingLabel(name)}>{name}</span>
+      <span {...tagLabel(name)}>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">
           {count}
@@ -124,11 +124,11 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
       class={chipClasses}
       data-tag-chip={slug}
       data-tag-mode="link"
-      {...writingLabel(name, "title", "#")}
+      {...tagLabel(name, "title", "#")}
       title={`#${name}`}
     >
       <IconHash class:list={["opacity-70", iconClasses[size]]} />
-      <span {...writingLabel(name)}>{name}</span>
+      <span {...tagLabel(name)}>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">
           {count}
@@ -142,11 +142,11 @@ const chipClasses = `${base} ${sizeClasses[size]} ${tone}`;
       data-tag-chip={slug}
       data-tag-mode="filter"
       aria-pressed={active ? "true" : "false"}
-      {...writingLabel(name, "title", "#")}
+      {...tagLabel(name, "title", "#")}
       title={`#${name}`}
     >
       <IconHash class:list={["opacity-70", iconClasses[size]]} />
-      <span {...writingLabel(name)}>{name}</span>
+      <span {...tagLabel(name)}>{name}</span>
       {count !== undefined && (
         <span class="text-muted-foreground ml-0.5 text-[0.85em] tabular-nums">
           {count}

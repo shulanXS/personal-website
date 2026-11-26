@@ -45,7 +45,7 @@ const tags = data.tags ?? [];
 const tagSlugs = tags.map(tagSlug);
 ---
 
-<li data-tagged-item data-tags={tagSlugs.join(",")}>
+<li lang="en" data-fixed-en data-tagged-item data-tags={tagSlugs.join(",")}>
   {
     variant === "compact" ? (
       <article class="flex flex-col gap-1.5">

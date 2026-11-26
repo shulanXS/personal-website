@@ -16,26 +16,13 @@
  * solves it the same way — see `notesWall.ts`.
  */
 
-import { flatRuntimeTranslations, defaultLocale } from "@/i18n";
+import { flatRuntimeTranslations } from "@/i18n";
 
 /**
  * The articles of a group, as the filter sees them.
  */
 function postsOf(group: HTMLElement): HTMLElement[] {
   return [...group.querySelectorAll<HTMLElement>("[data-tagged-item]")];
-}
-
-/**
- * Reads a translation of the active language.
- *
- * The dictionary is imported rather than read from the DOM, so that the
- * counts follow the interface language exactly like the rest of the page.
- */
-function translate(key: string): string {
-  const lang = document.documentElement.lang || defaultLocale;
-  const dict =
-    flatRuntimeTranslations[lang] ?? flatRuntimeTranslations[defaultLocale];
-  return dict?.[key] ?? key;
 }
 
 /**
@@ -53,7 +40,7 @@ function writeCount(element: HTMLElement, count: number): void {
     return;
   }
 
-  const template = translate(key);
+  const template = flatRuntimeTranslations.en[key] ?? key;
   element.textContent = template.replace(/\{\{0\}\}/g, String(count));
 }
 

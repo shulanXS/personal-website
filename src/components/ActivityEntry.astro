@@ -66,6 +66,7 @@ const project = entry.project;
 <li
   data-tagged-item
   data-tags={entry.tagSlugs.join(",")}
+  data-fixed-en={entry.kind === "post" || undefined}
   data-activity-kind={entry.kind}
   data-activity-date={entry.date.toISOString()}
 >

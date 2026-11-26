@@ -7,6 +7,7 @@ type Props = {
   pageDesc?: string;
   class?: string;
   /** Translation key of the page title, enables live language switching. */
+  fixedEnglish?: boolean;
   titleKey?: string;
   /** Translation key of the page description. */
   descKey?: string;
@@ -27,6 +28,8 @@ const backUrl = config.features.showBackButton
 ---
 
 <main
+  lang={Astro.props.fixedEnglish ? "en" : undefined}
+  data-fixed-en={Astro.props.fixedEnglish || undefined}
   data-backUrl={backUrl}
   id="main-content"
   class:list={["app-layout pb-4", className]}

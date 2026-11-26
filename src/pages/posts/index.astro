@@ -24,7 +24,7 @@ const posts = await getPublishedPosts();
  */
 const yearGroups = groupPostsByYear(posts, config.site.timezone);
 
-const t = useTranslations(config.site.uiLang);
+const t = useTranslations("en");
 
 // Only the tags that actually occur in the blog posts are offered here —
 // a tag that leads to an empty listing is noise.
@@ -32,16 +32,13 @@ const { tags } = await getTagIndex(Astro.currentLocale ?? config.site.lang);
 const postTags = tags.filter(tag => tag.counts.posts > 0);
 ---
 
-<Layout
-  title={`${t.pages.postsTitle} | ${t.site.title}`}
-  titleKey="pages.postsTitle"
-  width="list"
->
+<Layout title={`${t.pages.postsTitle} | ${t.site.title}`} width="list">
   <Header />
 
   <Breadcrumb />
 
   <Main
+    fixedEnglish
     pageTitle={t.pages.postsTitle}
     pageDesc={t.pages.postsDesc}
     titleKey="pages.postsTitle"
