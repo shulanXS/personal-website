@@ -69,12 +69,12 @@ function drawContentWatermarks(
 ) {
   ctx.save();
   ctx.font = "bold 34px Georgia, serif";
-  ctx.fillStyle = "rgba(72, 67, 50, 0.15)";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.13)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 128) {
-    const x = width * (row % 2 === 0 ? 0.30 : 0.70);
+  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 146) {
+    const x = width * (row % 2 === 0 ? 0.3 : 0.7);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(-Math.PI / 7);
@@ -119,8 +119,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
   frame.tabIndex = -1;
-  frame.style.cssText =
-    `position:fixed;left:-10000px;top:0;width:${width}px;height:600px;border:0;pointer-events:none`;
+  frame.style.cssText = `position:fixed;left:-10000px;top:0;width:${width}px;height:600px;border:0;pointer-events:none`;
   document.body.append(frame);
   try {
     const doc = frame.contentDocument!;
@@ -133,19 +132,28 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       dateStyle: "long",
       timeZone: button.dataset.shareZone,
     }).format(new Date(button.dataset.shareDate!));
-    const metadata = doc.createElement("header");
-    metadata.append(date);
-    const rating = button.parentElement?.querySelector("[data-rating-symbol]");
-    if (rating) metadata.append(doc.importNode(rating, true));
-    for (const icon of metadata.querySelectorAll("svg")) {
-      const color = icon.closest(".app-rating-star-fill") ? "#a66528" : "#d1c6af";
-      icon.setAttribute("color", color);
-    }
-    paper.append(metadata);
+    paper.append(date);
     if (button.dataset.shareTitle) {
       const title = doc.createElement("h1");
       title.textContent = button.dataset.shareTitle;
       paper.append(title);
+    }
+    const rating = button.parentElement?.querySelector("[data-rating-symbol]");
+    if (rating) {
+      const score = doc.importNode(rating, true);
+      const value = score.querySelector(".app-rating-value");
+      if (value) {
+        value.textContent =
+          rating.getAttribute("aria-label") || value.textContent;
+        score.prepend(value);
+      }
+      for (const icon of score.querySelectorAll("svg")) {
+        const color = icon.closest(".app-rating-star-fill")
+          ? "#a66528"
+          : "#d1c6af";
+        icon.setAttribute("color", color);
+      }
+      paper.append(score);
     }
     const content = doc.createElement("section");
     for (const node of body.childNodes)

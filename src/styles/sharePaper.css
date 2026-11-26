@@ -10,7 +10,7 @@ main {
   min-height: calc(100vw * 4 / 3);
   display: flex;
   flex-direction: column;
-  padding: 34px 34px 5px;
+  padding: 34px 34px 0;
   color: #272923;
   font:
     22px/1.65 Georgia,
@@ -19,13 +19,8 @@ main {
     serif;
   overflow-wrap: anywhere;
 }
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  font-size: 16px;
+main > time {
+  margin-top: auto;
 }
 .app-rating,
 .app-rating-stars {
@@ -34,14 +29,20 @@ header {
   gap: 3px;
 }
 .app-rating {
-  gap: 8px;
+  flex-wrap: wrap;
+  align-self: flex-start;
+  gap: 4px 14px;
+  border-left: 3px solid #ab773b;
+  padding-left: 10px;
+  font-size: 24px;
+  line-height: 1.35;
   font-weight: 600;
 }
 .app-rating-star,
 .app-rating-icon {
   display: block;
-  width: 19px;
-  height: 19px;
+  width: 21px;
+  height: 21px;
 }
 .app-rating-star {
   position: relative;
@@ -116,14 +117,10 @@ section svg {
   height: auto;
   margin: 16px auto;
 }
-section {
-  margin-bottom: 5px;
-}
 section > :last-child {
   margin-bottom: 0;
 }
 footer {
-  margin-top: auto;
-  height: 38px;
+  height: 32px;
   border-top: 1px solid #b6ae98;
 }
