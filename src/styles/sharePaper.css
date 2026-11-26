@@ -6,15 +6,15 @@ body {
 }
 main {
   position: relative;
-  width: 720px;
-  min-height: 960px;
+  width: 100%;
+  min-height: calc(100vw * 4 / 3);
   display: flex;
   flex-direction: column;
-  padding: 46px 52px 32px;
+  padding: 34px 34px 24px;
   background-color: #f5eedd;
   color: #272923;
   font:
-    20px/1.65 Georgia,
+    22px/1.65 Georgia,
     "Noto Serif SC Reading",
     "Noto Serif SC Reading Extended",
     serif;
@@ -33,7 +33,7 @@ h4 {
   margin: 1.1em 0 0.45em;
 }
 h1 {
-  font-size: 36px;
+  font-size: 32px;
   margin-top: 14px;
 }
 p,
@@ -90,12 +90,4 @@ footer {
   margin-top: auto;
   height: 60px;
   border-top: 1px solid #b6ae98;
-}
-aside {
-  position: absolute;
-  right: 14px;
-  width: 16px;
-  color: #b6b8ae;
-  font-size: 14px;
-  line-height: 1.25;
 }

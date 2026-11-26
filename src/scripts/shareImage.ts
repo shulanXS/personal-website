@@ -3,7 +3,7 @@ import mark from "@/assets/monogram-logo.svg?url";
 import readingFont from "@/styles/reading-font.css?inline";
 import paperStyle from "@/styles/sharePaper.css?inline";
 
-const width = 720;
+const width = 540;
 const domain = "www.chewenjie.com";
 const signature = "车文杰";
 
@@ -79,6 +79,24 @@ async function articleBody(url: string, signal: AbortSignal) {
   return body;
 }
 
+function drawMarginWatermarks(
+  ctx: CanvasRenderingContext2D,
+  footerTop: number
+) {
+  ctx.save();
+  ctx.translate(width - 14, 0);
+  ctx.rotate(Math.PI / 2);
+  ctx.font = "12px Georgia, serif";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.32)";
+  ctx.textBaseline = "middle";
+  const label = "WENJIE CHE";
+  const lastStart = footerTop - ctx.measureText(label).width;
+  for (let top = 80; top < lastStart; top += 470) {
+    ctx.fillText(label, top, 0);
+  }
+  ctx.restore();
+}
+
 // Centre the actual ink of the two scripts on the same axis as the monogram.
 function drawSignature(
   ctx: CanvasRenderingContext2D,
@@ -91,7 +109,7 @@ function drawSignature(
   const nameFont = ctx.font;
   ctx.font = "19px Georgia, serif";
   const site = ctx.measureText(domain);
-  const left = 52;
+  const left = 34;
   ctx.drawImage(logo, left, y - 18, 36, 36);
   ctx.textBaseline = "alphabetic";
   ctx.fillText(
@@ -118,7 +136,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
   frame.setAttribute("aria-hidden", "true");
   frame.tabIndex = -1;
   frame.style.cssText =
-    "position:fixed;left:-10000px;top:0;width:720px;height:600px;border:0;pointer-events:none";
+    `position:fixed;left:-10000px;top:0;width:${width}px;height:600px;border:0;pointer-events:none`;
   document.body.append(frame);
   try {
     const doc = frame.contentDocument!;
@@ -192,12 +210,6 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     await doc.fonts.load('600 22px "Noto Serif SC Reading"', signature);
     await doc.fonts.ready;
     const height = Math.ceil(paper.getBoundingClientRect().height);
-    for (let top = 620; top < height - 150; top += 1050) {
-      const stamp = doc.createElement("aside");
-      stamp.textContent = signature;
-      stamp.style.top = top + "px";
-      paper.append(stamp);
-    }
     const scale = Math.min(
       2,
       16000 / height,
@@ -219,6 +231,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     });
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    drawMarginWatermarks(ctx, footer.offsetTop);
     drawSignature(ctx, logo, footer.offsetTop + footer.offsetHeight / 2 + 4);
     try {
       return await new Promise<Blob>((resolve, reject) =>
