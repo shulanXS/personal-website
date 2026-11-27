@@ -3,7 +3,7 @@ import { writingLabel } from "@/i18n/writingLabels";
 import { Image } from "astro:assets";
 import Datetime from "./Datetime.astro";
 import TagChip from "./TagChip.astro";
-import RatingStars from "./RatingStars.astro";
+import WritingRatingBadge from "./WritingRatingBadge.astro";
 import {
   chapterDescription,
   chapterName,
@@ -428,7 +428,7 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                           by side, and the number is the part that is read.
                         */}
                         {work.data.rating !== undefined && (
-                          <RatingStars
+                          <WritingRatingBadge
                             value={work.data.rating}
                             tone={
                               work.data.type === "character" ||
@@ -436,7 +436,6 @@ function coverOf(group: WritingGroup): ImageMetadata | undefined {
                                 ? work.data.type
                                 : "default"
                             }
-                            size="xs"
 
 
                           />

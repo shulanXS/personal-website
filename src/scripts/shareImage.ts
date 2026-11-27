@@ -94,9 +94,13 @@ function drawRating(
   x: number,
   y: number
 ) {
-  const shape = rating.querySelector("path")?.getAttribute("d");
-  const number = rating.querySelector("text");
-  if (!shape || !number?.textContent) return;
+  // The star's bounding-box path inherits fill="none" from its SVG.
+  const path = Array.from(
+    rating.querySelectorAll<SVGPathElement>("svg path")
+  ).find(candidate => getComputedStyle(candidate).fill !== "none");
+  const shape = path?.getAttribute("d");
+  const value = rating.querySelector(".app-rating-value")?.textContent?.trim();
+  if (!path || !shape || !value) return;
   const labels = useTranslations(document.documentElement.lang).share;
   const symbol = rating.dataset.ratingSymbol;
   const label =
@@ -127,14 +131,35 @@ function drawRating(
   const scoreColor = getComputedStyle(rating)
     .getPropertyValue("--score-light")
     .trim();
-  ctx.translate(x, y - 18);
+  const box = path.getBBox();
+  const outline = new Path2D(shape);
+  const fillRule =
+    path.getAttribute("fill-rule") === "evenodd" ? "evenodd" : "nonzero";
+  for (let index = 0; index < 5; index++) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(17 / 24, 17 / 24);
+    ctx.translate(0, -box.y - box.height / 2);
+    ctx.fillStyle = "#828282";
+    ctx.fill(outline, fillRule);
+    const fraction = Math.min(1, Math.max(0, Number(value) - index));
+    ctx.beginPath();
+    ctx.rect(box.x, box.y, box.width * fraction, box.height);
+    ctx.clip();
+    ctx.fillStyle = scoreColor;
+    ctx.fill(outline, fillRule);
+    ctx.restore();
+    x += 20;
+  }
+  x += 7;
+  ctx.font = "700 17px " + family;
   ctx.fillStyle = scoreColor;
-  ctx.fill(new Path2D(shape), "evenodd");
-  ctx.fillStyle = "white";
-  ctx.font = "700 12px Arial, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(number.textContent.trim(), 20, Number(number.getAttribute("y")));
+  const score = ctx.measureText(value);
+  const baseline =
+    y + (score.actualBoundingBoxAscent - score.actualBoundingBoxDescent) / 2;
+  ctx.fillText(value, x, baseline);
+  ctx.font = "400 17px " + family;
+  ctx.fillText(" / 5", x + score.width, baseline);
   ctx.restore();
 }
 

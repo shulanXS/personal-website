@@ -1,0 +1,90 @@
+---
+import { flatRuntimeTranslations, useTranslations } from "@/i18n";
+import { formatTemplate } from "@/i18n/format";
+import config from "@/config";
+
+type Props = {
+  value: number;
+  tone?: "default" | "character" | "game";
+};
+
+const { value, tone = "default" } = Astro.props;
+const t = useTranslations(config.site.uiLang);
+const score = Math.min(5, Math.max(0, value));
+const colorStrength = score === 5 ? 100 : score >= 4 ? 60 : 20;
+const written = score.toFixed(1);
+const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
+const symbols = {
+  default: [
+    "star",
+    "ratingAccessible",
+    "M20 1 26 10 38 12 31 21 32 34 20 29 8 34 9 21 2 12 14 10Z",
+  ],
+  character: [
+    "heart",
+    "characterAffinityAccessible",
+    "M20 34C16 31 2 23 2 13 2 2 14 0 20 8 26 0 38 2 38 13 38 23 24 31 20 34Z",
+  ],
+  game: [
+    "gamepad",
+    "gameRatingAccessible",
+    "M10 6Q7 6 6 10L1 27Q0 33 6 32L12 27H28L34 32Q40 33 39 27L34 10Q33 6 30 6Z M8 10H10V12H12V14H10V16H8V14H6V12H8Z M30 11a1.4 1.4 0 1 0 2.8 0 1.4 1.4 0 1 0-2.8 0Z",
+  ],
+} as const;
+const [symbol, label, path] = symbols[tone];
+const textY = tone === "character" ? 18 : 20;
+---
+
+<svg
+  viewBox="0 0 40 36"
+  class:list={["app-rating", `app-rating-${tone}`]}
+  style={`--rating-strength: ${colorStrength}%`}
+  data-rating-perfect={score === 5 || undefined}
+  data-rating-symbol={symbol}
+  role="img"
+  aria-label={formatTemplate(t.writing[label], dict, [written])}
+  data-i18n={`writing.${label}`}
+  data-i18n-attr="aria-label"
+  data-i18n-args={written}
+>
+  <path
+    d={path}
+    fill="var(--rating)"
+    fill-rule="evenodd"
+    stroke-linejoin="round"
+    stroke="var(--rating)"
+    stroke-width=".65"></path>
+  <text
+    class="badge-number"
+    x="20"
+    y={textY}
+    text-anchor="middle"
+    dominant-baseline="central">{written}</text
+  >
+</svg>
+
+<style>
+  svg.app-rating {
+    display: inline-block;
+    width: 38px;
+    height: auto;
+    flex: none;
+    overflow: visible;
+  }
+  .badge-number {
+    fill: white;
+    font: 700 12px Arial, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  :global([data-theme="dark"]) .badge-number {
+    fill: #191d29;
+  }
+  [data-rating-perfect] {
+    filter: drop-shadow(0 0 1px color-mix(in srgb, var(--rating) 42%, transparent));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-rating-perfect] {
+      animation: rating-glow 900ms ease-out;
+    }
+  }
+</style>

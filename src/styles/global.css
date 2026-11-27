@@ -1706,12 +1706,18 @@
     background: color-mix(in oklab, var(--accent) 10%, transparent);
   }
 
+  /*
+   * The stars of a score.
+   *
+   * Each star is two layers laid on top of each other: an empty star, and
+   * a filled one that is clipped to the width of the fill. A half a star
+   * is therefore half a star, rather than a star of its own — and so is
+   * three tenths of a star, which is what a score of 4.3 has to look like.
+   */
   .app-rating {
-    display: inline-block;
-    width: 38px;
-    height: auto;
-    flex: none;
-    overflow: visible;
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
     --accent-light: #a44d08;
     --accent-dark: #fbbf24;
     --score-light: color-mix(
@@ -1725,7 +1731,7 @@
       #a0a5af
     );
     --rating: var(--score-light);
-    --rating-ink: white;
+    --rating-empty: #828282;
   }
 
   .app-rating-character {
@@ -1740,28 +1746,29 @@
 
   [data-theme="dark"] .app-rating {
     --rating: var(--score-dark);
-    --rating-ink: #191d29;
+    --rating-empty: #707887;
   }
 
-  .app-rating-size-md {
-    width: 44px;
+  .app-rating-stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
   }
 
-  .app-rating-value {
-    fill: var(--rating-ink);
-    font:
-      700 12px Arial,
-      sans-serif;
-    font-variant-numeric: tabular-nums;
+  .app-rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    line-height: 0;
   }
 
-  .app-rating[data-rating-perfect] {
+  [data-rating-perfect] .app-rating-stars {
     --rating-glow: color-mix(in srgb, var(--rating) 42%, transparent);
     filter: drop-shadow(0 0 1px var(--rating-glow));
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .app-rating[data-rating-perfect] {
+    [data-rating-perfect] .app-rating-stars {
       animation: rating-glow 900ms ease-out;
     }
 
@@ -1770,6 +1777,76 @@
         filter: drop-shadow(0 0 3px var(--rating));
       }
     }
+  }
+
+  .app-rating-star {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+  }
+
+  .app-rating-star-empty,
+  .app-rating-star-fill {
+    display: inline-block;
+    line-height: 0;
+  }
+
+  /*
+   * The empty star is the one underneath: it shows through the empty part.
+   *
+   * It is a shade of the paper rather than the border colour, so that the
+   * five stars read as five stars rather than as four and a smudge.
+   */
+  .app-rating-star-empty {
+    color: var(--rating-empty);
+  }
+
+  /*
+   * The filled star is clipped to the width of the fill, so that only
+   * that much of it shows. The width is written by the component as
+   * `--app-rating-fill`.
+   *
+   * The clipping is done with `clip-path` rather than with a narrow box
+   * that hides what does not fit: the narrow box would have to cut the
+   * star off with `overflow: hidden`, and the star inside it would then
+   * be wider than the box that holds it — a shape that overflows its
+   * own frame.
+   */
+  .app-rating-star-fill {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 calc(100% - var(--app-rating-fill, 0%)) 0 0);
+    color: var(--rating);
+  }
+
+  /*
+   * The number beside the stars, e.g. "4.3 / 5".
+   *
+   * It wears the colour of the score, so that the eye is pulled to the
+   * mark rather than to the date next to it.
+   */
+  .app-rating-value {
+    margin-left: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--rating);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * The number on its own, e.g. "4.3".
+   *
+   * In the margin of a listing the number is the score — the stars under
+   * it are the picture of it — so it is set large with lining numerals
+   * and a baseline decimal point, and the denominator is left out.
+   */
+  .app-rating-number {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--rating);
+    font-variant-numeric: lining-nums tabular-nums;
   }
 
   .app-writing-group-meta {
