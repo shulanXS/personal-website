@@ -19,7 +19,7 @@ export default {
     name: "车文杰",
     author: "车文杰",
     description:
-      "车文杰，计算机科学硕士。这里收录我的 AI 应用项目、英文技术文章、小说和影视游戏随笔。",
+      "车文杰，计算机科学硕士在读。这里收录我的 AI 应用项目、英文技术文章、小说和影视游戏随笔。",
   },
   share: {
     rating: "作品评分",
@@ -82,7 +82,7 @@ export default {
     /**
      * The one-line identity shown above the name in the hero section.
      */
-    identity: "计算机科学硕士 · AI 应用",
+    identity: "计算机科学硕士在读 · AI 应用",
     /**
      * The greeting that opens the hero section.
      */
@@ -300,7 +300,7 @@ export default {
   about: {
     title: "关于我",
     desc: "我是谁，我在做什么，以及这个站点为什么存在。",
-    identity: "计算机科学硕士 · AI 应用",
+    identity: "计算机科学硕士在读 · AI 应用",
     lead: "你好，我是车文杰。我做 AI 应用，也写小说。这个站点里有我用英文写的工程笔记，也有重看一部老剧、玩完一款游戏之后，用中文写下的感受。",
     sections: [
       {

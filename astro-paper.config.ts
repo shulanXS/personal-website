@@ -23,7 +23,7 @@ export default defineAstroPaperConfig({
      * dictionary (`site.description`).
      */
     description:
-      "车文杰，计算机科学硕士。这里收录我的 AI 应用项目、英文技术文章、小说和影视游戏随笔。",
+      "车文杰，计算机科学硕士在读。这里收录我的 AI 应用项目、英文技术文章、小说和影视游戏随笔。",
     author: "车文杰",
     profile: "",
     ogImage: "default-og.jpg",

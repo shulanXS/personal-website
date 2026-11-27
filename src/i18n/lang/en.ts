@@ -9,7 +9,7 @@ export default {
     name: "Wenjie Che",
     author: "Wenjie Che",
     description:
-      "Wenjie Che holds a master’s degree in Computer Science. Explore his applied AI projects, technical articles, fiction, and writing on film and games.",
+      "Wenjie Che is pursuing a master’s degree in Computer Science. Explore his applied AI projects, technical articles, fiction, and writing on film and games.",
   },
   share: {
     rating: "Rating",
@@ -72,7 +72,7 @@ export default {
     /**
      * The one-line identity shown above the name in the hero section.
      */
-    identity: "Master’s degree in Computer Science · Applied AI",
+    identity: "Master’s student in Computer Science · Applied AI",
     /**
      * The greeting that opens the hero section.
      */
@@ -291,7 +291,7 @@ export default {
   about: {
     title: "About",
     desc: "Who I am, what I do, and why this site exists.",
-    identity: "Master’s degree in Computer Science · Applied AI",
+    identity: "Master’s student in Computer Science · Applied AI",
     lead: "Hi, I’m Wenjie Che. I build AI applications and write fiction. I write about engineering in English. When a scene stays with me after a film, or I find myself returning to a game, I usually write about it in Chinese.",
     sections: [
       {
