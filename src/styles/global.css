@@ -1972,7 +1972,8 @@
   .app-writing-row-label-stack {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     gap: 0.125rem;
   }
 
