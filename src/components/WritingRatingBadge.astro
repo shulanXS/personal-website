@@ -50,7 +50,6 @@ const glyphs = [
   viewBox="5.62 3.75 58.76 40.25"
   class:list={["app-rating", `app-rating-${tone}`]}
   style={`--rating-strength: 100%; opacity: ${opacity}`}
-  data-rating-perfect={score === 5 || undefined}
   data-rating-symbol={symbol}
   role="img"
   aria-label={formatTemplate(t.writing[label], dict, [written])}
@@ -76,7 +75,7 @@ const glyphs = [
   >
     <path d={path} fill="currentColor" fill-rule="evenodd"></path>
   </svg>
-  <g transform="translate(46.042353 21.5) scale(.865628) translate(-28 -21)">
+  <g transform={`translate(46.042353 21.5) scale(${score === 5 ? 1.02 : 0.865628}) translate(-28 -21)`}>
     {
       [0, 2].map(index => (
         <path
@@ -104,15 +103,5 @@ const glyphs = [
     height: auto;
     flex: none;
     overflow: visible;
-  }
-  [data-rating-perfect] {
-    filter: drop-shadow(
-      0 0 1px color-mix(in srgb, var(--rating) 42%, transparent)
-    );
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    [data-rating-perfect] {
-      animation: rating-glow 900ms ease-out;
-    }
   }
 </style>
