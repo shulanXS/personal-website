@@ -177,39 +177,62 @@ function drawSignature(
   );
 }
 
-// Measure ink before adding the paper grain. Read just the band around the
-// footer so the last line's font, punctuation and export scale are accounted for.
-function drawFooter(
-  ctx: CanvasRenderingContext2D,
+// Read the transparent content from the bottom up, before adding any paper or
+// watermarks. A browser's line wrapping can differ from the measured layout.
+function paintedHeight(ctx: CanvasRenderingContext2D) {
+  const { width, height } = ctx.canvas;
+  for (let end = height; end > 0;) {
+    const start = Math.max(0, end - 128);
+    const { data } = ctx.getImageData(0, start, width, end - start);
+    for (let alpha = data.length - 1; alpha >= 3; alpha -= 4) {
+      if (data[alpha] >= 128)
+        return start + Math.floor(alpha / (width * 4)) + 1;
+    }
+    end = start;
+  }
+  throw new Error("empty export");
+}
+
+function finishPaper(
+  content: HTMLCanvasElement,
   logo: HTMLImageElement,
-  footer: HTMLElement,
   scale: number
 ) {
-  const canvas = ctx.canvas;
-  const y = canvas.height / scale - 28; // 14px for the visible half-mark and 14px beneath it.
-  drawSignature(ctx, logo, y);
-  const split = Math.floor((y - 19) * scale);
-  const top = Math.max(0, Math.floor((footer.offsetTop - 64) * scale));
-  const pixels = ctx.getImageData(0, top, canvas.width, canvas.height - top);
-  const hasInk = (row: number) => {
-    const start = (row - top) * pixels.width * 4 + 3;
-    let visiblePixels = 0;
-    for (let x = 0; x < pixels.width; x++) {
-      if (pixels.data[start + x * 4] >= 128 && ++visiblePixels >= 2)
-        return true;
-    }
-    return false;
-  };
-  let bodyEnd = split - 1;
-  while (bodyEnd > top && !hasInk(bodyEnd)) bodyEnd--;
-  let signatureStart = split;
-  while (signatureStart < canvas.height && !hasInk(signatureStart))
-    signatureStart++;
-  const thickness = Math.max(1, Math.round(scale));
-  const divider = Math.round((bodyEnd + 1 + signatureStart - thickness) / 2);
+  const bodyHeight = paintedHeight(content.getContext("2d")!);
+  const gap = Math.round(14 * scale);
+  const rule = Math.max(1, Math.round(scale));
+  const markHeight = Math.round(28 * scale);
+  const naturalHeight = bodyHeight + gap * 3 + rule + markHeight;
+  const output = content.ownerDocument.createElement("canvas");
+  output.width = content.width;
+  output.height = Math.max(naturalHeight, Math.ceil((output.width * 4) / 3));
+  const top = output.height - naturalHeight;
+  const ctx = output.getContext("2d")!;
+  ctx.drawImage(
+    content,
+    0,
+    0,
+    content.width,
+    bodyHeight,
+    0,
+    top,
+    content.width,
+    bodyHeight
+  );
+  content.width = content.height = 0;
+  ctx.scale(scale, scale);
+  const divider = top + bodyHeight + gap;
+  drawContentWatermarks(ctx, divider / scale);
   ctx.fillStyle = "#b6ae98";
-  ctx.fillRect(34, divider / scale, width - 68, thickness / scale);
-  return divider / scale;
+  ctx.fillRect(34, divider / scale, width - 68, rule / scale);
+  drawSignature(ctx, logo, (divider + rule + gap + markHeight / 2) / scale);
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.fillStyle = ctx.createPattern(
+    paperTexture(output.ownerDocument),
+    "repeat"
+  )!;
+  ctx.fillRect(0, 0, output.width / scale, output.height / scale);
+  return output;
 }
 
 async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
@@ -272,10 +295,9 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       detail.open = true;
     for (const element of content.querySelectorAll("[style]"))
       element.removeAttribute("style");
-    const footer = doc.createElement("footer");
     const logo = doc.createElement("img");
     logo.src = mark;
-    paper.append(content, footer);
+    paper.append(content);
     // Resolve each asset before capture so a missing image cannot silently disappear.
     try {
       await Promise.all(
@@ -299,49 +321,50 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     paper.getBoundingClientRect();
     await doc.fonts.load('600 22px "Noto Serif SC Reading"', signature);
     await doc.fonts.ready;
-    const height = Math.ceil(paper.getBoundingClientRect().height);
-    const scale = Math.min(
-      2,
-      16000 / height,
-      Math.sqrt(12000000 / (width * height))
-    );
     signal.throwIfAborted();
-    // Draw in the document that owns the loaded reading fonts.
     const canvas = doc.createElement("canvas");
-    canvas.width = Math.ceil(width * scale);
-    canvas.height = Math.ceil(height * scale);
-    const ctx = canvas.getContext("2d")!;
+    let scale = 1;
+    let ratingX = 0;
+    let ratingY = 0;
     await html2canvas(paper, {
       canvas,
-      scale,
+      get scale() {
+        return scale;
+      },
       width,
-      height,
       windowWidth: width,
       backgroundColor: null,
       logging: false,
+      onclone(_doc, clone) {
+        const height = Math.ceil(clone.getBoundingClientRect().height);
+        const exportHeight = Math.max((width * 4) / 3, height + 74);
+        scale = Math.min(
+          2,
+          16000 / exportHeight,
+          Math.sqrt(12000000 / (width * exportHeight))
+        );
+        canvas.width = Math.ceil(width * scale);
+        canvas.height = Math.ceil(height * scale);
+        const row = clone.querySelector<HTMLElement>(".export-rating");
+        if (row) {
+          ratingX = row.offsetLeft;
+          ratingY = row.offsetTop + row.offsetHeight / 2;
+        }
+      },
     });
+    const ctx = canvas.getContext("2d")!;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    if (rating)
-      drawRating(
-        ctx,
-        rating,
-        scoreRow.offsetLeft,
-        scoreRow.offsetTop + scoreRow.offsetHeight / 2
-      );
-    const divider = drawFooter(ctx, logo, footer, scale);
-    drawContentWatermarks(ctx, divider);
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.fillStyle = ctx.createPattern(paperTexture(doc), "repeat")!;
-    ctx.fillRect(0, 0, canvas.width / scale, canvas.height / scale);
+    if (rating) drawRating(ctx, rating, ratingX, ratingY);
+    const output = finishPaper(canvas, logo, scale);
     try {
       return await new Promise<Blob>((resolve, reject) =>
-        canvas.toBlob(
+        output.toBlob(
           blob => (blob ? resolve(blob) : reject(new Error("png"))),
           "image/png"
         )
       );
     } finally {
-      canvas.width = canvas.height = 0;
+      output.width = output.height = 0;
     }
   } finally {
     frame.remove();
