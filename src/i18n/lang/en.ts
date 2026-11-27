@@ -9,7 +9,7 @@ export default {
     name: "Wenjie Che",
     author: "Wenjie Che",
     description:
-      "Wenjie Che, a master's student working on applied AI. Writing about technology, reading notes and fiction.",
+      "Wenjie Che holds a master’s degree in Computer Science. Explore his applied AI projects, technical articles, fiction, and writing on film and games.",
   },
   share: {
     rating: "Rating",
@@ -72,7 +72,7 @@ export default {
     /**
      * The one-line identity shown above the name in the hero section.
      */
-    identity: "Master's student in Computer Science · Applied AI",
+    identity: "Master’s degree in Computer Science · Applied AI",
     /**
      * The greeting that opens the hero section.
      */
@@ -291,27 +291,21 @@ export default {
   about: {
     title: "About",
     desc: "Who I am, what I do, and why this site exists.",
-    identity: "Master's student in Computer Science · Applied AI",
-    lead: "Hi, I'm Che Wenjie, a master's student working on applied AI. I care about how technology actually reaches everyday life, and I believe a technology only matters once ordinary people actually use it.",
+    identity: "Master’s degree in Computer Science · Applied AI",
+    lead: "Hi, I’m Wenjie Che. I build AI applications and write fiction. I write about engineering in English. When a scene stays with me after a film, or I find myself returning to a game, I usually write about it in Chinese.",
     sections: [
       {
-        title: "What I do",
+        title: "What I build",
         body: [
-          "My research focuses on wiring large models into real product flows — not stopping at a working demo, but making them stable, explainable and usable in concrete work.",
-          "I write technical articles to organise what I have learned and where I got stuck; I also write fiction, which is the other road I keep my language alive on.",
+          "My projects include retrieval-augmented generation (RAG) systems and an interview assistant. Retrieval raises a question I keep coming back to. Once a system has found several relevant sources, how does it know it has enough evidence to answer?",
+          "I explore questions like this in my technical articles, from deciding when a search can stop to replaying tool calls and checking whether the evidence supports an answer.",
         ],
       },
       {
-        title: "This site",
+        title: "Fiction, film, and games",
         body: [
-          "This is my personal corner of the web. The technical articles are for people who are building things themselves; the notes hold the thoughts that have not grown into articles yet; the writing is the other half of my life outside of work.",
-          "I try to make every article worth reading: I would rather write slowly than often.",
-        ],
-      },
-      {
-        title: "Right now",
-        body: [
-          "The books I am reading, the small projects I am making and the tools I keep coming back to all end up in the notes. If any of it interests you, I would be glad to talk about it.",
+          "My novel Snow Falls on the River begins in a hospital ward in southern China. Its seven chapters follow an intern and a patient of the same age through the days after they meet.",
+          "My reviews often begin with a small gesture. In The Dark Knight, a passenger on a ferry raises a detonator, then lowers his hand. I also write about characters I understand differently the second time around, and games whose familiar paths I still want to walk.",
         ],
       },
     ],
@@ -319,22 +313,22 @@ export default {
     hereItems: [
       {
         label: "Blog",
-        desc: "Longer pieces on applied AI, web development and engineering practice.",
+        desc: "Technical articles in English on retrieval, tool use, and evaluating AI systems.",
         route: "posts",
       },
       {
         label: "Notes",
-        desc: "Thoughts, reading notes and daily fragments, written as they come.",
+        desc: "Short notes from everyday life.",
         route: "notes",
       },
       {
         label: "Personal Writing",
-        desc: "Novels, essays and short stories.",
+        desc: "Snow Falls on the River, essays, film and game reviews, and character studies.",
         route: "writing",
       },
       {
         label: "Projects",
-        desc: "Things I have built, open-sourced or experimented with.",
+        desc: "Retrieval systems, interview tools, and other software projects.",
         route: "projects",
       },
     ],
