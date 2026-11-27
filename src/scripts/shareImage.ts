@@ -85,6 +85,71 @@ function drawContentWatermarks(
   ctx.restore();
 }
 
+// Use the painted bounds of the glyphs and the icon path for one optical centre.
+function drawRating(
+  ctx: CanvasRenderingContext2D,
+  rating: HTMLElement,
+  x: number,
+  y: number
+) {
+  const path = rating.querySelector<SVGPathElement>(
+    'svg path:not([fill="none"])'
+  );
+  const shape = path?.getAttribute("d");
+  const value = rating.querySelector(".app-rating-value")?.textContent?.trim();
+  if (!path || !shape || !value) return;
+  const labels = useTranslations(document.documentElement.lang).share;
+  const symbol = rating.dataset.ratingSymbol;
+  const label =
+    symbol === "heart"
+      ? labels.affinity
+      : symbol === "gamepad"
+        ? labels.gameplay
+        : labels.rating;
+  ctx.save();
+  ctx.textBaseline = "alphabetic";
+  const text = (str: string, font: string, color: string) => {
+    ctx.font = font;
+    ctx.fillStyle = color;
+    const metrics = ctx.measureText(str);
+    ctx.fillText(
+      str,
+      x,
+      y +
+        (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2
+    );
+    x += metrics.width;
+  };
+  const small = '15px Georgia, "Noto Serif SC Reading", serif';
+  text(label, small, "#70685c");
+  x += 10;
+  const box = path.getBBox();
+  const outline = new Path2D(shape);
+  const fillRule =
+    path.getAttribute("fill-rule") === "evenodd" ? "evenodd" : "nonzero";
+  for (let index = 0; index < 5; index++) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(17 / 24, 17 / 24);
+    ctx.translate(0, -box.y - box.height / 2);
+    ctx.fillStyle = "#d1c6af";
+    ctx.fill(outline, fillRule);
+    const fraction = Math.min(1, Math.max(0, Number(value) - index));
+    ctx.beginPath();
+    ctx.rect(box.x, box.y, box.width * fraction, box.height);
+    ctx.clip();
+    ctx.fillStyle = "#a66528";
+    ctx.fill(outline, fillRule);
+    ctx.restore();
+    x += 20;
+  }
+  x += 7;
+  text(value, "600 21px Georgia, serif", "#272923");
+  x += 3;
+  text("/ 5", small, "#70685c");
+  ctx.restore();
+}
+
 // Centre the actual ink of the two scripts on the same axis as the monogram.
 function drawSignature(
   ctx: CanvasRenderingContext2D,
@@ -92,7 +157,7 @@ function drawSignature(
   dividerTop: number
 ) {
   // The visible ring extends about 13px above and below its centre.
-  const y = dividerTop + 29;
+  const y = dividerTop + 23;
   ctx.fillStyle = "#37392e";
   ctx.font = '600 22px "Noto Serif SC Reading", serif';
   const name = ctx.measureText(signature);
@@ -141,32 +206,13 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       title.textContent = button.dataset.shareTitle;
       paper.append(title);
     }
-    const rating = button.parentElement?.querySelector("[data-rating-symbol]");
+    const rating = button.parentElement?.querySelector<HTMLElement>(
+      "[data-rating-symbol]"
+    );
+    const scoreRow = doc.createElement("div");
     if (rating) {
-      const score = doc.importNode(rating, true);
-      const value = score.querySelector(".app-rating-value");
-      const labels = useTranslations(document.documentElement.lang).share;
-      const caption = doc.createElement("small");
-      const symbol = rating.getAttribute("data-rating-symbol");
-      caption.textContent =
-        symbol === "heart"
-          ? labels.affinity
-          : symbol === "gamepad"
-            ? labels.gameplay
-            : labels.rating;
-      score.prepend(caption);
-      if (value) {
-        const maximum = doc.createElement("small");
-        maximum.textContent = " / 5";
-        value.append(maximum);
-      }
-      for (const icon of score.querySelectorAll("svg")) {
-        const color = icon.closest(".app-rating-star-fill")
-          ? "#a66528"
-          : "#d1c6af";
-        icon.setAttribute("color", color);
-      }
-      paper.append(score);
+      scoreRow.className = "export-rating";
+      paper.append(scoreRow);
     }
     const content = doc.createElement("section");
     for (const node of body.childNodes)
@@ -249,6 +295,13 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       logging: false,
     });
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    if (rating)
+      drawRating(
+        ctx,
+        rating,
+        scoreRow.offsetLeft,
+        scoreRow.offsetTop + scoreRow.offsetHeight / 2
+      );
     drawContentWatermarks(ctx, footer.offsetTop);
     drawSignature(ctx, logo, footer.offsetTop);
     try {

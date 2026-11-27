@@ -22,47 +22,8 @@ main {
 main > time {
   margin-top: auto;
 }
-.app-rating,
-.app-rating-stars {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-.app-rating {
-  flex-wrap: wrap;
-  align-self: flex-start;
-  gap: 4px 10px;
-  font-size: 21px;
-  line-height: 1.2;
-}
-.app-rating-stars {
-  position: relative;
-  top: 0.34em;
-}
-.app-rating small {
-  font-size: 15px;
-  font-weight: 400;
-  color: #70685c;
-}
-.app-rating-value {
-  font-weight: 600;
-  white-space: nowrap;
-}
-.app-rating-star,
-.app-rating-icon {
-  display: block;
-  width: 17px;
-  height: 17px;
-}
-.app-rating-star {
-  position: relative;
-}
-.app-rating-star-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--app-rating-fill);
-  overflow: hidden;
+.export-rating {
+  height: 28px;
 }
 time,
 figcaption {
@@ -132,6 +93,6 @@ section > :last-child {
 }
 footer {
   margin-top: 16px;
-  height: 47px;
+  height: 41px;
   border-top: 1px solid #b6ae98;
 }
