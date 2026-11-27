@@ -3,7 +3,7 @@ title: 游戏测评：《荒野大镖客：救赎2》
 slug: red-dead-redemption-2
 type: game
 description: 亚瑟画过的地方。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2026-01-06T14:12:00.000Z
 draft: false
 tags:
   - 游戏测评

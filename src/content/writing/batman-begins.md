@@ -3,7 +3,7 @@ title: 观后感：《蝙蝠侠：侠影之谜》
 slug: batman-begins
 type: review
 description: 码头上，穿着蝙蝠战衣的人认出了自己送出的旧外套。布鲁斯记得向穿衣人问好，那一刻，比面具先抵达的是一个人的目光。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-11-22T08:01:00.000Z
 draft: false
 tags:
   - 观后感

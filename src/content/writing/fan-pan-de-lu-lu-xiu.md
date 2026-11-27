@@ -4,7 +4,7 @@ slug: fan-pan-de-lu-lu-xiu
 type: review
 description: 年少时只看见 Zero 戴上面具的风姿。再看鲁路修走到终局，才发现每一次胜利，都让可以直呼他名字的人少了一个。
 rating: 3.9
-pubDatetime: 2026-05-17T21:29:00.000Z
+pubDatetime: 2025-07-26T06:24:00.000Z
 draft: false
 tags:
   - 观后感

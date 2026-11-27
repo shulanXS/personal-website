@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 3
 status: completed
 description: 凌晨，止痛药起效前还有二十分钟。一碗没送出去的酸梅汤，盛着旁观者多想替人分担、却终究递不到痛处的心意。
-pubDatetime: 2025-06-11T13:32:33.000Z
+pubDatetime: 2025-08-30T07:51:00.000Z
 draft: false
 tags:
   - 小说

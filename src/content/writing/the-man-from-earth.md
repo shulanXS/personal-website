@@ -3,7 +3,7 @@ title: 观后感：《这个男人来自地球》
 slug: the-man-from-earth
 type: review
 description: 一场告别谈到一万多年前，约翰也有记不清、答不上的事。正是这些空白，让漫长得近乎神话的一生有了人的尺度。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-11-03T08:00:00.000Z
 draft: false
 tags:
   - 观后感

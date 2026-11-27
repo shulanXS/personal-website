@@ -4,7 +4,7 @@ slug: wei-mei-hao-de-shi-jie-xian-shang-zhu-fu
 type: review
 description: 一群人分摊债务，也分摊闯祸之后的狼狈。所谓美好世界，有时就是明知明天还要倒霉，今晚仍有人陪你笑出声。
 rating: 4.4
-pubDatetime: 2025-01-29T23:10:00.000Z
+pubDatetime: 2025-07-06T11:59:00.000Z
 draft: false
 tags:
   - 观后感

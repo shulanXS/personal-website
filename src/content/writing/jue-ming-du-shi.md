@@ -4,7 +4,7 @@ slug: jue-ming-du-shi
 type: review
 description: 沃尔特说了太多次为了家人。等这句话终于说不下去，留在沉默里的，才是他最舍不得放手的自己。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-08-15T06:43:00.000Z
 draft: false
 tags:
   - 观后感

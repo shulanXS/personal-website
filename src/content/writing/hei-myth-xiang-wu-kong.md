@@ -4,7 +4,7 @@ slug: hei-myth-xiang-wu-kong
 type: game
 description: 一段乐声便能唤起我记忆里的西游，亲手走过山路，又会为那些断开的线索怅然。神话落到脚下，自有它的回响与崎岖。
 rating: 4.3
-pubDatetime: 2025-06-16T16:18:00.000Z
+pubDatetime: 2025-02-12T10:54:00.000Z
 draft: false
 tags:
   - 游戏测评

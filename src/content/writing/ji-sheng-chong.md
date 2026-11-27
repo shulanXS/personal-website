@@ -4,7 +4,7 @@ slug: ji-sheng-chong
 type: review
 description: 雨水顺着台阶往下流，气味却跟着人走进客厅。同一座城里，有人欣赏雨景，有人要下楼捞起自己的生活。
 rating: 4.9
-pubDatetime: 2026-11-20T12:00:00.000Z
+pubDatetime: 2025-09-15T06:44:00.000Z
 draft: false
 tags:
   - 观后感

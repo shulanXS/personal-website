@@ -4,8 +4,8 @@ slug: cong-ling-kaishi-de-yi-shi-jie-sheng-huo
 type: character
 description: 菜月昴拼命想让别人看见自己的价值。等那些逞强的话终于说尽，他才有机会相信，空着手也可以向人求助。
 rating: 4.5
-pubDatetime: 2025-07-12T12:31:00.000Z
-modDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-07-28T07:59:00.000Z
+modDatetime: 2025-08-04T07:59:00.000Z
 draft: false
 tags:
   - 角色分析

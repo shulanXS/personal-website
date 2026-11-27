@@ -4,7 +4,7 @@ slug: gang-de-qin
 type: review
 description: 车间停了工，钢铁却还能在这群人手里发出琴声。时代给劳动标过价，很少肯停下来，听一听它的音色。
 rating: 4.8
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2026-03-17T11:07:00.000Z
 draft: false
 tags:
   - 观后感

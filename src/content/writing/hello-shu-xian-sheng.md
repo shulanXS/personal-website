@@ -4,7 +4,7 @@ slug: hello-shu-xian-sheng
 type: review
 description: 树先生清醒时讨不到的一点敬意，偏在幻觉里得到了。看着他终于能抬起头，我却越来越难替他高兴。
 rating: 4.7
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-10-08T09:41:00.000Z
 draft: false
 tags:
   - 观后感

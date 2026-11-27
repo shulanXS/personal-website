@@ -6,7 +6,7 @@ series: 雪落江川
 chapterNumber: 2
 status: completed
 description: 两颗青柠檬，一本翻旧的唐诗。病房里的日子原来也能用这些小事计量，用一个人进门时先看向谁的眼睛计量。
-pubDatetime: 2026-06-08T14:26:15.000Z
+pubDatetime: 2025-04-03T10:23:00.000Z
 draft: false
 tags:
   - 小说

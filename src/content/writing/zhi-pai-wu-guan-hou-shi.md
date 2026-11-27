@@ -4,7 +4,7 @@ slug: zhi-pai-wu-guan-hou-shi
 type: review
 description: 弗兰克把通往高位的每一步都算得精彩。看惯了中式权谋里那些欲言又止的时刻，我更想知道，一个人算不到自己的地方在哪里。
 rating: 3
-pubDatetime: 2025-10-21T12:59:00.000Z
+pubDatetime: 2025-04-30T13:12:00.000Z
 draft: false
 tags:
   - 观后感

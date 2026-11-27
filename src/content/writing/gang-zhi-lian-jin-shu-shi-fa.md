@@ -4,7 +4,7 @@ slug: gang-zhi-lian-jin-shu-shi-fa
 type: review
 description: 炼金术能算清一场交换，却算不出人该为谁付出。兄弟俩走得越远，那个看似严密的等式里，容得下的东西反而越少。
 rating: 4.8
-pubDatetime: 2025-10-14T00:42:00.000Z
+pubDatetime: 2025-08-11T13:34:00.000Z
 draft: false
 tags:
   - 观后感

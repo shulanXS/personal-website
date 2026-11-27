@@ -4,7 +4,7 @@ slug: da-ming-wang-chao-1566
 type: review
 description: 庙堂上轻轻落下的一句话，到了田埂上，就是一家人整年的生计。重看这盘棋，我的目光总落在棋盘之外。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-05-04T10:27:00.000Z
 draft: false
 tags:
   - 观后感

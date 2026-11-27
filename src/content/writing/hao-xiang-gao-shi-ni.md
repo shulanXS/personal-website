@@ -4,7 +4,7 @@ slug: hao-xiang-gao-shi-ni
 type: character
 description: 爽子说一句话，总要比旁人多花一点时间。好在有些心意迟迟才抵达，接住它的人也愿意等。
 rating: 5
-pubDatetime: 2025-10-06T17:46:00.000Z
+pubDatetime: 2025-03-07T14:40:00.000Z
 draft: false
 tags:
   - 角色分析

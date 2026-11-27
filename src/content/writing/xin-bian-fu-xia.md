@@ -4,7 +4,7 @@ slug: xin-bian-fu-xia
 type: review
 description: 哥谭的长夜里，布鲁斯习惯让人看见他的影子便心生畏惧。直到有人需要牵着他的手走出去，他才懂得光该照向哪里。
 rating: 4.8
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-07-22T13:59:00.000Z
 draft: false
 tags:
   - 观后感

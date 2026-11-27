@@ -3,7 +3,7 @@ title: 游戏测评：《艾尔登法环》
 slug: elden-ring
 type: game
 description: 从希芙拉河坐电梯下来。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-11-15T14:23:00.000Z
 draft: false
 tags:
   - 游戏测评

@@ -4,7 +4,7 @@ slug: chu-men-de-shi-jie
 type: review
 description: 楚门推开门时，第一次不知道明天的天气。屏幕外的人伸手换台，他却要用余生学习怎样走进一场真正的雨。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-12-23T07:21:00.000Z
 draft: false
 tags:
   - 观后感

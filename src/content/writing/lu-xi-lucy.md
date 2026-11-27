@@ -4,7 +4,7 @@ slug: lu-xi-lucy
 type: character
 description: 露西终于站上月球，脚下是梦寐以求的远方。可愿望成真的那一刻，她最想靠近的人却留在了地球上。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-02-03T07:05:00.000Z
 draft: false
 tags:
   - 角色分析

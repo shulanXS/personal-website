@@ -3,7 +3,7 @@ title: 观后感：《小偷家族》
 slug: shoplifters
 type: review
 description: 一家人挤在屋檐下，听见了看不见的烟花。那几秒钟里，谁也无需拿出一纸证明，说明自己为什么属于身旁的人。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-10-16T07:06:00.000Z
 draft: false
 tags:
   - 观后感

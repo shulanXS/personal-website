@@ -4,7 +4,7 @@ slug: hori-miyamura
 type: review
 description: 堀与宫村最让我羡慕的时刻，都在相爱以后。一个人终于可以收起在人前的样子，另一个人还坐在身边。
 rating: 4.5
-pubDatetime: 2025-03-31T21:56:00.000Z
+pubDatetime: 2025-10-23T07:46:00.000Z
 draft: false
 tags:
   - 观后感

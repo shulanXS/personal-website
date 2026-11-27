@@ -4,7 +4,7 @@ slug: zhen-huan-zhuan-re-shou-ji
 type: review
 description: 年少时一心盼甄嬛赢，重看才发觉，每赢一步，她能与之分享的人便少一个。走到最高处，那份安静已有了寒意。
 rating: 4.9
-pubDatetime: 2025-03-14T05:51:00.000Z
+pubDatetime: 2025-07-24T07:07:00.000Z
 draft: false
 tags:
   - 观后感

@@ -4,7 +4,7 @@ slug: gao-yu-liang
 type: character
 description: 高育良太懂得把话说圆。可当一个人能为每一步都找到道理，他还有没有机会听见自己心里的反对声？
 rating: 3.5
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-01-21T06:14:00.000Z
 draft: false
 tags:
   - 角色分析

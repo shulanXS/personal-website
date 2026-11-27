@@ -3,7 +3,7 @@ title: 从“工具”到“外挂大脑”：AI是如何一步步接管我的�
 slug: ai-wai-gui-da-nao
 type: essay
 description: 每当我先向 AI 发问，一个更慢的问题就退到了身后：若把犹疑也交给它，那个作决定的人还剩下多少自己的声音？
-pubDatetime: 2025-09-12T05:31:00.000Z
+pubDatetime: 2025-06-12T12:08:00.000Z
 draft: false
 tags:
   - 随笔

@@ -3,7 +3,7 @@ title: 我家的三条狗与别人餐桌上的狗肉
 slug: san-tiao-gou-yu-bie-ren-de-can-zhuo
 type: essay
 description: 我依然会好好照料家里的三条狗，直到它们老去。那是我的选择，也是我与这三条具体生命之间的契约。
-pubDatetime: 2026-11-27T06:00:00.000Z
+pubDatetime: 2025-03-23T06:33:00.000Z
 draft: false
 tags:
   - 随笔

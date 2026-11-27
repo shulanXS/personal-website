@@ -4,7 +4,7 @@ slug: hui-ya-da-jiao-jie-wang-xiang-wo-gao-bai
 type: review
 description: 一场告白被演算成无数次攻守。等笑声过去，才听见两个人藏在胜负心底的同一句话：这样的我，你也会喜欢吗？
 rating: 4.7
-pubDatetime: 2025-09-13T07:21:00.000Z
+pubDatetime: 2025-09-06T08:38:00.000Z
 draft: false
 tags:
   - 观后感

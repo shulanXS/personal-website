@@ -4,7 +4,7 @@ slug: si-wang-bi-ji
 type: review
 description: 月每写下一个名字，下一次落笔便更容易一点。重看他与 L 的交锋，最令人不安的是那只手怎样渐渐不再迟疑。
 rating: 4.8
-pubDatetime: 2026-05-04T16:34:00.000Z
+pubDatetime: 2025-05-06T14:38:00.000Z
 draft: false
 tags:
   - 观后感

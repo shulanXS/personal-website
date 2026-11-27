@@ -3,7 +3,7 @@ title: 观后感：《海边的曼彻斯特》
 slug: manchester-by-the-sea
 type: review
 description: 几包冷冻食品从冰箱里掉出来，帕特里克撑住了一整天的平静也跟着散落。悲伤有时要等到这样一件小事，才找得到入口。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-10-05T11:55:00.000Z
 draft: false
 tags:
   - 观后感

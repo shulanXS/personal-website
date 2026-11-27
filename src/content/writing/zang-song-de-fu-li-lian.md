@@ -4,7 +4,7 @@ slug: zang-song-de-fu-li-lian
 type: review
 description: 芙莉莲有漫长的岁月去学习告别，却也和我们一样，只能在那个人走后才明白，一段看似短暂的同行究竟占了多少时光。
 rating: 4.2
-pubDatetime: 2025-07-22T22:26:00.000Z
+pubDatetime: 2026-01-17T06:44:00.000Z
 draft: false
 tags:
   - 观后感

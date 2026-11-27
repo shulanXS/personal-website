@@ -4,7 +4,7 @@ slug: ni-de-ming-zi
 type: review
 description: 三年的时差横在两个人之间，名字先从记忆里褪去，寻找的念头却留了下来。人有时会先认出一份思念，才认出对方。
 rating: 4.7
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-06-05T10:33:00.000Z
 draft: false
 tags:
   - 观后感

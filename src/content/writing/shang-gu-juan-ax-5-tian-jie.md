@@ -4,7 +4,7 @@ slug: shang-gu-juan-ax-5-tian-jie
 type: game
 description: 雪漫城外的路走过无数遍，我仍愿意再走一次。天际省最珍贵的自由，是巨龙还在远处盘旋，而我今天只想沿溪采花。
 rating: 5
-pubDatetime: 2025-11-16T08:11:00.000Z
+pubDatetime: 2025-10-07T11:21:00.000Z
 draft: false
 tags:
   - 游戏测评

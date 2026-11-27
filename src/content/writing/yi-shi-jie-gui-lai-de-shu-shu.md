@@ -4,7 +4,7 @@ slug: yi-shi-jie-gui-lai-de-shu-shu
 type: review
 description: 舅舅记得住旧游戏的诀窍，却常认不出别人递来的好意。那些惹人发笑的误会里，藏着一个人遭遇冷眼太久之后的本能。
 rating: 4.7
-pubDatetime: 2025-05-23T21:25:00.000Z
+pubDatetime: 2025-12-26T13:18:00.000Z
 draft: false
 tags:
   - 观后感

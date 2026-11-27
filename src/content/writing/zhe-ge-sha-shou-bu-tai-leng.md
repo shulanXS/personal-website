@@ -4,7 +4,7 @@ slug: zhe-ge-sha-shou-bu-tai-leng
 type: review
 description: 里昂带着一盆植物辗转而居，后来有人替它寻到泥土。两个孤独的人曾短暂相依，竟也给世上某样东西留下了根。
 rating: 4.8
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-04-17T14:35:00.000Z
 draft: false
 tags:
   - 观后感

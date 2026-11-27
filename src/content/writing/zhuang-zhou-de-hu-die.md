@@ -3,7 +3,7 @@ title: 白日之外的赴约
 slug: zhuang-zhou-de-hu-die
 type: essay
 description: 梦里的一次相见，醒来竟像一场失约。我想循着白日里那一点空落，看看那些只在睡梦中出现的人，究竟带走了什么。
-pubDatetime: 2026-05-17T05:44:00.000Z
+pubDatetime: 2025-04-18T08:19:00.000Z
 draft: false
 tags:
   - 随笔

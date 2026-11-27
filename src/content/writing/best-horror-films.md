@@ -4,7 +4,7 @@ slug: best-horror-films
 type: review
 description: 在一个家、一个村庄里，最熟悉的礼数也能令人背脊发凉。恐惧藏得最深的时候，连解释它的隐喻都显得多余。
 rating: 4.4
-pubDatetime: 2025-12-09T00:55:00.000Z
+pubDatetime: 2025-08-17T07:59:00.000Z
 draft: false
 tags:
   - 观后感

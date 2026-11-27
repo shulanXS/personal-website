@@ -4,7 +4,7 @@ slug: ren-min-de-ming-yi
 type: review
 description: 饭桌上的话客气周全，谁该先动筷子却从来不用说出口。权力最深的痕迹，常留在人人已经习惯的礼数里。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2026-01-19T13:14:00.000Z
 draft: false
 tags:
   - 观后感

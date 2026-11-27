@@ -3,7 +3,7 @@ title: 游戏测评：《生化危机8：村庄》
 slug: resident-evil-village
 type: game
 description: 贝内文托宅邸里的空背包。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-11-10T07:20:00.000Z
 draft: false
 tags:
   - 游戏测评

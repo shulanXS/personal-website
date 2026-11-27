@@ -3,7 +3,7 @@ title: 观后感：《阿Q正传》
 slug: the-true-story-of-ah-q
 type: review
 description: 阿Q努力要把最后那个圈画圆，像他曾努力从屈辱里挤出一点得意。笑意到了这里忽然停住，只剩那只无处安放的手。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-01-04T09:22:00.000Z
 draft: false
 tags:
   - 观后感

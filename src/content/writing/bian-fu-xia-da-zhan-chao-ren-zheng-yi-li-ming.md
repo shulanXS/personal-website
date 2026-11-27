@@ -4,7 +4,7 @@ slug: bian-fu-xia-da-zhan-chao-ren-zheng-yi-li-ming
 type: review
 description: 当一个人仰头看见神，另一个人低头看见威胁，同一片天空便有了两种颜色。哥谭与大都会的距离，也许就隔着一次误认。
 rating: 4.6
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2026-01-10T09:09:00.000Z
 draft: false
 tags:
   - 观后感

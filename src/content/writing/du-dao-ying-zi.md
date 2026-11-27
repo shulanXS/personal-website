@@ -4,7 +4,7 @@ slug: du-dao-ying-zi
 type: character
 description: 毒岛樱子肯承认自己的嫉妒，也肯承担开口之后的难堪。她身上最动人的一点，是喜欢一个人时还保有自己的棱角。
 rating: 4.7
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-10-21T06:35:00.000Z
 draft: false
 tags:
   - 角色分析

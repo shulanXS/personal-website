@@ -4,7 +4,7 @@ slug: qi-tong-wei
 type: character
 description: 祁同伟总能指出命运亏欠他的地方。可沿着他走过的路回望，每一次声称别无选择的瞬间，都值得再看一眼。
 rating: 3.7
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2026-01-08T13:18:00.000Z
 draft: false
 tags:
   - 角色分析

@@ -4,7 +4,7 @@ slug: qian-yu-qian-xun
 type: review
 description: 汤屋把千寻的名字收走，只许她以工作换取栖身之地。她还记得怎样善待一个陌生人，也就留住了回家的线索。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-05-20T07:25:00.000Z
 draft: false
 tags:
   - 观后感

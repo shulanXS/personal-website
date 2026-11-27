@@ -4,7 +4,7 @@ slug: mo-dai-huang-di
 type: review
 description: 溥仪一生穿过许多扇门，门两边的人总替他决定他是谁。直到晚年以游客的身份回来，故宫才有了一条可以自己走的路。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-01-01T09:40:00.000Z
 draft: false
 tags:
   - 观后感

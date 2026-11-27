@@ -4,7 +4,7 @@ slug: feng-sao-lv-shi
 type: review
 description: 吉米花了许多年让所有人记住索尔。等到他终于肯说出自己的名字，那两个音节比任何一场辩护都难。
 rating: 4.9
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-09-12T07:12:00.000Z
 draft: false
 tags:
   - 观后感

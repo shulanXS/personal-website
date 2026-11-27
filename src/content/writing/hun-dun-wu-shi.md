@@ -4,7 +4,7 @@ slug: hun-dun-wu-shi
 type: review
 description: 三个人同行时，绕路也是好时光。直到片尾曲响起，才忽然明白，那些看似耽搁了行程的日子，本来就是整段旅程。
 rating: 4.8
-pubDatetime: 2026-02-28T16:51:00.000Z
+pubDatetime: 2025-04-26T14:14:00.000Z
 draft: false
 tags:
   - 观后感

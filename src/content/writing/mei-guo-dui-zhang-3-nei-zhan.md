@@ -4,7 +4,7 @@ slug: mei-guo-dui-zhang-3-nei-zhan
 type: review
 description: 协议还容得下辩论，西伯利亚的那段录像却只容得下一个失去父母的人。盾牌落地时，各自坚持的正义都沉得令人拿不动。
 rating: 4.8
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2025-04-22T12:38:00.000Z
 draft: false
 tags:
   - 观后感

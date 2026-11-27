@@ -4,7 +4,7 @@ slug: fei-yue-feng-ren-yuan
 type: review
 description: 麦克墨菲没能搬起水疗台，酋长却记住了他使劲的样子。有些自由先在一个人的手上落空，后来才从另一个人的窗里飞出去。
 rating: 4.8
-pubDatetime: 2026-11-19T12:00:00.000Z
+pubDatetime: 2026-02-08T12:47:00.000Z
 draft: false
 tags:
   - 观后感

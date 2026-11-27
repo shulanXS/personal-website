@@ -3,7 +3,7 @@ title: 观后感：《大佛普拉斯》
 slug: da-fo-pu-la-si-du-cai
 type: review
 description: 一同吃过许多顿饭，菜埔才第一次走进肚财的小屋。原来离一个朋友最近的地方，也可能是他生前从未带你去过的天地。
-pubDatetime: 2026-11-26T06:00:00.000Z
+pubDatetime: 2025-02-10T08:48:00.000Z
 draft: false
 tags:
   - 观后感
