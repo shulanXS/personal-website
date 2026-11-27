@@ -9,7 +9,9 @@ main {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 34px 34px 0;
+  /* Capture below the final line box so low glyphs survive rasterization.
+     The exporter trims the transparent buffer after drawing. */
+  padding: 34px 34px 2lh;
   color: #272923;
   font:
     22px/1.65 Georgia,

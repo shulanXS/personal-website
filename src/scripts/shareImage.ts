@@ -5,7 +5,7 @@ import readingFont from "@/styles/reading-font.css?inline";
 import paperStyle from "@/styles/sharePaper.css?inline";
 
 const width = 540;
-const footerGap = 16;
+const footerGap = 19;
 const domain = "www.chewenjie.com";
 const signature = "车文杰";
 
@@ -70,12 +70,12 @@ function drawContentWatermarks(
   footerTop: number
 ) {
   ctx.save();
-  ctx.font = "bold 39px Georgia, serif";
-  ctx.fillStyle = "rgba(72, 67, 50, 0.105)";
+  ctx.font = "bold 44px Georgia, serif";
+  ctx.fillStyle = "rgba(72, 67, 50, 0.085)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 180) {
+  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 215) {
     const x = width * (row % 2 === 0 ? 0.3 : 0.7);
     ctx.save();
     ctx.translate(x, y);
@@ -194,7 +194,7 @@ function paintedHeight(ctx: CanvasRenderingContext2D) {
     const start = Math.max(0, end - 128);
     const { data } = ctx.getImageData(0, start, width, end - start);
     for (let alpha = data.length - 1; alpha >= 3; alpha -= 4) {
-      if (data[alpha] >= 128)
+      if (data[alpha] !== 0)
         return start + Math.floor(alpha / (width * 4)) + 1;
     }
     end = start;
