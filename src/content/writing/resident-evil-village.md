@@ -7,7 +7,8 @@ pubDatetime: 2025-11-10T07:20:00.000Z
 draft: false
 tags:
   - 游戏测评
-  - 生存恐怖
+  - 生存
+  - 恐怖
   - 动作
 rating: 4.8
 ---
