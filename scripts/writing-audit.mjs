@@ -312,12 +312,11 @@ check(
 const badgeCheck = await page.evaluate(() => {
   const badges = Array.from(document.querySelectorAll("svg.app-rating"));
   return badges.length > 0 && badges.every(badge => {
-    const value = badge.querySelector("text")?.textContent?.trim();
-    return badge.querySelectorAll("path").length === 1 &&
-      /^\d\.\d$/.test(value ?? "") && badge.getAttribute("aria-label")?.includes(value);
+    const digits = Array.from(badge.querySelectorAll("[data-digit]"), el => el.dataset.digit);
+    return digits.length === 2 && badge.getAttribute("aria-label")?.includes(digits.join("."));
   });
 });
-check("评分数字显示在单个图标内", badgeCheck);
+check("评分方牌显示正确的艺术字数字", badgeCheck);
 
 // --- 14. the page of a scored work --------------------------------------
 //
