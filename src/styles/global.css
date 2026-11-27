@@ -1718,39 +1718,35 @@
     display: inline-flex;
     align-items: center;
     gap: 1px;
-  }
-
-  /*
-   * The stacked variant.
-   *
-   * The number is read first and the stars confirm it, so the number sits
-   * above. This is the shape of the score in the margin of a listing,
-   * where the column is narrow and the two cannot sit side by side.
-   */
-  .app-rating-game {
-    --rating: #137264;
-    --rating-empty: #cfe5df;
-  }
-
-  [data-theme="dark"] .app-rating-game {
-    --rating: #79dcc4;
-    --rating-empty: #31584f;
+    --accent-light: #a44d08;
+    --accent-dark: #fbbf24;
+    --score-light: color-mix(
+      in srgb,
+      var(--accent-light) var(--rating-strength),
+      #696969
+    );
+    --score-dark: color-mix(
+      in srgb,
+      var(--accent-dark) var(--rating-strength),
+      #a0a5af
+    );
+    --rating: var(--score-light);
+    --rating-empty: #828282;
   }
 
   .app-rating-character {
-    --rating: #c026a3;
-    --rating-heart: #ff5cce;
-    --rating-empty: #fce6f8;
+    --accent-light: #b41a85;
+    --accent-dark: #ff9cde;
   }
 
-  [data-theme="dark"] .app-rating-character {
-    --rating: #ff9cde;
-    --rating-heart: #ff9cde;
-    --rating-empty: #683459;
+  .app-rating-game {
+    --accent-light: #007464;
+    --accent-dark: #79dcc4;
   }
 
-  .app-rating-character .app-rating-star-fill {
-    color: var(--rating-heart);
+  [data-theme="dark"] .app-rating {
+    --rating: var(--score-dark);
+    --rating-empty: #707887;
   }
 
   .app-rating-stacked {

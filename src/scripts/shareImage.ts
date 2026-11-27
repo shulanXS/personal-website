@@ -126,6 +126,10 @@ function drawRating(
     '"Noto Serif SC Reading", "Noto Serif SC Reading Extended", serif';
   text(label, "400 16px " + family, "#70685c");
   x += 10;
+  // The exported paper always has a light background.
+  const scoreColor = getComputedStyle(rating)
+    .getPropertyValue("--score-light")
+    .trim();
   const box = path.getBBox();
   const outline = new Path2D(shape);
   const fillRule =
@@ -135,20 +139,20 @@ function drawRating(
     ctx.translate(x, y);
     ctx.scale(17 / 24, 17 / 24);
     ctx.translate(0, -box.y - box.height / 2);
-    ctx.fillStyle = "#d1c6af";
+    ctx.fillStyle = "#828282";
     ctx.fill(outline, fillRule);
     const fraction = Math.min(1, Math.max(0, Number(value) - index));
     ctx.beginPath();
     ctx.rect(box.x, box.y, box.width * fraction, box.height);
     ctx.clip();
-    ctx.fillStyle = "#a66528";
+    ctx.fillStyle = scoreColor;
     ctx.fill(outline, fillRule);
     ctx.restore();
     x += 20;
   }
   x += 7;
   ctx.font = "700 17px " + family;
-  ctx.fillStyle = "#37392e";
+  ctx.fillStyle = scoreColor;
   const score = ctx.measureText(value);
   const baseline =
     y + (score.actualBoundingBoxAscent - score.actualBoundingBoxDescent) / 2;
@@ -194,8 +198,7 @@ function paintedHeight(ctx: CanvasRenderingContext2D) {
     const start = Math.max(0, end - 128);
     const { data } = ctx.getImageData(0, start, width, end - start);
     for (let alpha = data.length - 1; alpha >= 3; alpha -= 4) {
-      if (data[alpha] !== 0)
-        return start + Math.floor(alpha / (width * 4)) + 1;
+      if (data[alpha] !== 0) return start + Math.floor(alpha / (width * 4)) + 1;
     }
     end = start;
   }

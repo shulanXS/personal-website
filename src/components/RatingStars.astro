@@ -120,6 +120,7 @@ const ariaLabel = formatTemplate(ratingLabel, dict, [written]);
     `app-rating-size-${size}`,
     className,
   ]}
+  style={`--rating-strength: ${score * 20}%`}
   data-rating-symbol={symbol}
   role="img"
   aria-label={ariaLabel}
