@@ -3,7 +3,7 @@ title: 观后感：《擅长捉弄的高木同学》
 slug: shan-chang-zhuo-nong-de-gao-mu-tong-xue
 type: review
 description: 一句喜欢，绕过了多少个课间才走到嘴边。也许两个人都舍不得说破，因为等待回答的日子本身就已经很甜。
-rating: 4.7
+rating: 4.9
 pubDatetime: 2026-02-09T07:19:00.000Z
 draft: false
 tags:
