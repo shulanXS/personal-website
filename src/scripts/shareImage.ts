@@ -6,6 +6,8 @@ import paperStyle from "@/styles/sharePaper.css?inline";
 
 const width = 540;
 const footerGap = 19;
+const bottomGap = footerGap * 1.7;
+const signatureInkHeight = 32;
 const domain = "www.chewenjie.com";
 const signature = "车文杰";
 
@@ -75,10 +77,9 @@ function drawContentWatermarks(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  for (let row = 0, y = 100; y < footerTop - 50; row++, y += 215) {
-    const x = width * (row % 2 === 0 ? 0.3 : 0.7);
+  for (let y = 120; y < footerTop - 85; y += 265) {
     ctx.save();
-    ctx.translate(x, y);
+    ctx.translate(width / 2, y);
     ctx.rotate(-Math.PI / 7);
     ctx.fillText("WENJIE CHE", 0, 0);
     ctx.restore();
@@ -169,13 +170,13 @@ function drawSignature(
   y: number
 ) {
   ctx.fillStyle = "#37392e";
-  ctx.font = '600 22px "Noto Serif SC Reading", serif';
+  ctx.font = '600 25px "Noto Serif SC Reading", serif';
   const name = ctx.measureText(signature);
   const nameFont = ctx.font;
-  ctx.font = "19px Georgia, serif";
+  ctx.font = "22px Georgia, serif";
   const site = ctx.measureText(domain);
   const left = 34;
-  ctx.drawImage(logo, left, y - 18, 36, 36);
+  ctx.drawImage(logo, left, y - 21, 42, 42);
   ctx.textBaseline = "alphabetic";
   ctx.fillText(
     domain,
@@ -185,7 +186,7 @@ function drawSignature(
   ctx.font = nameFont;
   ctx.fillText(
     signature,
-    left + 45,
+    left + 51,
     y + (name.actualBoundingBoxAscent - name.actualBoundingBoxDescent) / 2
   );
 }
@@ -213,8 +214,9 @@ function finishPaper(
   const bodyHeight = paintedHeight(content.getContext("2d")!);
   const gap = Math.round(footerGap * scale);
   const rule = Math.max(1, Math.round(scale));
-  const markHeight = Math.round(28 * scale);
-  const naturalHeight = bodyHeight + gap * 3 + rule + markHeight;
+  const markHeight = Math.round(signatureInkHeight * scale);
+  const naturalHeight =
+    bodyHeight + gap * 2 + rule + markHeight + Math.round(bottomGap * scale);
   const output = content.ownerDocument.createElement("canvas");
   output.width = content.width;
   output.height = Math.max(naturalHeight, Math.ceil((output.width * 4) / 3));
@@ -331,7 +333,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     signal.throwIfAborted();
     doc.body.append(paper);
     paper.getBoundingClientRect();
-    await doc.fonts.load('600 22px "Noto Serif SC Reading"', signature);
+    await doc.fonts.load('600 25px "Noto Serif SC Reading"', signature);
     await doc.fonts.ready;
     signal.throwIfAborted();
     const canvas = doc.createElement("canvas");
@@ -351,7 +353,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
         const height = Math.ceil(clone.getBoundingClientRect().height);
         const exportHeight = Math.max(
           (width * 4) / 3,
-          height + 3 * footerGap + 32
+          height + 2 * footerGap + bottomGap + signatureInkHeight + 4
         );
         scale = Math.min(
           2,
