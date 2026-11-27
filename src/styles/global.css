@@ -1978,7 +1978,7 @@
     flex-direction: column;
     align-items: flex-start;
     line-height: 1.59375rem; /* Match the title’s first line box. */
-    gap: 0.125rem;
+    gap: 0.0625rem;
   }
 
   .app-writing-row-body {
