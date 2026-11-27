@@ -3,7 +3,7 @@ title: 关于我的恋爱观：我的“非主流”底线，以及我为何绝�
 slug: guan-yu-ai-qing-shen-ti-yu-qi-yue
 type: essay
 description: 我想从一句承诺谈起。两个人靠得越近，越需要知道彼此愿意交付什么，又有什么只因出于自愿才值得珍惜。
-pubDatetime: 2026-03-03T11:11:00.000Z
+pubDatetime: 2025-11-01T11:11:00.000Z
 draft: false
 tags:
   - 随笔
