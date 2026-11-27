@@ -122,6 +122,7 @@ const ariaLabel = formatTemplate(ratingLabel, dict, [written]);
     className,
   ]}
   style={`--rating-strength: ${colorStrength}%`}
+  data-rating-perfect={score === 5 || undefined}
   data-rating-symbol={symbol}
   role="img"
   aria-label={ariaLabel}

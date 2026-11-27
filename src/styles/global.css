@@ -1762,6 +1762,23 @@
     line-height: 0;
   }
 
+  [data-rating-perfect] .app-rating-stars {
+    --rating-glow: color-mix(in srgb, var(--rating) 42%, transparent);
+    filter: drop-shadow(0 0 1px var(--rating-glow));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-rating-perfect] .app-rating-stars {
+      animation: rating-glow 900ms ease-out;
+    }
+
+    @keyframes rating-glow {
+      50% {
+        filter: drop-shadow(0 0 3px var(--rating));
+      }
+    }
+  }
+
   .app-rating-star {
     position: relative;
     display: inline-block;
