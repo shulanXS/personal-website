@@ -3,7 +3,7 @@ title: 观后感：《蝙蝠侠：黑暗骑士》
 slug: the-dark-knight
 type: review
 description: 渡轮上的乘客举起引爆器，又慢慢放下。哥谭得以迎来天亮，靠的也是这只最终什么都没有按下的手。
-pubDatetime: 2026-03-09T08:08:00.000Z
+pubDatetime: 2025-11-23T08:08:00.000Z
 draft: false
 tags:
   - 观后感

@@ -7,7 +7,7 @@ chapterNumber: 1
 status: completed
 cover: ../../assets/covers/xue-luo-jiang-chuan.png
 description: 十一月的南方病房里，实习生第一次被托付去留意一个同龄人。病历上的年龄只有两位数字，抬眼相见，却是两种截然不同的明天。
-pubDatetime: 2025-02-24T09:09:00.000Z
+pubDatetime: 2025-09-19T09:09:00.000Z
 draft: false
 tags:
   - 小说

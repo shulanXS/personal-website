@@ -3,7 +3,7 @@ title: 观后感：《蝙蝠侠：黑暗骑士崛起》
 slug: the-dark-knight-rises
 type: review
 description: 隔着咖啡馆的桌子看见彼此，阿尔弗雷德终于可以不起身问候。有一种牵挂，要到自己不再被需要时才算圆满。
-pubDatetime: 2025-05-09T14:43:00.000Z
+pubDatetime: 2025-11-24T14:43:00.000Z
 draft: false
 tags:
   - 观后感

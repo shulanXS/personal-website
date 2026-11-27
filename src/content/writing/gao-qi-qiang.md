@@ -4,7 +4,7 @@ slug: gao-qi-qiang
 type: character
 description: 鱼摊前那张赔笑的脸，后来也让别人学会了赔笑。重看高启强的一生，我想知道，他从什么时候起认不出那个低头的人。
 rating: 4.5
-pubDatetime: 2025-03-12T11:41:00.000Z
+pubDatetime: 2025-01-08T11:41:00.000Z
 draft: false
 tags:
   - 角色分析
