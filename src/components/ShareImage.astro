@@ -96,7 +96,6 @@ const t = useTranslations(config.site.uiLang);
 </style>
 <script>
   import { useTranslations } from "@/i18n";
-  let pending = false;
   let timer: number;
   function notify(message: string) {
     document.querySelector(".share-image-status")?.remove();
@@ -114,8 +113,10 @@ const t = useTranslations(config.site.uiLang);
       event.target.closest<HTMLButtonElement>("[data-share-image]");
     if (!button) return;
     event.preventDefault();
-    if (pending) return;
-    pending = true;
+    // Navigation can leave listeners from two builds on the same document.
+    // Claim the actual button synchronously, before loading the exporter.
+    if (button.hasAttribute("aria-busy") || button.hasAttribute("data-saved"))
+      return;
     button.setAttribute("aria-busy", "true");
     const controller = new AbortController();
     const cancel = () => controller.abort();
@@ -144,7 +145,6 @@ const t = useTranslations(config.site.uiLang);
     } finally {
       document.removeEventListener("astro:before-swap", cancel);
       button.removeAttribute("aria-busy");
-      pending = false;
     }
   });
 </script>
