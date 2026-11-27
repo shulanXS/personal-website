@@ -21,6 +21,9 @@ main {
 .export-rating {
   height: 28px;
 }
+h1 + .export-rating {
+  margin-top: 10px;
+}
 time,
 figcaption {
   font-size: 16px;

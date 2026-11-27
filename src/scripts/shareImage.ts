@@ -147,7 +147,14 @@ function drawRating(
     x += 20;
   }
   x += 7;
-  text(value + " / 5", "500 17px " + family, "#37392e");
+  ctx.font = "700 17px " + family;
+  ctx.fillStyle = "#37392e";
+  const score = ctx.measureText(value);
+  const baseline =
+    y + (score.actualBoundingBoxAscent - score.actualBoundingBoxDescent) / 2;
+  ctx.fillText(value, x, baseline);
+  ctx.font = "400 17px " + family;
+  ctx.fillText(" / 5", x + score.width, baseline);
   ctx.restore();
 }
 
