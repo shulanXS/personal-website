@@ -64,6 +64,7 @@ const t = useTranslations(config.site.uiLang);
  * drawing would be wrong in a way nobody would notice.
  */
 const score = Math.min(5, Math.max(0, value));
+const colorStrength = score === 5 ? 100 : score >= 4 ? 60 : 20;
 
 /*
  * The score as it is written.
@@ -120,7 +121,7 @@ const ariaLabel = formatTemplate(ratingLabel, dict, [written]);
     `app-rating-size-${size}`,
     className,
   ]}
-  style={`--rating-strength: ${score * 20}%`}
+  style={`--rating-strength: ${colorStrength}%`}
   data-rating-symbol={symbol}
   role="img"
   aria-label={ariaLabel}
