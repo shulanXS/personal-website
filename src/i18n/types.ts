@@ -385,8 +385,6 @@ export interface UIStrings {
   about: {
     /** The title of the page. */
     title: string;
-    /** The one-line description under the title. */
-    desc: string;
     /** The short identity line next to the avatar. */
     identity: string;
     /** The lead paragraph. */
@@ -397,25 +395,6 @@ export interface UIStrings {
       title: string;
       /** The paragraphs of a section. */
       body: string[];
-    }[];
-    /** The heading above the list of things the site holds. */
-    hereTitle: string;
-    /** The items of the list of things the site holds. */
-    hereItems: {
-      /**
-       * The name of one thing the site holds.
-       */
-      label: string;
-      /** What that thing is. */
-      desc: string;
-      /**
-       * The route the item links to.
-       *
-       * The route is part of the dictionary rather than being paired with
-       * the items by position: a positional pairing breaks silently the
-       * moment one translation adds, removes or reorders an item.
-       */
-      route: "posts" | "notes" | "writing" | "projects";
     }[];
     /** The heading above the contact links. */
     contactTitle: string;

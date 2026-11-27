@@ -290,46 +290,14 @@ export default {
   },
   about: {
     title: "About",
-    desc: "Who I am, what I do, and why this site exists.",
     identity: "Master’s student in Computer Science · Applied AI",
-    lead: "Hi, I’m Wenjie Che. I build AI applications and write fiction. I write about engineering in English. When a scene stays with me after a film, or I find myself returning to a game, I usually write about it in Chinese.",
+    lead: "Hi, I’m Wenjie Che. I’m pursuing a master’s degree in computer science, with a particular interest in applied AI. When an answer sounds convincing, I usually have one more question: how did the system arrive at it?",
     sections: [
       {
-        title: "What I build",
+        title: "Away from the keyboard",
         body: [
-          "My projects include retrieval-augmented generation (RAG) systems and an interview assistant. Retrieval raises a question I keep coming back to. Once a system has found several relevant sources, how does it know it has enough evidence to answer?",
-          "I explore questions like this in my technical articles, from deciding when a search can stop to replaying tool calls and checking whether the evidence supports an answer.",
+          "I enjoy films, TV, and games. Sometimes I revisit a show years later and find myself sympathizing with the character I liked least the first time around. I write about those shifts in Chinese. I also write fiction, which gives me a chance to imagine what things look like from someone else’s side.",
         ],
-      },
-      {
-        title: "Fiction, film, and games",
-        body: [
-          "My novel Snow Falls on the River begins in a hospital ward in southern China. Its seven chapters follow an intern and a patient of the same age through the days after they meet.",
-          "My reviews often begin with a small gesture. In The Dark Knight, a passenger on a ferry raises a detonator, then lowers his hand. I also write about characters I understand differently the second time around, and games whose familiar paths I still want to walk.",
-        ],
-      },
-    ],
-    hereTitle: "What lives here",
-    hereItems: [
-      {
-        label: "Blog",
-        desc: "Technical articles in English on retrieval, tool use, and evaluating AI systems.",
-        route: "posts",
-      },
-      {
-        label: "Notes",
-        desc: "Short notes from everyday life.",
-        route: "notes",
-      },
-      {
-        label: "Personal Writing",
-        desc: "Snow Falls on the River, essays, film and game reviews, and character studies.",
-        route: "writing",
-      },
-      {
-        label: "Projects",
-        desc: "Retrieval systems, interview tools, and other software projects.",
-        route: "projects",
       },
     ],
     contactTitle: "Get in touch",
