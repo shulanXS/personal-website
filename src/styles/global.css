@@ -1969,11 +1969,15 @@
    * narrow, and a row of two things in it would wrap in the middle of a
    * word.
    */
+  .app-writing-row-link:has(.app-writing-row-label-stack) {
+    align-items: start;
+  }
+
   .app-writing-row-label-stack {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
+    line-height: 1.59375rem; /* Match the title’s first line box. */
     gap: 0.125rem;
   }
 
