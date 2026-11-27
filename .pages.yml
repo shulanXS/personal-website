@@ -119,34 +119,20 @@ content:
   # ---------------------------------------------------------------------------
   # Blog — the `posts` collection.
   #
-  # Only `.md` files are editable here: the extension of the collection
-  # comes from the `filename` template, so the MDX files — whose bodies
-  # contain JSX that the rich-text editor would destroy — stay out of reach.
+  # Use the MDX source editor to preserve imports, JSX and code fences.
   # ---------------------------------------------------------------------------
   - name: posts
     label: 技术文章
     type: collection
     path: src/content/posts
+    format: yaml-frontmatter
     filename:
-      template: "{fields.slug}.md"
+      template: "{fields.slug}.mdx"
       field: create
     operations:
       # The URL is the `slug` field, not the file name. Renaming the file
       # would only let the two drift apart.
       rename: false
-    exclude:
-      # These articles carry raw HTML in their body — a `<figure>`, a
-      # `<video>`, an HTML comment. The rich-text editor is a Markdown
-      # editor: it does not know those tags, so it escapes them into
-      # visible text on the first save, and the article would show a wall
-      # of `‹video autoplay=“loop”›` instead of the video. They are left
-      # to be edited in the repository.
-      - astro-paper-2.md
-      - astro-paper-3.md
-      - astro-paper-4.md
-      - tailwind-typography.md
-      - how-to-add-latex-equations-in-blog-posts.md
-      - setting-dates-via-git-hooks.md
     view:
       fields: [title, pubDatetime, tags, draft]
       primary: title
@@ -223,10 +209,10 @@ content:
         default: false
         label: 隐藏编辑链接
       - name: body
-        type: rich-text
-        label: 正文
+        type: code
+        label: 正文（MDX 源码）
         options:
-          media: images
+          format: mdx
 
   # ---------------------------------------------------------------------------
   # Notes — short-form posts ("碎碎念").
@@ -331,7 +317,7 @@ content:
         type: string
         required: true
         label: 标题
-        description: 影视文章使用「《作品名》观后感」；游戏文章使用「《游戏名》玩后感」；角色分析使用「《作品名》角色分析：人名」。
+        description: 请使用「观后感：《作品名》」「角色分析：《作品名》人名」或「游戏测评：《游戏名》」。
       - name: slug
         type: string
         required: true
@@ -353,6 +339,8 @@ content:
               label: 观后感
             - name: character
               label: 角色分析
+            - name: game
+              label: 游戏测评
             - name: short
               label: 短篇
       - name: description
@@ -363,12 +351,12 @@ content:
       - name: rating
         type: number
         required: false
-        label: 作品评分 / 角色喜爱度
+        label: 作品评分 / 游戏评分 / 角色喜爱度
         options:
           min: 0
           max: 5
           step: 0.1
-        description: 0 到 5 分，按 0.1 分递增。观后感用星级表示作品评价；角色分析用粉色心形表示我有多喜欢这个角色，不是人物塑造质量或道德评价。填写 0 显示 0.0，只有留空才不显示。
+        description: 0 到 5 分，按 0.1 分递增。游戏测评用手柄表示游玩体验，观后感用星级表示作品评价；角色分析用粉色心形表示我有多喜欢这个角色，不是人物塑造质量或道德评价。填写 0 显示 0.0，只有留空才不显示。
       - name: series
         type: string
         required: false
@@ -401,6 +389,7 @@ content:
         component: updateDate
       - name: tags
         component: tagList
+        description: 首个标签填写所选类型（原创小说填「小说」）。更改类型时请一并更新首标签，其余标签填写媒介或题材。
       - name: canonicalURL
         type: string
         required: false

@@ -148,14 +148,14 @@ export default defineAstroPaperConfig({
 
 | 集合     | 路径                     | 文件名模板         | 说明                                                               |
 | -------- | ------------------------ | ------------------ | ------------------------------------------------------------------ |
-| Blog     | `src/content/posts`      | `{fields.slug}.md` | URL 为 `/posts/{slug}/`。文件名即 URL，**slug 一旦发布就不要改**。 |
+| Blog     | `src/content/posts`      | `{fields.slug}.mdx` | URL 为 `/posts/{slug}/`。文件名即 URL，**slug 一旦发布就不要改**。 |
 | Notes    | `src/content/notes`      | `{fields.id}.md`   | `id` 是自动生成的 UUID，链接永不变动。标题可留空，可以只发图片。   |
 | Writing  | `src/content/writing`    | `{fields.slug}.md` | URL 为 `/writing/{slug}/`。                                        |
 | Projects | `src/data/projects.json` | —                  | 整个 JSON 文件是一个表单，`order` 小的排前面。                     |
 
 ### 注意事项
 
-- **MDX 文件不在 CMS 中**：MDX 正文含 JSX 组件，CMS 的富文本编辑器会破坏它们。`src/content/posts/*.mdx` 只能在本地编辑。
+- **技术文章使用 MDX 源码编辑器**。标题、摘要和标签可在表单中编辑。修改正文时请保留已有的组件导入、JSX 和代码块。
 - **格式会被规范化**：CMS 读取文件后会重新序列化整个 frontmatter，键序、引号风格和空行不会保留。内容不会丢失，但**不要依赖具体的 YAML 排版**。
 - **图片上传到 `public/uploads/`**，文件名会被随机重命名。Markdown 里写 `/uploads/xxx.png` 这样的绝对路径。
 - **草稿不是保密机制**：仓库公开时，草稿源文件仍能在 GitHub 上看到。
