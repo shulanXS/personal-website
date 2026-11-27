@@ -3,7 +3,7 @@ title: 角色分析：《人民的名义》祁同伟
 slug: qi-tong-wei
 type: character
 description: 祁同伟总能指出命运亏欠他的地方。可沿着他走过的路回望，每一次声称别无选择的瞬间，都值得再看一眼。
-rating: 3.5
+rating: 3
 pubDatetime: 2026-01-09T13:18:00.000Z
 draft: false
 tags:
