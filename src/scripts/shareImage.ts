@@ -154,10 +154,8 @@ function drawRating(
 function drawSignature(
   ctx: CanvasRenderingContext2D,
   logo: HTMLImageElement,
-  dividerTop: number
+  y: number
 ) {
-  // The visible ring extends about 13px above and below its centre.
-  const y = dividerTop + 23;
   ctx.fillStyle = "#37392e";
   ctx.font = '600 22px "Noto Serif SC Reading", serif';
   const name = ctx.measureText(signature);
@@ -178,6 +176,41 @@ function drawSignature(
     left + 45,
     y + (name.actualBoundingBoxAscent - name.actualBoundingBoxDescent) / 2
   );
+}
+
+// Measure ink before adding the paper grain. Read just the band around the
+// footer so the last line's font, punctuation and export scale are accounted for.
+function drawFooter(
+  ctx: CanvasRenderingContext2D,
+  logo: HTMLImageElement,
+  footer: HTMLElement,
+  scale: number
+) {
+  const canvas = ctx.canvas;
+  const y = canvas.height / scale - 28; // 14px for the visible half-mark and 14px beneath it.
+  drawSignature(ctx, logo, y);
+  const split = Math.floor((y - 19) * scale);
+  const top = Math.max(0, Math.floor((footer.offsetTop - 64) * scale));
+  const pixels = ctx.getImageData(0, top, canvas.width, canvas.height - top);
+  const hasInk = (row: number) => {
+    const start = (row - top) * pixels.width * 4 + 3;
+    let visiblePixels = 0;
+    for (let x = 0; x < pixels.width; x++) {
+      if (pixels.data[start + x * 4] >= 128 && ++visiblePixels >= 2)
+        return true;
+    }
+    return false;
+  };
+  let bodyEnd = split - 1;
+  while (bodyEnd > top && !hasInk(bodyEnd)) bodyEnd--;
+  let signatureStart = split;
+  while (signatureStart < canvas.height && !hasInk(signatureStart))
+    signatureStart++;
+  const thickness = Math.max(1, Math.round(scale));
+  const divider = Math.round((bodyEnd + 1 + signatureStart - thickness) / 2);
+  ctx.fillStyle = "#b6ae98";
+  ctx.fillRect(34, divider / scale, width - 68, thickness / scale);
+  return divider / scale;
 }
 
 async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
@@ -278,13 +311,7 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
     const canvas = doc.createElement("canvas");
     canvas.width = Math.ceil(width * scale);
     canvas.height = Math.ceil(height * scale);
-    // Paint every output pixel, including the rounded last row of a long export.
     const ctx = canvas.getContext("2d")!;
-    ctx.save();
-    ctx.scale(scale, scale);
-    ctx.fillStyle = ctx.createPattern(paperTexture(doc), "repeat")!;
-    ctx.fillRect(0, 0, canvas.width / scale, canvas.height / scale);
-    ctx.restore();
     await html2canvas(paper, {
       canvas,
       scale,
@@ -302,8 +329,11 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
         scoreRow.offsetLeft,
         scoreRow.offsetTop + scoreRow.offsetHeight / 2
       );
-    drawContentWatermarks(ctx, footer.offsetTop);
-    drawSignature(ctx, logo, footer.offsetTop);
+    const divider = drawFooter(ctx, logo, footer, scale);
+    drawContentWatermarks(ctx, divider);
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = ctx.createPattern(paperTexture(doc), "repeat")!;
+    ctx.fillRect(0, 0, canvas.width / scale, canvas.height / scale);
     try {
       return await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(

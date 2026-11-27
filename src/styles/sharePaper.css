@@ -92,7 +92,5 @@ section > :last-child {
   margin-bottom: 0;
 }
 footer {
-  margin-top: 16px;
-  height: 41px;
-  border-top: 1px solid #b6ae98;
+  height: 72px;
 }
