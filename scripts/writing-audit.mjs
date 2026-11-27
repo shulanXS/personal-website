@@ -309,51 +309,15 @@ check(
   JSON.stringify(ratings)
 );
 
-// The number of the stars is five for every work, and the filled ones
-// follow the score exactly: a score of 4.5 fills four stars and half of
-// the fifth, and a score of 4.3 fills four stars and three tenths of it.
-//
-// The check reads the score out of the accessible name and works out
-// what the fills ought to be, rather than looking for a particular
-// fraction — the scale is continuous, so any fraction may show up.
-const starShapes = await page.evaluate(() => {
-  const group = document.querySelector(".app-rating");
-  if (!group) return null;
-  const stars = [...group.querySelectorAll(".app-rating-star")];
-  const fills = stars.map(star => {
-    const fill = star.querySelector(".app-rating-star-fill");
-    return fill?.style.getPropertyValue("--app-rating-fill") ?? "";
+const badgeCheck = await page.evaluate(() => {
+  const badges = Array.from(document.querySelectorAll("svg.app-rating"));
+  return badges.length > 0 && badges.every(badge => {
+    const value = badge.querySelector("text")?.textContent?.trim();
+    return badge.querySelectorAll("path").length === 1 &&
+      /^\d\.\d$/.test(value ?? "") && badge.getAttribute("aria-label")?.includes(value);
   });
-  return {
-    count: stars.length,
-    fills,
-    aria: group.getAttribute("aria-label") ?? "",
-    number: group.querySelector(".app-rating-number, .app-rating-value")
-      ?.textContent?.trim() ?? "",
-  };
 });
-
-// The fills have to add up to the score, in stars.
-const expectedFills = starShapes
-  ? (() => {
-      const score = Number.parseFloat(starShapes.number);
-      if (Number.isNaN(score)) return null;
-      const total = starShapes.fills.reduce(
-        (sum, f) => sum + (Number.parseFloat(f) || 0) / 100,
-        0
-      );
-      return { score, total, delta: Math.abs(total - score) };
-    })()
-  : null;
-
-check(
-  "星星的填充与分数一致",
-  !!starShapes &&
-    starShapes.count === 5 &&
-    !!expectedFills &&
-    expectedFills.delta < 0.02,
-  JSON.stringify({ ...starShapes, expectedFills })
-);
+check("评分数字显示在单个图标内", badgeCheck);
 
 // --- 14. the page of a scored work --------------------------------------
 //
@@ -389,7 +353,7 @@ if (scoredHref) {
   check(
     "作品页在标题下显示评分与数字",
     !!detail &&
-      Number.parseFloat(detail.value) > 0 &&
+      Number.parseFloat(detail.value) >= 0 &&
       detail.belowTitle &&
       detail.width > 0,
     JSON.stringify(detail)

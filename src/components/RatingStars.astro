@@ -1,182 +1,65 @@
 ---
-import IconGamepad from "@/assets/icons/IconGamepad.svg";
-import IconStarFilled from "@/assets/icons/IconStarFilled.svg";
-import IconHeartFilled from "@/assets/icons/IconHeartFilled.svg";
 import { flatRuntimeTranslations, useTranslations } from "@/i18n";
 import { formatTemplate } from "@/i18n/format";
 import config from "@/config";
 
 type Props = {
-  /**
-   * The score, from one to five stars.
-   *
-   * The scale is continuous: a score of 4.3 is four stars and three tenths
-   * of the fifth, and it is drawn that way. The number is the score itself
-   * — a `4.3` is four and three tenths of a star, not four stars and a
-   * third of a star of its own — and the fraction is worked out here
-   * rather than stored, so that the drawing and the number can never
-   * disagree.
-   */
   value: number;
-  /**
-   * The size of the stars.
-   *
-   * The small one is for a listing, where the score is a fact about the
-   * work among other facts; the large one is for the page of the work
-   * itself, where the score is the thing the reader came for.
-   */
-  size?: "xs" | "sm" | "md";
-  /**
-   * Show the number.
-   *
-   * The stars alone say "good"; the number says how good.
-   */
-  showValue?: boolean;
-  /**
-   * How the score is laid out.
-   *
-   * `inline` sets the stars and the number side by side — the score sits
-   * in a line of other facts, beside the date.
-   *
-   * `stacked` sets the number above the stars, in a narrow column — the
-   * score sits in the margin of a listing, where the number is read first
-   * and the stars are the confirmation of it.
-   */
-  variant?: "inline" | "stacked";
+  size?: "xs" | "md";
   tone?: "default" | "character" | "game";
-  class?: string;
 };
 
-const {
-  value,
-  size = "sm",
-  showValue = false,
-  variant = "inline",
-  tone = "default",
-  class: className = "",
-} = Astro.props;
-
+const { value, size = "xs", tone = "default" } = Astro.props;
 const t = useTranslations(config.site.uiLang);
-
-/*
- * The score is clamped rather than trusted: a score that is out of range
- * would draw a number of stars that is not the number of stars, and the
- * drawing would be wrong in a way nobody would notice.
- */
 const score = Math.min(5, Math.max(0, value));
 const colorStrength = score === 5 ? 100 : score >= 4 ? 60 : 20;
-
-/*
- * The score as it is written.
- *
- * Keep one decimal place, including the trailing zero of a whole score.
- */
 const written = score.toFixed(1);
-
-/*
- * The stars, and how much of each one is filled.
- *
- * The whole stars come first, then the partial one, and the rest are
- * empty. A score of 4.3 therefore fills four stars and three tenths of
- * the fifth.
- */
-const whole = Math.floor(score);
-const fraction = score - whole;
-
-const stars = Array.from({ length: 5 }, (_, index) => {
-  const fill = index < whole ? 1 : index === whole ? fraction : 0;
-  return { fill };
-});
-
-const starSizeClasses = {
-  xs: tone === "character" ? "size-2.5" : "size-2",
-  sm: "size-2.5",
-  md: "size-4",
-};
-/*
- * The accessible name of the group of stars.
- *
- * It is composed out of the flattened dictionary rather than out of the
- * strings of the built language, so that the word for "rating" is the
- * word of the language the visitor is reading — and so that the name
- * the runtime switcher rebuilds is the same name the server wrote.
- */
 const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
 const symbols = {
-  game: [IconGamepad, "gamepad", "gameRatingAccessible"],
-  character: [IconHeartFilled, "heart", "characterAffinityAccessible"],
-  default: [IconStarFilled, "star", "ratingAccessible"],
+  default: [
+    "star",
+    "ratingAccessible",
+    "M20 1 26 10 38 12 31 21 32 34 20 29 8 34 9 21 2 12 14 10Z",
+  ],
+  character: [
+    "heart",
+    "characterAffinityAccessible",
+    "M20 34C16 31 2 23 2 13 2 2 14 0 20 8 26 0 38 2 38 13 38 23 24 31 20 34Z",
+  ],
+  game: [
+    "gamepad",
+    "gameRatingAccessible",
+    "M10 6Q7 6 6 10L1 27Q0 33 6 32L12 27H28L34 32Q40 33 39 27L34 10Q33 6 30 6Z M8 10H10V12H12V14H10V16H8V14H6V12H8Z M30 11a1.4 1.4 0 1 0 2.8 0 1.4 1.4 0 1 0-2.8 0Z",
+  ],
 } as const;
-const [RatingIcon, symbol, label] = symbols[tone];
-const ratingKey = `writing.${label}`;
-const ratingLabel = t.writing[label];
-const ariaLabel = formatTemplate(ratingLabel, dict, [written]);
+const [symbol, label, path] = symbols[tone];
+const textY = tone === "character" ? 18 : 20;
 ---
 
-<span
-  class:list={[
-    "app-rating",
-    `app-rating-${tone}`,
-    `app-rating-${variant}`,
-    `app-rating-size-${size}`,
-    className,
-  ]}
+<svg
+  viewBox="0 0 40 36"
+  class:list={["app-rating", `app-rating-${tone}`, `app-rating-size-${size}`]}
   style={`--rating-strength: ${colorStrength}%`}
   data-rating-perfect={score === 5 || undefined}
   data-rating-symbol={symbol}
   role="img"
-  aria-label={ariaLabel}
-  data-i18n={ratingKey}
+  aria-label={formatTemplate(t.writing[label], dict, [written])}
+  data-i18n={`writing.${label}`}
   data-i18n-attr="aria-label"
   data-i18n-args={written}
 >
-  {
-    showValue && variant === "stacked" && (
-      <span
-        class="app-rating-number"
-        data-i18n="writing.ratingNumber"
-        data-i18n-args={written}
-      >
-        {written}
-      </span>
-    )
-  }
-  <span class="app-rating-stars">
-    {
-      stars.map(({ fill }) => (
-        <span class="app-rating-star">
-          <span class="app-rating-star-empty">
-            <RatingIcon
-              class:list={["app-rating-icon", starSizeClasses[size]]}
-            />
-          </span>
-          {/*
-            The filled star is laid over the empty one and clipped to the
-            width of the fill, so that half a star is half a star rather
-            than a star of its own — and so that two tenths of a star is
-            two tenths of a star.
-          */}
-          <span
-            class="app-rating-star-fill"
-            style={`--app-rating-fill: ${fill * 100}%`}
-          >
-            <RatingIcon
-              class:list={["app-rating-icon", starSizeClasses[size]]}
-            />
-          </span>
-        </span>
-      ))
-    }
-  </span>
-  {
-    showValue && variant === "inline" && (
-      <span
-        class="app-rating-value"
-        data-i18n="writing.ratingNumber"
-        data-i18n-args={written}
-      >
-        {written}
-      </span>
-    )
-  }
-</span>
+  <path
+    d={path}
+    fill="var(--rating)"
+    fill-rule="evenodd"
+    stroke-linejoin="round"
+    stroke="var(--rating)"
+    stroke-width=".65"></path>
+  <text
+    class="app-rating-value"
+    x="20"
+    y={textY}
+    text-anchor="middle"
+    dominant-baseline="central">{written}</text
+  >
+</svg>
