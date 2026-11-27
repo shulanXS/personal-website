@@ -11,7 +11,7 @@ type Props = {
 const { value, tone = "default" } = Astro.props;
 const t = useTranslations(config.site.uiLang);
 const score = Math.min(5, Math.max(0, value));
-const opacity = 0.72 + 0.08 * (score / 5);
+const opacity = (30 + 10 * score) / 100;
 const written = score.toFixed(1);
 const dict = flatRuntimeTranslations[config.site.uiLang] ?? {};
 const symbols = {
