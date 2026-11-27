@@ -5,6 +5,7 @@ import readingFont from "@/styles/reading-font.css?inline";
 import paperStyle from "@/styles/sharePaper.css?inline";
 
 const width = 540;
+const footerGap = 16;
 const domain = "www.chewenjie.com";
 const signature = "车文杰";
 
@@ -92,9 +93,10 @@ function drawRating(
   x: number,
   y: number
 ) {
-  const path = rating.querySelector<SVGPathElement>(
-    'svg path:not([fill="none"])'
-  );
+  // The star's bounding-box path inherits fill="none" from its SVG.
+  const path = Array.from(
+    rating.querySelectorAll<SVGPathElement>("svg path")
+  ).find(candidate => getComputedStyle(candidate).fill !== "none");
   const shape = path?.getAttribute("d");
   const value = rating.querySelector(".app-rating-value")?.textContent?.trim();
   if (!path || !shape || !value) return;
@@ -199,7 +201,7 @@ function finishPaper(
   scale: number
 ) {
   const bodyHeight = paintedHeight(content.getContext("2d")!);
-  const gap = Math.round(14 * scale);
+  const gap = Math.round(footerGap * scale);
   const rule = Math.max(1, Math.round(scale));
   const markHeight = Math.round(28 * scale);
   const naturalHeight = bodyHeight + gap * 3 + rule + markHeight;
@@ -337,7 +339,10 @@ async function renderImage(button: HTMLButtonElement, signal: AbortSignal) {
       logging: false,
       onclone(_doc, clone) {
         const height = Math.ceil(clone.getBoundingClientRect().height);
-        const exportHeight = Math.max((width * 4) / 3, height + 74);
+        const exportHeight = Math.max(
+          (width * 4) / 3,
+          height + 3 * footerGap + 32
+        );
         scale = Math.min(
           2,
           16000 / exportHeight,
