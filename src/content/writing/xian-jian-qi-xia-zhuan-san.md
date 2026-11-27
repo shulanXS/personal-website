@@ -3,7 +3,7 @@ title: 观后感：《仙剑奇侠传三》
 slug: xian-jian-qi-xia-zhuan-san
 type: review
 description: 少年时只盼景天打赢最后一仗，重看却惦记起长卿与紫萱没喝下去的那碗水。原来最难放下的往往是胜负之外的事。
-rating: 4.9
+rating: 4.8
 pubDatetime: 2026-02-19T12:50:00.000Z
 draft: false
 tags:
