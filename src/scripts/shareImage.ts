@@ -120,8 +120,9 @@ function drawRating(
     );
     x += metrics.width;
   };
-  const small = '15px Georgia, "Noto Serif SC Reading", serif';
-  text(label, small, "#70685c");
+  const family =
+    '"Noto Serif SC Reading", "Noto Serif SC Reading Extended", serif';
+  text(label, "400 16px " + family, "#70685c");
   x += 10;
   const box = path.getBBox();
   const outline = new Path2D(shape);
@@ -144,9 +145,7 @@ function drawRating(
     x += 20;
   }
   x += 7;
-  text(value, "600 21px Georgia, serif", "#272923");
-  x += 3;
-  text("/ 5", small, "#70685c");
+  text(value + " / 5", "500 17px " + family, "#37392e");
   ctx.restore();
 }
 
